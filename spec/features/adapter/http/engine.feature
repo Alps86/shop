@@ -1,5 +1,5 @@
 # language: de
-@http @composition
+@http @http-composition
 Funktionalität: Echte Standardenginekomposition
   Als Gast erhalte ich von Hugo NginxSSI und VarnishESI zusammengesetztes HTML.
 
