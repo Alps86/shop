@@ -5,7 +5,7 @@ Entwicklungsgrundlage für einen B2C-Elektroshop: eine Go-Anwendung in einem Roo
 - [Agentenregeln](AGENTS.md): Umsetzung, unabhängige Plan- und Abschlussreview, Nachweise und Squash-Merge.
 - [Styleguide](spec/styleguide/README.md): allgemeine Regeln, Go und Cucumber.
 
-Der aktuelle Stand enthält Architekturverträge, Qualitätskonfiguration und minimale Standardanbindung für Gherkin/Godog. Die [arc42-Architektur](spec/architecture/README.md) beschreibt den verbindlichen Fach-, Prozess-, Seiten- und SEO-Vertrag in zwölf Kapiteln; anschließend folgen Fachszenarien in Story #4. Shop-Produktivcode ist noch nicht vorhanden. Syntaxprüfung ist kein fachliches Green.
+Der aktuelle Stand enthält Architekturverträge, Qualitätskonfiguration und minimale Standardanbindung für Gherkin/Godog. Die [arc42-Architektur](spec/architecture/README.md) beschreibt den verbindlichen Fach-, Prozess-, Seiten- und SEO-Vertrag in zwölf Kapiteln; anschließend folgen Fachszenarien in Story #4. Die Umsetzung des Fachkerns und der Applicationports erfolgt in [Issue #8](https://github.com/Alps86/shop/issues/8). Syntaxprüfung ist kein fachliches Green.
 
 ## Werkzeuge und lokale Prüfung
 
