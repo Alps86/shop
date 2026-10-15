@@ -1,0 +1,15 @@
+# PostgreSQL, Outbox und logisches CDC
+
+Jede fachliche Änderung schreibt im selben PostgreSQL-Commit ein Outboxereignis. Gewählte CDC-Technik: PostgreSQL-logische Replikation `pgoutput` mit Publication nur für Outbox und dauerhaftem Replication Slot; ein kleiner Adapter liest WAL-Änderungen und projiziert nach OpenSearch. Kein Zeitstempel-Polling als CDC ausgeben, kein zusätzlicher Kafka/Debezium-Cluster für diese Demo. SQL-/Replikationsprotokoll bleibt Adapterdetail, Domain kennt nur Ereignisse.
+
+`ProductProjectionEvent` enthält EventID, SchemaVersion=1, ProductID, monotone ProjectionVersion, OccurredAt UTC, Kind `upsert|delete`, vollständigen aufgelösten Product-/Variant-/Inventory-/Compliance-Snapshot und Kontext. Preis-/Bestandsänderung ermittelt betroffene ProductID, erhöht unter Product-Projektionslock die monotone Version und schreibt den vollständigen Snapshot. Mehrere SKUänderungen desselben Product erhalten geordnete Versionen. Fachliche Rootrevisionen und ProjectionVersion sind verschieden.
+
+CDC verarbeitet nur committed WAL-Transaktionen. OpenSearch-Upsert verwendet externe Version; niedrigere/identische Version ist erfolgreicher Stale/Duplicate-Noop, abweichender Payload zur identischen EventID Diagnosefehler. LSN erst nach erfolgreicher Indexbestätigung dauerhaft quittieren. Absturz davor liefert Duplikate, keine verlorene neuere Version. Technische Indexausfälle mit Backoff 1–30s wiederholen, fachlich ungültiges Schema als sichtbarer Fehler anhalten; nicht still droppen. Rückstau/letzte angewandte Version/LSN sind /backend-Diagnose.
+
+Löschung ist versionierter Tombstone: kein späteres älteres Upsert darf Produkt wiederbeleben. Tombstones behalten, bis alle relevanten Replays/Indexwechsel abgeschlossen sind; Demo löscht nichtphysisch aus Versionsregister. Eventual consistency: Ziel im normalen lokalen Betrieb ≤2s Commit→Suchsicht, keine Kaufgarantie aus Suchpreis. Detail und Checkout lesen maßgeblich PostgreSQL. Indexausfall zeigt SearchUnavailable und lässt diese Pfade funktionieren.
+
+## Reindexierung und Prozessaufträge
+
+Reindex: neuen Index mit Schema erzeugen, konsistenten DB-Snapshot samt Start-LSN/ProjectionVersion sichern, alle publizierten Produkte importieren, WAL ab Grenzpunkt nachziehen, Versionsschutz anwenden, Catchup erreichen und Alias atomar wechseln. Alter Index erst danach entfernen. Abbruch belässt alten Alias intakt. WAL-/Slotverlust ist expliziter Reindexbedarf, kein Überspringen von Änderungen. Begrenzte Demo-Outboxaufbewahrung erst nach bestätigter LSN und ohne laufenden Reindex; produktive Langzeitretention ist Härtungsfolgearbeit.
+
+Neben Suchereignissen enthält Outbox `EnsureCart`, `EnsureOrder`, `CartUpdated` als Prozessaufträge. Ein separater idempotenter Dispatcher bedient Temporal und speichert Quittung, ohne Such-CDC-Checkpoint zu missbrauchen. PostgreSQL bleibt Wahrheit; Temporal und OpenSearch dürfen zeitweise nachlaufen. Alle Order-/Inventory-/Cartabschlussänderungen samt Ereignissen sind eine Transaktion, keine Atomarität über Temporal/OpenSearch.

@@ -1,0 +1,9 @@
+# Gastprofile und geschützter Zugriff
+
+Browser erhält kryptografisch zufällige 256-Bit-Sessionfähigkeit als HttpOnly, SameSite=Lax Cookie `shop_session`, Path=/, in HTTPS Secure; lokale HTTPdemo darf Secure bewusst nicht setzen. Server speichert ausschließlich Hash der Fähigkeit → eigene UserID. Keine UserID allein ist Zugangsberechtigung. Cookie max-age30 Tage, serverseitig dieselbe Frist seit Ausgabe; keine langlebige persönliche URL. Cart lebt separat maximal168h ohne Aktivität. Verlorenes/abgelaufenes Cookie stellt keinen fremden Gast wieder her.
+
+Vier öffentliche Demoprofillinks wählen **nur Interessen**, nicht eine geteilte Gastidentität: GET zeigt Bestätigungsformular, POST mit CSRF wählt neutral/mobile/home/coffee. Jeder Browser bleibt eigener User mit eigenen Cart-/Orderrechten. Interessenänderung persistiert über Besuche; Cart/Bestellungen werden weder übertragen noch geteilt. Keine Konten/Passwörter. Sichtbare Profilauswahl darf ProfileCode nennen, interne Gewichte bleiben serverseitig.
+
+Cart/Checkout/Orderzugriff prüft Session→UserID und Ressource.UserID bei jeder Operation. Fremde/unbekannte Kennung gleich404 ohne Existenzhinweis; fehlende/ungültige Session erhält neuen leeren Gast erst bei ausdrücklichem Start, nie fremde Daten. CSRF-Token an Session binden, zustandsändernde GETs abweisen. HTTPantworten no-store. Statuslink enthält nur OrderID und ist ausschließlich im ursprünglichen Browser nutzbar; kein Emailversand oder geteilter Zugriff im POC.
+
+Aktiver Cart wird vor168h wieder aufgenommen; exakt an Grenze410 mit Hinweis „Warenkorb abgelaufen“ und explizitem neuen Einkauf. Ordered Cart bleibt lesbar als Verweis auf Order, neue Waren starten neue CartID. Cookieablauf kann alte Statusseiten unzugänglich machen; dauerhafte kontobasierte Wiederherstellung/DSGVO-Löschkonzept sind Folgearbeit vor Produktivbetrieb, kein vorgetäuschtes Kundenkonto.
