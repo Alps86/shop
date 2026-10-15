@@ -82,6 +82,20 @@ func (store *cartStore) Expire(_ context.Context, _ value.CartID, now time.Time)
 }
 
 func (current *world) restart() error {
+	if err := current.resumeCart(); err != nil {
+		return err
+	}
+
+	current.runner.Stop()
+	current.runner = current.adapter.Worker()
+	if err := current.runner.Start(); err != nil {
+		return err
+	}
+
+	return current.resumeCart()
+}
+
+func (current *world) resumeCart() error {
 	user := value.UserID("u-a")
 	if current.databaseStore != nil {
 		user = current.guest.UserID
@@ -93,11 +107,6 @@ func (current *world) restart() error {
 	}
 
 	current.view = view
-	current.runner.Stop()
-	current.runner = current.adapter.Worker()
-	if err := current.runner.Start(); err != nil {
-		return err
-	}
 
 	return current.sameRun()
 }

@@ -46,7 +46,17 @@ func (current *world) openVersionedCart(row map[string]string) error {
 	current.newCartID = view.Cart.ID
 	binding := application.ProcessBinding{DefinitionVersion: view.Cart.DefinitionVersion, RuleSetVersion: view.Cart.RuleSetVersion}
 
-	return current.adapter.EnsureCart(context.Background(), view.Cart.ID, binding)
+	if err := current.adapter.EnsureCart(context.Background(), view.Cart.ID, binding); err != nil {
+		return err
+	}
+
+	return current.initializeVersionedCart()
+}
+
+func (current *world) initializeVersionedCart() error {
+	_, err := current.adapter.EvaluateCart(context.Background(), application.EvaluateCommand{UserID: current.guest.UserID, CartID: current.newCartID})
+
+	return err
 }
 
 func (current *world) versionsObserved(table *godog.Table) error {
@@ -62,6 +72,15 @@ func (current *world) versionsObserved(table *godog.Table) error {
 }
 
 func (current *world) boundVersion(id, rules string) error {
+	_, err := current.adapter.EvaluateCart(context.Background(), application.EvaluateCommand{UserID: current.guest.UserID, CartID: value.CartID(id)})
+	if err != nil {
+		return err
+	}
+
+	return current.queryBoundVersion(id, rules)
+}
+
+func (current *world) queryBoundVersion(id, rules string) error {
 	cart, err := current.databaseStore.Carts().Get(context.Background(), value.CartID(id))
 	if err != nil {
 		return err
