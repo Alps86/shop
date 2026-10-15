@@ -181,3 +181,15 @@ Funktionalität: Kontextgebundene verifizierte Pflichtangaben
       | ApplicableBatteryNotice | valid | OK | true |
       | DisposalNotice | wrongCode | ComplianceIncomplete | false |
       | unknownRequirement | valid | ComplianceIncomplete | false |
+
+  Szenariogrundriss: Die Rollenlesesicht behauptet keine Kaufbarkeit
+    Wenn Rollen ohne behauptete Kaufprüfung aufgelöst werden
+      | Manufacturer | VerificationStatus | ExistingSKU | SKU |
+      | Fiktiver Hersteller | pending | PHONE | <sku> |
+    Dann lautet die ungeprüfte Rollenansicht
+      | Code | Manufacturer | VerificationStatus |
+      | <code> | <hersteller> | <status> |
+    Beispiele:
+      | sku | code | hersteller | status |
+      | PHONE | OK | Fiktiver Hersteller | pending |
+      | OTHER | InvalidReference | | |

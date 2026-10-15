@@ -22,9 +22,14 @@ func (service Service) ApplyChange(ctx context.Context, command ChangeCommand) (
 		return CartView{}, err
 	}
 
+	result, found, err := service.replayChange(ctx, command)
+	if service.hasReplay(found, err) {
+		return result, err
+	}
+
 	cart, err := service.change(owned, command)
 	if err != nil {
-		return CartView{}, err
+		return NewCartView(service.visibleCart(owned)), err
 	}
 
 	return service.saveChange(ctx, cart, command)
@@ -36,9 +41,7 @@ func (service Service) Change(ctx context.Context, session Session, command Chan
 		return CartView{}, err
 	}
 
-	command.UserID = cart.UserID
-
-	return service.Processes.UpdateCart(ctx, command)
+	return service.routeChange(ctx, cart, command)
 }
 
 func (service Service) change(cart sale.Cart, command ChangeCommand) (sale.Cart, error) {
@@ -113,4 +116,25 @@ func (service Service) evaluateChange(ctx context.Context, cart sale.Cart) (sale
 	}
 
 	return cart.SetEvaluation(evaluation)
+}
+
+func (service Service) replayChange(ctx context.Context, command ChangeCommand) (CartView, bool, error) {
+	if service.Commands == nil {
+		return CartView{}, false, nil
+	}
+
+	return service.Commands.ReplayChange(ctx, command)
+}
+
+func (service Service) hasReplay(found bool, err error) bool {
+	return found || err != nil
+}
+
+func (service Service) routeChange(ctx context.Context, cart sale.Cart, command ChangeCommand) (CartView, error) {
+	command.UserID = cart.UserID
+	if service.terminal(cart) {
+		return service.ApplyChange(ctx, command)
+	}
+
+	return service.Processes.UpdateCart(ctx, command)
 }

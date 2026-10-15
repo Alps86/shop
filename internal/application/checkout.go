@@ -13,9 +13,7 @@ func (service Service) Place(ctx context.Context, session Session, command Place
 		return PurchaseResult{}, err
 	}
 
-	command.UserID = cart.UserID
-
-	return service.Processes.PlaceOrder(ctx, command)
+	return service.routePlace(ctx, cart, command)
 }
 
 func (service Service) ApplyPlace(ctx context.Context, command PlaceCommand) (PurchaseResult, error) {
@@ -33,7 +31,7 @@ func (service Service) ApplyPlace(ctx context.Context, command PlaceCommand) (Pu
 
 func (service Service) finish(ctx context.Context, cart sale.Cart, command PlaceCommand) (PurchaseResult, error) {
 	if err := service.ready(cart, command.EvaluationID); err != nil {
-		return NewCartPurchaseResult(cart), err
+		return NewCartPurchaseResult(service.visibleCart(cart)), err
 	}
 
 	authorization, err := service.authorize(ctx, cart, command.CommandID)
@@ -97,4 +95,13 @@ func (service Service) commit(ctx context.Context, cart sale.Cart, command Place
 
 func (authorization PaymentAuthorization) matches(cart sale.Cart, id value.CommandID) bool {
 	return authorization.CartID == cart.ID && authorization.CartRevision == cart.Revision && authorization.CommandID == id && authorization.Total == cart.Checkout.Value.ConfirmedEvaluation.Value.Total
+}
+
+func (service Service) routePlace(ctx context.Context, cart sale.Cart, command PlaceCommand) (PurchaseResult, error) {
+	command.UserID = cart.UserID
+	if service.terminal(cart) {
+		return service.ApplyPlace(ctx, command)
+	}
+
+	return service.Processes.PlaceOrder(ctx, command)
 }

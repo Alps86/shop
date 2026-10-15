@@ -9,6 +9,12 @@ import (
 )
 
 type world struct {
+	preview               sale.CartEvaluation
+	previewRules          sale.DiscountRules
+	interestData          map[value.UserID][]sale.CategoryInterest
+	interestResult        []sale.CategoryInterest
+	interestUser          value.UserID
+	commandWrites         map[value.CommandID]application.CartWrite
 	inventoryProducts     map[value.SKU]value.ProductID
 	coordinationOperation string
 	processUser           value.UserID
@@ -84,3 +90,7 @@ type cartStarter struct {
 type processDouble struct {
 	current *world
 }
+
+type commandReader struct{ current *world }
+
+type interestReader struct{ current *world }

@@ -43,6 +43,22 @@ func NewOrder(id value.OrderID, cart Cart, items []OrderItem, now time.Time) (Or
 		return Order{}, err
 	}
 
+	return cart.purchaseOrder(id, items, now), nil
+}
+
+func NewPurchase(id value.OrderID, cart Cart, items []OrderItem, now time.Time) (Order, Cart, error) {
+	if err := cart.validatePurchase(id, items, now); err != nil {
+		return Order{}, cart, err
+	}
+
+	order := cart.purchaseOrder(id, items, now)
+	cart.State = Ordered
+	cart.Revision++
+
+	return order, cart, nil
+}
+
+func (cart Cart) purchaseOrder(id value.OrderID, items []OrderItem, now time.Time) Order {
 	checkout := cart.Checkout.Value
 	evaluation := checkout.ConfirmedEvaluation.Value
 	order := Order{ID: id, CartID: cart.ID, UserID: cart.UserID, PlacedAt: now, Items: items,
@@ -50,7 +66,7 @@ func NewOrder(id value.OrderID, cart Cart, items []OrderItem, now time.Time) (Or
 		ShippingMethod: checkout.ShippingMethod, PaymentMethod: checkout.PaymentMethod, Subtotal: evaluation.Subtotal,
 		Discounts: evaluation.Discounts, ShippingCost: evaluation.ShippingCost, Taxes: evaluation.Taxes, Total: evaluation.Total}
 
-	return order.Snapshot(), nil
+	return order.Snapshot()
 }
 
 func (cart Cart) validatePurchase(id value.OrderID, items []OrderItem, now time.Time) error {

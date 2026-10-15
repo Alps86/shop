@@ -1,0 +1,22 @@
+{
+  "DatasetVersion": "startup-v1",
+  "SourceURL": "https://example.invalid/synthetic-runtime-start",
+  "RetrievedAt": "2026-10-15T00:00:00Z",
+  "LicenseNote": "synthetic-only; own test data, no real compliance claim",
+  "Products": [{
+    "ID": "p-phone", "FamilyID": "f-phone", "FamilyVersion": 1,
+    "Name": {"de-DE": "Synthetisches Testtelefon"}, "Brand": "Synthetic",
+    "PrimaryCategoryID": "mobile", "Variants": [{"SKU": "PHONE", "Attributes": {"color": {"Type": "select", "Options": ["red"]}}}],
+    "Manufacturer": {"Name": "Fiktiver Testhersteller", "PostalAddress": {"Street": "Testweg 1", "PostalCode": "12345", "City": "Teststadt", "Country": "DE"}, "ElectronicAddress": "synthetic@example.invalid"},
+    "Compliance": {"Context": {"Market": "DE", "Locale": "de-DE", "VerificationStatus": "verified"}},
+    "Revision": 1, "Published": true, "Slug": "testmodell"
+  }],
+  "Families": [{"ID": "f-phone", "Version": 1, "Attributes": [{"Code": "color", "Name": {"de-DE": "Farbe"}, "Type": "select", "Level": "variant", "Options": [{"Code": "red", "Label": {"de-DE": "Rot"}}]}]}],
+  "Categories": [
+    {"ID": "mobile", "Version": 1, "Name": {"de-DE": "Mobilgeraete"}, "FilterAttributes": ["color"], "TopAttributes": ["color"]},
+    {"ID": "home", "Version": 1, "Name": {"de-DE": "Haushalt"}},
+    {"ID": "coffee", "Version": 1, "Name": {"de-DE": "Kaffee"}}
+  ],
+  "Inventories": [{"SKU": "PHONE", "Price": {"MinorUnits": 10000, "Currency": "EUR"}, "StockQuantity": 10, "Revision": 1}],
+  "PurchaseCosts": {"PHONE": {"MinorUnits": 8000, "Currency": "EUR"}}
+}

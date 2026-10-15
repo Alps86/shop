@@ -1,0 +1,5 @@
+.git
+.qlty
+cover.out
+*.log
+node_modules

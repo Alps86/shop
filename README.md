@@ -5,7 +5,7 @@ Entwicklungsgrundlage für einen B2C-Elektroshop: eine Go-Anwendung in einem Roo
 - [Agentenregeln](AGENTS.md): Umsetzung, unabhängige Plan- und Abschlussreview, Nachweise und Squash-Merge.
 - [Styleguide](spec/styleguide/README.md): allgemeine Regeln, Go und Cucumber.
 
-Der Fachkern für Katalog, Varianten, Pflichtdaten, Bewertung, Warenkorb und Bestellkopien ist implementiert. Applicationports koordinieren Gastzugriff, tokenfreie Prozesseingänge, Preisbestätigung, Empfehlungen und getrennten Lieferfortschritt. Die [arc42](spec/architecture/README.md) beschreibt den verbindlichen Vertrag in zwölf Kapiteln; die [konkrete Kern-API](spec/architecture/05-bausteine/core-api.md) erschließt die Go-Signaturen. [Cucumber-Verträge](spec/features/README.md) prüfen die aktiven Kernfälle tatsächlich. Reale Adapter, Dienste und Oberfläche folgen; der aktuelle Stand ist noch kein vorführbarer Shop. Ein Syntaxparse belegt keine offene Runtimefunktion.
+Der Fachkern für Katalog, Varianten, Pflichtdaten, Bewertung, Warenkorb und Bestellkopien ist implementiert. Applicationports koordinieren Gastzugriff, tokenfreie Prozesseingänge, Preisbestätigung, Empfehlungen und getrennten Lieferfortschritt. Die [arc42](spec/architecture/README.md) beschreibt den verbindlichen Vertrag in zwölf Kapiteln; die [konkrete Kern-API](spec/architecture/05-bausteine/core-api.md) erschließt die Go-Signaturen. [Cucumber-Verträge](spec/features/README.md) prüfen die aktiven Kernfälle tatsächlich. Die reale Laufzeit wird in [Issue #10](https://github.com/Alps86/shop/issues/10) und die Storefront in [Issue #11](https://github.com/Alps86/shop/issues/11) umgesetzt; der aktuelle Stand ist noch kein vorführbarer Shop. Ein Syntaxparse belegt keine offene Runtimefunktion.
 
 
 ## Werkzeuge und lokale Prüfung
@@ -38,11 +38,29 @@ Vor Push Qlty-Checks, Smells und Metrics tatsächlich prüfen. Smells müssen oh
 Ab dem ersten Produktivpackage führt CI die echten Tests einschließlich der strikten Godog-Anbindung aus und misst alle vom aktuellen Go-Build erfassten Packages dynamisch:
 
 ```sh
-go test ./... -count=1 -coverpkg=./... -covermode=atomic -coverprofile=cover.out
+export SHOP_PROCESS_COVERDIR="$(mktemp -d)"
+merged_coverage="$(mktemp -d)"
+go test -p 1 ./... -count=1 -coverpkg=./... -covermode=atomic -coverprofile=cover.out -args -test.gocoverdir="$SHOP_PROCESS_COVERDIR"
+go tool covdata merge -i="$SHOP_PROCESS_COVERDIR" -o="$merged_coverage" -pcombine
+go tool covdata textfmt -i="$merged_coverage" -o=cover.out
 go run github.com/vladopajic/go-test-coverage/v2@v2.19.0 --config=.testcoverage.yml
-go test -race ./... -count=1
+go test -p 1 -race ./... -count=1
 ```
 
 Das [Standardwerkzeug](https://github.com/vladopajic/go-test-coverage) verlangt durch `.testcoverage.yml` je Datei, Package und insgesamt 100 %. Keine Excludes, Overrides oder `coverage-ignore`-Annotationen verwenden. Fachliche Tests bleiben Cucumber-Blackbox-Verträge. Nicht implementierte Spezifikation bleibt als `@spec-only` sichtbar; aktive Implementierungsslices müssen angebunden und aktiviert werden.
+
+Die vollständigen nativen Dienstläufe führen Packages mit dem Standardparameter `-p 1` nacheinander aus. Damit konkurrieren mehrere unabhängig startende Integrationssuites auf dem begrenzten Runner nicht gleichzeitig um dieselbe Suchinstanz; die echten konkurrierenden Transaktions- und Workflowfälle innerhalb der Suites bleiben aktiv. Das öffentliche Suchbudget bleibt unverändert 250 ms.
+
+Die aktiven Adapterfälle benötigen echte PostgreSQL-, Temporal- und OpenSearchdienste. `SHOP_TEST_POSTGRES_DSN`, `SHOP_TEST_TEMPORAL_ADDRESS`, `TEMPORAL_ADDRESS` und `SHOP_TEST_OPENSEARCH_URL` benennen deren Testverbindungen. `SHOP_PROCESS_COVERDIR` sammelt zusätzlich die native Coverage der tatsächlich gebauten und gestarteten Shopdatei; das Testframework überschreibt seine eigene Variable `GOCOVERDIR`, deshalb wird die Prozessgrenze ausdrücklich verdrahtet. Die Standardbefehle `covdata merge -pcombine` und `textfmt` führen beide nativen Messungen zusammen. Das Coveragegate enthält dadurch auch `cmd/shop`; keine Ausschlüsse und kein eigener Coveragechecker.
+
+## Laufzeit im Aufbau
+
+`docker compose up --detach --build --wait` startet den technischen Laufzeitstand aus [compose.yml](compose.yml). `cmd/shop` verbindet dieselben Applicationports mit PostgreSQL, echten Temporalworkern, Prozessoutbox und WAL-Projektor. `SHOP_SEED_FILE` importiert vor der Adapterbindung eine versionierte Quelle mit den bestehenden Validierungs-/Noop-/Transaktionsgrenzen. Der aktuelle Container enthält ausdrücklich einen synthetischen technischen Startkatalog; er ersetzt keine verifizierten Pflichtdaten für die abschließende Demo. `GET /health` prüft die Fach-DB, `GET /ready` zusätzlich die tatsächliche Prozessannahme; Suchstörungen bleiben als eigener Diagnosestatus sichtbar und sperren die Kaufbereitschaft nicht. Storefront und separater Backendlistener werden mit #11 und dem anschließenden Integrationspaket verbunden. Der technische Start ist noch kein vollständiger Gastshopnachweis.
+
+Gepinnt sind [PostgreSQL 16.15](https://hub.docker.com/_/postgres), [Temporal CLI 1.9.1 mit echtem Entwicklungsserver](https://github.com/temporalio/cli), [OpenSearch 3.9.0](https://docs.opensearch.org/latest/install-and-configure/install-opensearch/docker/) und [Go 1.26.9](https://hub.docker.com/_/golang). Temporal speichert seine History in einem eigenen SQLitevolume des echten Servers, der Fachzustand liegt in PostgreSQL. Alle veröffentlichten Ports binden Loopback. Das ausdrücklich lokale Demopasswort ist keine produktive Zugangskonfiguration. Persistente Volumes bleiben bei `docker compose down` erhalten; `docker compose down --volumes` löscht ausschließlich die eigenen Demodaten und Prozesse endgültig.
+
+Die aktuelle Entwicklungsmaschine erlaubt keinen Dockerzugriff. Native echte Dienstfälle sind zusätzliche Adapterbelege; der tatsächliche Compose-Start und Restart werden im berechtigten CI-Runner ausgeführt und erst nach erfolgreichem Lauf als erfüllt gewertet.
+
+Die Compose-Suchinstanz verwendet einen festen Java-Heap von 1 GiB; PostgreSQL, Temporal, Go und gegebenenfalls der Build benötigen zusätzlich Arbeitsspeicher. Das öffentliche Suchbudget bleibt unabhängig davon 250 ms. Fehlende oder ausschließlich unwirksame Interessensignale erzeugen keinen zusätzlichen Rankingausdruck.
 
 **Aussagegrenze:** Native Packageermittlung und Standard-Coverageprüfung erfassen den aktuellen buildfähigen Go-Umfang. Sie sind kein unabhängiger AST-Blockvergleich aller Repositoryquellen oder aller Plattform-/Build-Tag-Kombinationen und kein automatischer Beweis vollständiger Slicezuordnung. Solche zusätzliche Härtung ist offen. Review prüft deshalb insbesondere neue Quellen, Build-Tags, zusätzliche Module und unzulässige `spec-only`-Markierungen. Es gibt keine frei konfigurierbare Bootstrap-Abschaltung.

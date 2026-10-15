@@ -26,6 +26,9 @@ func (current *world) register(ctx *godog.ScenarioContext) {
 		return ctx, nil
 	})
 	current.registerCheckout(ctx)
+	current.registerPreview(ctx)
+	current.registerInterests(ctx)
+	current.registerReplay(ctx)
 	current.registerActivities(ctx)
 	current.registerAtomicity(ctx)
 	current.registerDelivery(ctx)
@@ -37,6 +40,7 @@ func (current *world) register(ctx *godog.ScenarioContext) {
 
 func (current *world) reset() {
 	*current = world{now: time.Date(2026, 10, 15, 0, 0, 0, 0, time.UTC), sessions: map[application.Session]application.SessionIdentity{}, profiles: map[value.UserID]application.ProfileCode{}, carts: map[value.CartID]sale.Cart{}, orders: map[value.OrderID]sale.Order{}, inventories: map[value.SKU]sale.Inventory{}}
+	current.commandWrites = map[value.CommandID]application.CartWrite{}
 	current.purchaseRecords = map[value.CommandID]purchaseRecord{}
 	current.inventoryProducts = map[value.SKU]value.ProductID{}
 	current.service = application.Service{Guests: current, Carts: current, Orders: orderStore{current}, Clock: current, Purchase: current, Payment: current, Evaluator: evaluator{current}, Writer: cartWriter{current}, Fulfillment: deliveryStore{current}, Starter: cartStarter{current}}

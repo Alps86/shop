@@ -64,6 +64,12 @@ jobs:
   cucumber-and-coverage:
     name: cucumber-and-coverage
     runs-on: ubuntu-latest
+    env:
+      SHOP_TEST_POSTGRES_DSN: postgres://shop:local-demo-only@127.0.0.1:15432/shop?sslmode=disable
+      SHOP_TEST_TEMPORAL_ADDRESS: 127.0.0.1:17233
+      TEMPORAL_ADDRESS: 127.0.0.1:17233
+      SHOP_TEST_OPENSEARCH_URL: http://127.0.0.1:19200
+      SHOP_PROCESS_COVERDIR: /tmp/shop-native-coverage
     steps:
       - uses: actions/checkout@v4
         with:
@@ -71,6 +77,20 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
+      - name: Echte Hugo-/SSI-/ESI-Standardengines installieren
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends hugo nginx varnish
+          hugo version
+          nginx -v
+          varnishd -V
+      - name: Tatsächliche Compose-Laufzeit starten
+        run: docker compose up --detach --build --wait --wait-timeout 180
+      - name: Tatsächlichen Dienstrestart prüfen
+        run: |
+          docker compose restart shop
+          docker compose up --detach --wait --wait-timeout 120
+          docker compose exec shop /shop healthcheck
       - name: Sämtliches Gherkin ohne Verhaltensbehauptung parsen
         run: go test ./... -run '^TestFeatureSyntax$' -count=1
       - name: Native Packageermittlung, fachliches Verhalten und vollständige Coveragequote
@@ -82,11 +102,25 @@ jobs:
             exit 0
           fi
           printf 'Produktivpackages laut Go:\n%s\n' "$packages"
-          go test ./... -count=1 -coverpkg=./... -covermode=atomic -coverprofile=cover.out
+          mkdir -p "$SHOP_PROCESS_COVERDIR" /tmp/shop-merged-coverage
+          go test -p 1 ./... -count=1 -coverpkg=./... -covermode=atomic -coverprofile=cover.out -args -test.gocoverdir="$SHOP_PROCESS_COVERDIR"
+          go tool covdata merge -i="$SHOP_PROCESS_COVERDIR" -o=/tmp/shop-merged-coverage -pcombine
+          go tool covdata textfmt -i=/tmp/shop-merged-coverage -o=cover.out
           go run github.com/vladopajic/go-test-coverage/v2@v2.19.0 --config=.testcoverage.yml
+      - name: Compose-Ausgabe sichern
+        if: always()
+        run: docker compose logs --no-color
+      - name: Eigene Testdienste entfernen
+        if: always()
+        run: docker compose down --volumes
   race:
     name: race
     runs-on: ubuntu-latest
+    env:
+      SHOP_TEST_POSTGRES_DSN: postgres://shop:local-demo-only@127.0.0.1:15432/shop?sslmode=disable
+      SHOP_TEST_TEMPORAL_ADDRESS: 127.0.0.1:17233
+      TEMPORAL_ADDRESS: 127.0.0.1:17233
+      SHOP_TEST_OPENSEARCH_URL: http://127.0.0.1:19200
     steps:
       - uses: actions/checkout@v4
         with:
@@ -94,6 +128,15 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
+      - name: Echte Hugo-/SSI-/ESI-Standardengines installieren
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends hugo nginx varnish
+          hugo version
+          nginx -v
+          varnishd -V
+      - name: Tatsächliche Compose-Laufzeit starten
+        run: docker compose up --detach --build --wait --wait-timeout 180
       - name: Echte Standardtestanbindung mit Race-Erkennung
         run: |
           packages="$(go list -f '{{if or .GoFiles .CgoFiles}}{{.ImportPath}}{{end}}' ./... | sed '/^$/d')"
@@ -102,7 +145,13 @@ jobs:
             echo 'Bootstrap: Race-Prüfung der tatsächlichen Testanbindung; keine Shop-Fachlogik vorhanden.'
             exit 0
           fi
-          go test -race ./... -count=1
+          go test -p 1 -race ./... -count=1
+      - name: Compose-Ausgabe sichern
+        if: always()
+        run: docker compose logs --no-color
+      - name: Eigene Testdienste entfernen
+        if: always()
+        run: docker compose down --volumes
   quality-gate:
     name: quality-gate
     if: always()

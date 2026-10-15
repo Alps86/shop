@@ -23,6 +23,7 @@ func (current *world) initialize(context *godog.ScenarioContext) {
 	current.attributeSteps(context)
 	current.productSteps(context)
 	current.complianceSteps(context)
+	current.roleReadSteps(context)
 }
 
 func tableRow(table *godog.Table) row {

@@ -14,7 +14,7 @@ func (port evaluator) Evaluate(_ context.Context, cart sale.Cart) (sale.CartEval
 
 	items := port.priced(cart)
 
-	evaluation, err := items.Evaluate(nil, port.shipping(cart))
+	evaluation, err := items.Evaluate(port.current.previewRules, port.shipping(cart))
 	evaluation.ID = "e-a"
 	evaluation.CartRevision = cart.Revision
 	evaluation.RuleSetVersion = cart.RuleSetVersion
@@ -31,6 +31,7 @@ func (port cartWriter) Save(_ context.Context, write application.CartWrite) (app
 	}
 
 	port.current.carts[write.Cart.ID] = write.Cart
+	port.current.commandWrites[write.CommandID] = write
 
 	return application.NewCartView(write.Cart), nil
 }
@@ -39,7 +40,7 @@ func (port evaluator) priced(cart sale.Cart) sale.PricedItems {
 	items := sale.PricedItems{}
 	for _, item := range cart.Items {
 		inventory := port.current.inventories[item.SKU]
-		items = append(items, sale.PricedItem{SKU: item.SKU, ProductID: "p-phone", Quantity: item.Quantity, UnitPrice: inventory.Price, InventoryRevision: inventory.Revision})
+		items = append(items, sale.PricedItem{SKU: item.SKU, ProductID: port.current.inventoryProducts[item.SKU], Quantity: item.Quantity, UnitPrice: inventory.Price, InventoryRevision: inventory.Revision})
 	}
 
 	return items
