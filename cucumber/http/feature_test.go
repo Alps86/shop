@@ -90,4 +90,7 @@ func (current *world) registerComposition(ctx *godog.ScenarioContext) {
 	ctx.Step(`^die Cachegrenze beobachtet$`, current.cacheResult)
 	ctx.Step(`^der komponierte Cache invalidiert wird$`, current.invalidateComposition)
 	ctx.Step(`^die Standardenginelogs enthalten keine Fähigkeiten$`, current.inspectLogs)
+	ctx.Step(`^die Fragmentcachefrist verstreicht$`, current.awaitFragmentExpiry)
+	ctx.Step(`^getrennte Gastcookiejars werden eingerichtet$`, current.prepareClients)
+	ctx.Step(`^die öffentliche Rahmenantwort wird verglichen$`, current.compareFrame)
 }

@@ -88,3 +88,22 @@ Funktionalität: Geschützte normale Formulare und HTMX
       | Header:HX-Push-Url | /de-DE/warenkorb |
       | Absent | Eigenen Einkauf starten |
       | Body | Menge ändern |
+
+  Szenariogrundriss: Erfolgreiche private Commands markieren auch Redirectantworten
+    Wenn der Shop liefert eine HTTPansicht
+      | Method | URL | Listener | Session | CSRFSource | Form | HTMX |
+      | POST | <url> | <listener> | <session> | <source> | <form> | <htmx> |
+    Dann die HTTPantwort enthält die sichtbaren Vertragswerte
+      | Field | Value |
+      | Status | <status> |
+      | Header:Cache-Control | private,no-store |
+      | Header:X-Robots-Tag | noindex,nofollow |
+    Beispiele:
+      | url | listener | session | source | form | htmx | status |
+      | /backend/inventory | backend | | /backend | sku=RED-256&revision=3&commandID=redirect-inventory&price=12500 | false | 303 |
+      | /backend/lieferschritt | backend | | /backend | orderID=order-a&shipmentID=shipment-a&commandID=redirect-delivery&sku=RED-256&quantity=1&status=shipped | false | 303 |
+      | /de-DE/warenkorb/aktion | public | test-session-a | /de-DE/warenkorb | cartID=cart-a&commandID=redirect-cart&revision=2&sku=RED-256&quantity=1&action=add | false | 303 |
+      | /de-DE/profil | public | test-session-a | /de-DE/profil | profile=coffee | false | 303 |
+      | /de-DE/warenkorb/aktion | public | test-session-a | /de-DE/kasse | cartID=cart-a&commandID=redirect-order&revision=2&evaluationID=evaluation-a&action=place&return=checkout | false | 303 |
+      | /de-DE/warenkorb/aktion | public | test-session-a | /de-DE/kasse | cartID=cart-a&commandID=redirect-order&revision=2&evaluationID=evaluation-a&action=place&return=checkout | true | 303 |
+      | /de-DE/warenkorb/aktion | public | test-session-a | /de-DE/warenkorb | cartID=cart-a&commandID=fragment-cart&revision=2&sku=RED-256&quantity=1&action=add | true | 200 |

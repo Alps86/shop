@@ -19,3 +19,7 @@ Der vollständige neue Build wird atomar bereitgestellt. Go und Nginx sehen dens
 Die eigene SVGdarstellung ist neutral und selbst erstellt. HTMX 2.0.11 liegt mit Originallizenz unter `internal/adapter/http/asset/vendor/`; [Primärdokumentation](https://htmx.org/docs/). Styles, eigene Interaktion und eingebettetes HTMX werden mit tatsächlichem Inhaltsfingerprint adressiert. Nach einer Assetänderung werden Datei und referenzierter Fingerprint gemeinsam aktualisiert.
 
 Varnish wird mit `-p vsl_mask=-ReqHeader,-BereqHeader,-RespHeader,-BerespHeader,-ReqUnset,-BereqUnset,-RespUnset,-BerespUnset` gestartet. Sessionfähigkeiten und Set-Cookie erscheinen dadurch nicht in den gemeinsam verfügbaren Headerlogs; Nginx führt kein Accesslog und protokolliert nur kritische Laufzeitfehler.
+
+Öffentliche zusammengesetzte HTMLantworten erhalten am Varnish-Ausgang `public,max-age=0`: Ein Browser speichert dadurch dynamische Bestandteile nicht länger als deren kürzere Gültigkeit. Varnish behält intern die getrennten Rahmen- und Fragmentcaches. Die Fragment-TTL berücksichtigt alle sichtbaren Karten einschließlich Empfehlungen und endet spätestens an deren nächster Pflichtdaten- oder Regelgrenze.
+
+`ProductCard.URL` ist das vollständige vom Applicationport gelieferte Variantenlinkziel einschließlich SKU-Query. Karten, Empfehlungen und aktive Checkoutalternativen übernehmen diese URL unverändert.

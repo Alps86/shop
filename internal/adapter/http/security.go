@@ -56,6 +56,7 @@ func (handler *Handler) csrfToken(identity string) string {
 }
 
 func (handler *Handler) authorize(writer http.ResponseWriter, request *http.Request) bool {
+	handler.privateHeaders(writer)
 	if request.Method != "POST" {
 		handler.failure(writer, request, newHTTPError(405, "Änderung benötigt POST"))
 		return false
@@ -77,6 +78,7 @@ func (handler *Handler) authorize(writer http.ResponseWriter, request *http.Requ
 }
 
 func (handler *Handler) privatePage(writer http.ResponseWriter, request *http.Request, kind, title string) Page {
+	handler.privateHeaders(writer)
 	page := newPage(kind, title)
 	page.CacheControl = "private,no-store"
 	page.Robots = "noindex,nofollow"
@@ -92,4 +94,9 @@ func (handler *Handler) guest(request *http.Request) (application.GuestView, err
 	}
 
 	return handler.config.Guests.Open(request.Context(), (requestView{request}).session())
+}
+
+func (handler *Handler) privateHeaders(writer http.ResponseWriter) {
+	writer.Header().Set("Cache-Control", "private,no-store")
+	writer.Header().Set("X-Robots-Tag", "noindex,nofollow")
 }

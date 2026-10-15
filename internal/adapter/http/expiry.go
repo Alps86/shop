@@ -2,6 +2,7 @@ package http
 
 import (
 	"fmt"
+	"github.com/Alps86/shop/internal/application"
 	"github.com/Alps86/shop/internal/domain/catalog"
 	"strings"
 	"time"
@@ -16,14 +17,8 @@ func (page *Page) limitCache(now time.Time) {
 		return
 	}
 
-	ttl := 5
-	for _, card := range page.Search.Cards {
-		ttl = min(ttl, (cacheWindow{now}).complianceTTL(card.Compliance))
-	}
-
-	for _, card := range page.Detail.Cards {
-		ttl = min(ttl, (cacheWindow{now}).complianceTTL(card.Compliance))
-	}
+	window := cacheWindow{now}
+	ttl := min(window.cardsTTL(page.Search.Cards), window.cardsTTL(page.Detail.Cards), window.cardsTTL(page.Recommendations.Cards))
 
 	page.CacheControl = fmt.Sprintf("public,max-age=%d", ttl)
 	if ttl <= 0 {
@@ -59,4 +54,13 @@ func (window cacheWindow) ruleTTL(rule catalog.RuleReference) int {
 	}
 
 	return max(0, ttl)
+}
+
+func (window cacheWindow) cardsTTL(cards []application.ProductCard) int {
+	ttl := 5
+	for _, card := range cards {
+		ttl = min(ttl, window.complianceTTL(card.Compliance))
+	}
+
+	return ttl
 }

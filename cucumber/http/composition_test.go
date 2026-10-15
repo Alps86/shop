@@ -104,7 +104,7 @@ func (current *world) composedRequest(table *godog.Table) error {
 	}
 
 	request.Header.Set("Cookie", fields["Cookie"])
-	response, err := http.DefaultClient.Do(request)
+	response, err := current.engineClient(fields["Jar"]).Do(request)
 	if err != nil {
 		return err
 	}
@@ -259,4 +259,9 @@ func (current *world) engineOrigin(engine *compositionEngine) error {
 	engine.origin = httptest.NewServer(compositionOrigin{current: current, handler: handler})
 
 	return engine.prepareSource(current.fixture)
+}
+
+func (current *world) awaitFragmentExpiry(table *godog.Table) error {
+	time.Sleep(time.Duration(readCount(read(table)[0]["Milliseconds"])) * time.Millisecond)
+	return nil
 }

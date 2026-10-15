@@ -9,7 +9,7 @@ Funktionalität: Zusammenhängende Variantenansicht
       | spec/fixtures/http/shop.json | |
     Und HTTPportdaten werden ersetzt
       | JSON |
-      | {"Detail":{"Cards":[{"ProductID":"p-phone","URL":"/de-DE/produkt/testmodell--p-phone","Name":"Testmodell","SKU":"RED-256","Image":{"URL":"/assets/product.svg","AltText":{"de-DE":"gallery-red"}},"UnitPrice":{"MinorUnits":12000,"Currency":"EUR"},"AvailableQuantity":7,"VariantCount":2,"Compliance":{"Context":{"Market":"DE","Locale":"de-DE","VerificationStatus":"verified"},"Notices":[{"Text":{"de-DE":"verified-red"}}]}}]}} |
+      | {"Detail":{"Cards":[{"ProductID":"p-phone","URL":"/de-DE/produkt/testmodell--p-phone?sku=RED-256","Name":"Testmodell","SKU":"RED-256","Image":{"URL":"/assets/product.svg","AltText":{"de-DE":"gallery-red"}},"UnitPrice":{"MinorUnits":12000,"Currency":"EUR"},"AvailableQuantity":7,"VariantCount":2,"Compliance":{"Context":{"Market":"DE","Locale":"de-DE","VerificationStatus":"verified"},"Notices":[{"Text":{"de-DE":"verified-red"}}]}}]}} |
 
   Szenariogrundriss: HTML und HTMX zeigen dieselbe vollständige rote Variante
     Wenn der Shop liefert eine HTTPansicht

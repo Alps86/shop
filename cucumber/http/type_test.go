@@ -5,6 +5,7 @@ import (
 	shophttp "github.com/Alps86/shop/internal/adapter/http"
 	"github.com/Alps86/shop/internal/application"
 	"github.com/Alps86/shop/internal/domain/sale"
+	"github.com/Alps86/shop/internal/domain/value"
 	"net/http"
 	"net/http/httptest"
 	"os/exec"
@@ -13,6 +14,8 @@ import (
 )
 
 type world struct {
+	engineClients      map[string]*http.Client
+	sharedFrame        string
 	lastCSRF           string
 	cache              shophttp.CacheInvalidator
 	cacheServer        *httptest.Server
@@ -38,6 +41,8 @@ type world struct {
 }
 
 type fixture struct {
+	Guests          map[application.Session]application.GuestView
+	Carts           map[value.CartID]application.CartView
 	Routes          []shophttp.PublicRoute
 	Diagnostics     map[string]string
 	FrameContent    string

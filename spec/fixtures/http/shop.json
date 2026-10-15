@@ -103,7 +103,7 @@
     "Cards": [
       {
         "ProductID": "p-phone",
-        "URL": "/de-DE/produkt/testmodell--p-phone",
+        "URL": "/de-DE/produkt/testmodell--p-phone?sku=BLUE-128",
         "Name": "Testmodell <b>",
         "SKU": "BLUE-128",
         "Image": {
@@ -149,7 +149,7 @@
       },
       {
         "ProductID": "p-phone",
-        "URL": "/de-DE/produkt/testmodell--p-phone",
+        "URL": "/de-DE/produkt/testmodell--p-phone?sku=RED-256",
         "Name": "Testmodell <b>",
         "SKU": "RED-256",
         "Image": {
@@ -280,7 +280,7 @@
     "Cards": [
       {
         "ProductID": "p-phone",
-        "URL": "/de-DE/produkt/testmodell--p-phone",
+        "URL": "/de-DE/produkt/testmodell--p-phone?sku=RED-256",
         "Name": "Testmodell <b>",
         "SKU": "RED-256",
         "Image": {

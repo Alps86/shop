@@ -60,6 +60,9 @@ sub vcl_hash {
 }
 
 sub vcl_deliver {
+    if (req.esi_level == 0 && resp.http.Content-Type ~ "text/html" && resp.http.Cache-Control !~ "no-store|private") {
+        set resp.http.Cache-Control = "public,max-age=0";
+    }
     unset resp.http.Server;
     unset resp.http.Via;
 }

@@ -104,6 +104,8 @@ Funktionalität: Sichtbare Datenzustände und unveränderte Vorschau
       | Field | Value |
       | Status | 303 |
       | Header:Location | /de-DE/bestellung/order-a |
+      | Header:Cache-Control | private,no-store |
+      | Header:X-Robots-Tag | noindex,nofollow |
 
   Szenario: Leerer Cart führt vor dem Abschluss zurück zur Auswahl
     Angenommen HTTPportdaten werden ersetzt
@@ -116,6 +118,8 @@ Funktionalität: Sichtbare Datenzustände und unveränderte Vorschau
       | Field | Value |
       | Status | 303 |
       | Header:Location | /de-DE/warenkorb |
+      | Header:Cache-Control | private,no-store |
+      | Header:X-Robots-Tag | noindex,nofollow |
 
   Szenario: Ausstehender Gastport liefert einen lesbaren Wiederaufnahmeort
     Angenommen explizite HTTPdaten liegen vor
@@ -128,6 +132,8 @@ Funktionalität: Sichtbare Datenzustände und unveränderte Vorschau
       | Field | Value |
       | Status | 202 |
       | Header:Location | /de-DE/warenkorb |
+      | Header:Cache-Control | private,no-store |
+      | Header:X-Robots-Tag | noindex,nofollow |
       | Header:Retry-After | 2 |
 
   Szenario: Abgelaufener Checkout erlaubt nur den ausdrücklichen Neustart

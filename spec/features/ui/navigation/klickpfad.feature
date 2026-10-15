@@ -60,3 +60,53 @@ Funktionalität: Durchgängiger eigener Gastpfad über HTTP
     Und die HTTPantwort enthält die sichtbaren Vertragswerte
       | Field | Value |
       | BodyAll | <!doctype html>,historyRestoreAsHxRequest,hx-push-url="true" |
+
+  Szenariogrundriss: Vollständige Variantenlinkziele aus B bleiben unverändert
+    Angenommen HTTPportdaten werden ersetzt
+      | JSON |
+      | {"Recommendations":{"Cards":[{"ProductID":"p-phone","Name":"Empfohlenes Modell","SKU":"RED-256","URL":"/de-DE/produkt/testmodell--p-phone?sku=RED-256"}]}} |
+    Wenn der Shop liefert eine HTTPansicht
+      | Method | URL | Session |
+      | GET | <source> | <session> |
+    Dann die HTTPantwort enthält die sichtbaren Vertragswerte
+      | Field | Value |
+      | Status | 200 |
+      | Body | href="/de-DE/produkt/testmodell--p-phone?sku=RED-256" |
+      | Absent | ?sku=RED-256?sku= |
+    Wenn der Shop liefert eine HTTPansicht
+      | Method | URL |
+      | GET | /de-DE/produkt/testmodell--p-phone?sku=RED-256 |
+    Dann die HTTPantwort enthält die sichtbaren Vertragswerte
+      | Field | Value |
+      | Status | 200 |
+      | Body | data-sku="RED-256" |
+    Beispiele:
+      | source | session |
+      | /de-DE/ | |
+      | /de-DE/suche | |
+      | /de-DE/kategorie/smartphones--c-phone | |
+      | /de-DE/produkt/testmodell--p-phone | |
+      | /de-DE/warenkorb | test-session-a |
+
+  Szenario: Aktive Checkoutalternative verwendet das vollständige Linkziel aus dem Kaufresultat
+    Angenommen explizite HTTPdaten liegen vor
+      | Fixture | Fault |
+      | spec/fixtures/http/shop.json | Place:Unavailable |
+    Und HTTPportdaten werden ersetzt
+      | JSON |
+      | {"Purchase":{"UnavailableSKU":{"Present":true,"Value":"BLUE-128"},"Alternatives":[{"ProductID":"p-phone","Name":"Verfügbare rote Variante","SKU":"RED-256","URL":"/de-DE/produkt/testmodell--p-phone?sku=RED-256"}]}} |
+    Wenn der Shop liefert eine HTTPansicht
+      | Method | URL | Session | CSRFSource | Form |
+      | POST | /de-DE/warenkorb/aktion | test-session-a | /de-DE/kasse | cartID=cart-a&commandID=alternative-link&revision=2&evaluationID=evaluation-a&action=place&return=checkout |
+    Dann die HTTPantwort enthält die sichtbaren Vertragswerte
+      | Field | Value |
+      | Status | 409 |
+      | Body | href="/de-DE/produkt/testmodell--p-phone?sku=RED-256" |
+      | Absent | ?sku=RED-256?sku= |
+    Wenn der Shop liefert eine HTTPansicht
+      | Method | URL |
+      | GET | /de-DE/produkt/testmodell--p-phone?sku=RED-256 |
+    Dann die HTTPantwort enthält die sichtbaren Vertragswerte
+      | Field | Value |
+      | Status | 200 |
+      | Body | data-sku="RED-256" |

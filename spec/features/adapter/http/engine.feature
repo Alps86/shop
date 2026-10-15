@@ -130,3 +130,55 @@ Funktionalität: Echte Standardenginekomposition
       | shop_session |
       | shop_start |
       | Set-Cookie |
+
+  Szenario: Zwei echte Cookiejars teilen denselben neutralen Rahmen und getrennte private Badges
+    Angenommen HTTPportdaten werden ersetzt
+      | JSON |
+      | {"Guests":{"session-first":{"UserID":"first","Session":"session-first","CartID":{"Present":true,"Value":"cart-first"}},"session-second":{"UserID":"second","Session":"session-second","CartID":{"Present":true,"Value":"cart-second"}}},"Carts":{"cart-first":{"Cart":{"ID":"cart-first","UserID":"first","Items":[{"SKU":"RED-256","Quantity":2}]}},"cart-second":{"Cart":{"ID":"cart-second","UserID":"second","Items":[{"SKU":"BLUE-128","Quantity":7}]}}}} |
+    Und getrennte Gastcookiejars werden eingerichtet
+      | Jar | Session |
+      | first | session-first |
+      | second | session-second |
+    Wenn die zusammengesetzte HTTPansicht wird angefordert
+      | URL | Jar |
+      | /de-DE/ | first |
+    Dann die HTTPantwort enthält die sichtbaren Vertragswerte
+      | Field | Value |
+      | Status | 200 |
+      | Body | data-composition="nginx-ssi" |
+      | Absent | Warenkorb (2) |
+      | Absent | Warenkorb (7) |
+    Und die öffentliche Rahmenantwort wird verglichen
+      | Mode |
+      | remember |
+    Wenn die zusammengesetzte HTTPansicht wird angefordert
+      | URL | Jar |
+      | /de-DE/ | second |
+    Dann die öffentliche Rahmenantwort wird verglichen
+      | Mode |
+      | identical |
+    Wenn die zusammengesetzte HTTPansicht wird angefordert
+      | URL | Jar |
+      | /de-DE/warenkorb/badge | first |
+    Dann die HTTPantwort enthält die sichtbaren Vertragswerte
+      | Field | Value |
+      | Status | 200 |
+      | Body | Warenkorb (2) |
+      | Absent | Warenkorb (7) |
+      | Header:Cache-Control | private,no-store |
+    Wenn die zusammengesetzte HTTPansicht wird angefordert
+      | URL | Jar |
+      | /de-DE/warenkorb/badge | second |
+    Dann die HTTPantwort enthält die sichtbaren Vertragswerte
+      | Field | Value |
+      | Status | 200 |
+      | Body | Warenkorb (7) |
+      | Absent | Warenkorb (2) |
+      | Header:Cache-Control | private,no-store |
+    Wenn die zusammengesetzte HTTPansicht wird angefordert
+      | URL | Jar |
+      | /de-DE/warenkorb/badge | first |
+    Dann die HTTPantwort enthält die sichtbaren Vertragswerte
+      | Field | Value |
+      | Body | Warenkorb (2) |
+      | Header:Cache-Control | private,no-store |

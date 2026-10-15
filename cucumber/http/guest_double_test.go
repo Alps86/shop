@@ -9,6 +9,10 @@ import (
 
 func (double guestDouble) Open(_ context.Context, session application.Session) (application.GuestView, error) {
 	result := double.current.fixture.Guest
+	if configured, exists := double.current.fixture.Guests[session]; exists {
+		result = configured
+	}
+
 	if session == "foreign" {
 		return application.GuestView{}, value.NewError("NotFound", "Session")
 	}
@@ -28,7 +32,12 @@ func (double guestDouble) GetCart(_ context.Context, session application.Session
 		return application.CartView{}, value.NewError("NotFound", "Cart")
 	}
 
-	return double.current.fixture.Cart, double.current.portError("GetCart")
+	result := double.current.fixture.Cart
+	if configured, exists := double.current.fixture.Carts[id]; exists {
+		result = configured
+	}
+
+	return result, double.current.portError("GetCart")
 }
 
 func (double guestDouble) StartCart(context.Context, application.Session, value.CommandID) (application.CartView, error) {
