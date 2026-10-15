@@ -149,6 +149,8 @@ Funktionalität: Sichtbare Datenzustände und unveränderte Vorschau
     Dann die HTTPantwort enthält die sichtbaren Vertragswerte
       | Field | Value |
       | Status | 410 |
+      | Body | Warenkorb abgelaufen |
+      | Absent | Dieses Produkt wurde dauerhaft entfernt |
       | Body | Neuen Einkauf starten |
       | Absent | Adresse speichern |
       | Absent | Demo-Bestellung verbindlich abschließen |

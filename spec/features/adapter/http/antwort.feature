@@ -22,7 +22,6 @@ Funktionalität: Routing und sichere Fehlerantworten
       | /de-DE/produkt/alt--p-phone?sku=RED-256 | 301 | /de-DE/produkt/testmodell--p-phone?sku=RED-256 |
       | /de-DE/kategorie/alt--c-phone?brand=Beta | 301 | /de-DE/kategorie/smartphones--c-phone?brand=Beta |
       | /de-DE/produkt/alt--missing | 404 | |
-      | /de-DE/produkt/alt--p-removed | 410 | |
       | /de-DE/produkt/testmodell--p-phone?sku=OTHER | 404 | |
       | /de-DE/produkt/testmodell--p-phone?sku=bad%20sku | 422 | |
       | /de-DE/produkt/testmodell--p-phone?redirect=https://foreign.example | 422 | |
@@ -91,3 +90,15 @@ Funktionalität: Routing und sichere Fehlerantworten
       | Snapshot | /backend | | backend | 503 | Daten vorübergehend nicht verfügbar |
       | ListOrders | /backend | | backend | 503 | Daten vorübergehend nicht verfügbar |
       | AdminGetOrder | /backend/bestellung/order-a | | backend | 503 | Daten vorübergehend nicht verfügbar |
+
+  Szenario: Dauerhaft entferntes Produkt ist kein abgelaufener Warenkorb
+    Wenn der Shop liefert eine HTTPansicht
+      | Method | URL |
+      | GET | /de-DE/produkt/alt--p-removed |
+    Dann die HTTPantwort enthält die sichtbaren Vertragswerte
+      | Field | Value |
+      | Status | 410 |
+      | Body | Dieses Produkt wurde dauerhaft entfernt |
+      | Absent | Warenkorb abgelaufen |
+      | Header:Cache-Control | private,no-store |
+      | Header:X-Robots-Tag | noindex,nofollow |

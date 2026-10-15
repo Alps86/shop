@@ -45,10 +45,11 @@ func (mapped responseError) message() string {
 		return requestError.Error()
 	}
 
-	messages := map[int]string{202: "Änderung angenommen, Status wird aktualisiert", 404: "Nicht gefunden", 410: "Warenkorb abgelaufen", 409: "Daten geändert. Bitte neu laden und bestätigen.", 422: "Eingabe prüfen", 503: "Daten vorübergehend nicht verfügbar"}
+	messages := map[int]string{202: "Änderung angenommen, Status wird aktualisiert", 404: "Nicht gefunden", 410: "Nicht mehr verfügbar", 409: "Daten geändert. Bitte neu laden und bestätigen.", 422: "Eingabe prüfen", 503: "Daten vorübergehend nicht verfügbar"}
 
-	if value.Code(err) == "PaymentDeclined" {
-		return "Simulierte Freigabe abgelehnt"
+	specific := map[string]string{"Removed": "Dieses Produkt wurde dauerhaft entfernt", "Expired": "Warenkorb abgelaufen", "PaymentDeclined": "Simulierte Freigabe abgelehnt"}
+	if message, exists := specific[value.Code(err)]; exists {
+		return message
 	}
 
 	return messages[(responseError{err}).status()]
