@@ -1,0 +1,10 @@
+id: shop-go-no-else
+language: Go
+severity: error
+message: "else ist laut Shop-Styleguide nicht zulässig; verwende Guard Clauses und frühe Rückgaben."
+files:
+  - "**/*.go"
+rule:
+  all:
+    - kind: if_statement
+    - regex: "}\\s*else\\b"

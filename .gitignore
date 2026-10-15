@@ -1,0 +1,4 @@
+.quality/results/
+.qlty/out/
+*.test
+__pycache__/

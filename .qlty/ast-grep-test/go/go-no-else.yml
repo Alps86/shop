@@ -1,0 +1,7 @@
+id: shop-go-no-else
+valid:
+  - |
+    func valid() { if true { return } }
+invalid:
+  - |
+    func invalid() { if true { return } else { return } }

@@ -1,0 +1,13 @@
+id: shop-go-no-one-line-functions
+language: Go
+severity: error
+message: "Funktionen, Methoden und Funktionsliterale werden mehrzeilig formatiert."
+files:
+  - "**/*.go"
+rule:
+  all:
+    - any:
+        - kind: function_declaration
+        - kind: method_declaration
+        - kind: func_literal
+    - regex: "^[^\\n]*$"

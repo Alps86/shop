@@ -1,0 +1,7 @@
+id: shop-go-no-composite-if-condition
+valid:
+  - |
+    func valid() { if ready { return } }
+invalid:
+  - |
+    func invalid() { if ready && enabled { return } }

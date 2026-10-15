@@ -1,0 +1,51 @@
+id: shop-go-error-types
+valid:
+  - |
+    type Failure struct{}
+    func (err Failure) Error() string { return "failure" }
+  - |
+    func (err *Failure) Error() string { return "failure" }
+    type Failure struct{}
+  - |
+    type (
+     Failure struct{}
+    )
+    func (err Failure) Error() string { return "failure" }
+  - |
+    type Failure int
+    func (Failure) Error() (message string) { return "failure" }
+  - |
+    package example
+    import "errors"
+    const failureMessage = "failure"
+    var ErrFailure = errors.New(failureMessage)
+  - |
+    package example
+    import "errors"
+    const failureMessage = "failure"
+    var ErrFailure = errors.New(failureMessage)
+    type Failure struct{}
+    func (err Failure) Error() string { return failureMessage }
+  - |
+    type Failure[T any] struct{}
+    func (err *Failure[T]) Error() (message string) { return "failure" }
+invalid:
+  - |
+    type WrongPlace int
+  - |
+    type (
+     Failure struct{}
+     WrongPlace int
+    )
+    func (err Failure) Error() string { return "failure" }
+  - |
+    type WrongPlace = int
+  - |
+    type Failure struct{}
+    func (err Failure) Error(value int) string { return "failure" }
+  - |
+    type Failure struct{}
+    func (err Failure) Error() int { return 1 }
+  - |
+    type WrongPlace int
+    func (err Different) Error() string { return "failure" }

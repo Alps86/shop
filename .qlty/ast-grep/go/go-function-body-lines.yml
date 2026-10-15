@@ -1,0 +1,20 @@
+id: shop-go-function-body-lines
+language: Go
+severity: error
+message: "Der Funktionskörper darf maximal 20 Zeilen umfassen; Signatur und reine äußere Funktionsklammern zählen nicht mit."
+files:
+  - "**/*.go"
+rule:
+  all:
+    - any:
+        - kind: function_declaration
+        - kind: method_declaration
+        - kind: func_literal
+    - has:
+        kind: block
+        field: body
+        any:
+          - regex: '\A\{[^\S\n]*\n(?:[^\n]*\n){21}'
+          - regex: '\A\{[^\n]*\S[^\n]*\n(?:[^\n]*\n){20}'
+          - regex: '\A\{[^\S\n]*\n(?:[^\n]*\n){20}[^\n]*\S[^\n]*\}\z'
+          - regex: '\A\{[^\n]*\S[^\n]*\n(?:[^\n]*\n){19}[^\n]*\S[^\n]*\}\z'

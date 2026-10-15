@@ -1,0 +1,10 @@
+id: shop-go-no-switch
+language: Go
+severity: error
+message: "switch ist laut Shop-Styleguide nicht zulässig; lagere die Entscheidung in eine fachlich passende Struktur aus."
+files:
+  - "**/*.go"
+rule:
+  any:
+    - kind: expression_switch_statement
+    - kind: type_switch_statement

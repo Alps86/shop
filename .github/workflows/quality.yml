@@ -1,0 +1,102 @@
+name: Quality
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+permissions:
+  contents: read
+env:
+  QLTY_VERSION: '0.651.0'
+  SHOP_BASE_SHA: ${{ github.event.pull_request.base.sha || 'origin/main' }}
+jobs:
+  static:
+    name: static
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Qlty installieren
+        run: curl -fsSL https://qlty.sh | bash
+      - name: Statische Regeln und echte technische Regressionen
+        run: PATH="$HOME/.qlty/bin:$PATH" python3 scripts/quality.py static
+      - uses: actions/upload-artifact@v4
+        with:
+          include-hidden-files: true
+          name: static-result
+          path: .quality/results/static.json
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - run: python3 scripts/quality.py build
+      - uses: actions/upload-artifact@v4
+        with:
+          include-hidden-files: true
+          name: build-result
+          path: .quality/results/build.json
+  cucumber-and-coverage:
+    name: cucumber-and-coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - run: python3 scripts/quality.py cucumber-and-coverage
+      - uses: actions/upload-artifact@v4
+        with:
+          include-hidden-files: true
+          name: cucumber-and-coverage-result
+          path: .quality/results/cucumber-and-coverage.json
+  race:
+    name: race
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - run: python3 scripts/quality.py race
+      - uses: actions/upload-artifact@v4
+        with:
+          include-hidden-files: true
+          name: race-result
+          path: .quality/results/race.json
+  quality-gate:
+    name: quality-gate
+    if: always()
+    needs: [static, build, cucumber-and-coverage, race]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+      - name: Jeder Pflichtjob muss erfolgreich sein
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: python3 -c 'import json,os; assert all(x["result"] == "success" for x in json.loads(os.environ["RESULTS"]).values())'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: '*-result'
+          path: .quality/results
+          merge-multiple: true
+      - run: python3 scripts/quality.py quality-gate

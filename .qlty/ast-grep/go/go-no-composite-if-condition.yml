@@ -1,0 +1,13 @@
+id: shop-go-no-composite-if-condition
+language: Go
+severity: error
+message: "Zusammengesetzte if-Bedingungen mit && oder || gehören in eine sprechend benannte Prädikatmethode."
+files:
+  - "**/*.go"
+rule:
+  any:
+    - pattern: "$A && $B"
+    - pattern: "$A || $B"
+  inside:
+    kind: if_statement
+    field: condition

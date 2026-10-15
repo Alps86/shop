@@ -1,0 +1,12 @@
+id: shop-go-types-in-type-file
+language: Go
+severity: error
+message: "Typdeklarationen gehören in type.go; eigene Fehlertypen dürfen in errors.go stehen."
+files:
+  - "**/*.go"
+ignores:
+  - "**/type.go"
+  - "**/errors.go"
+  - "**/type_test.go"
+rule:
+  kind: type_declaration

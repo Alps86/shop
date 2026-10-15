@@ -1,0 +1,49 @@
+package spacing
+
+func Short(value int) int {
+	return value
+}
+
+func Compact() int {
+	value := 1
+	return value
+}
+
+func Prepared() int {
+	value := 1
+
+	return value
+}
+
+func Nested(values []int) int {
+	for _, value := range values {
+		if value < 0 {
+			return value
+		}
+	}
+
+	return 0
+}
+
+func Callback() int {
+	value := invoke(func() int {
+		value := 1
+		value++
+
+		return value
+	})
+
+	return value
+}
+
+func invoke(callback func() int) int {
+	return callback()
+}
+
+func Literal() map[string]int {
+	value := map[string]int{
+		"key": 1,
+	}
+
+	return value
+}

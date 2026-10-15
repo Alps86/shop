@@ -1,0 +1,6 @@
+{
+  ".qlty/checks/type-spacing/checker.go": "9a5fe733d987b19b69c738a4b0c411b811b46c2e3b0259c655e158fd7b4ffd83",
+  ".qlty/checks/type-spacing/main.go": "fe78e925ff4b438f3c6c1fe9962faf6c95b3350cab63312d04789252f41bfe1a",
+  ".qlty/checks/type-spacing/regression.go": "e0c1947ea520e5fd68886d58da5a3e3d8dc8e3d0ca2ff61a91d408b371e4372c",
+  ".qlty/checks/type-spacing/type.go": "1fd5e68a5a126b85bd733e1da9fdb565e2bf1de34a60ded679933f277280cacb"
+}
