@@ -1,0 +1,89 @@
+{{define "simulation"}}<p class="simulation" role="note">Simulation – keine echte Bestellung/Zahlung</p>{{end}}
+{{define "hidden"}}<input type="hidden" name="csrf" value="{{.CSRF}}"><input type="hidden" name="commandID" value="{{.CommandID}}"><input type="hidden" name="cartID" value="{{.Cart.Cart.ID}}"><input type="hidden" name="revision" value="{{.Cart.Cart.Revision}}"><input type="hidden" name="evaluationID" value="{{.Cart.Cart.Evaluation.Value.ID}}">{{end}}
+{{define "start"}}<form method="post" action="/de-DE/gast"><input type="hidden" name="csrf" value="{{.CSRF}}"><input type="hidden" name="commandID" value="{{.CommandID}}"><input type="hidden" name="add" value="{{field .Form "add" ""}}"><input type="hidden" name="return" value="{{.Kind}}"><input type="hidden" name="profile" value="{{.ProfileChoice}}"><button>Eigenen Einkauf starten</button></form>{{end}}
+{{define "cart"}}
+{{template "simulation" .}}
+<h1>Dein Warenkorb</h1>
+{{if .Preview.Present}}
+<section>
+  <h2>Unverbindliche Zubehör- und Rabattvorschau</h2>
+  {{template "evaluationValue" .Preview.Value}}
+  <form method="post" action="/de-DE/warenkorb/aktion" hx-post="/de-DE/warenkorb/aktion" hx-target="#content" hx-disabled-elt="button">
+    {{template "hidden" .}}
+    <input type="hidden" name="sku" value="{{.PreviewSKU}}">
+    <input type="hidden" name="quantity" value="1">
+    <button name="action" value="add">Zubehör übernehmen</button>
+  </form>
+  <a href="/de-DE/warenkorb">Zubehör ablehnen</a>
+</section>
+{{end}}
+{{if not .Guest.UserID}}{{template "start" .}}{{end}}
+{{if not .Cart.Cart.Items}}
+<p>Dein Warenkorb ist leer.</p><a href="/de-DE/">Weiter einkaufen</a>
+{{end}}
+{{if .Cart.OrderID.Present}}
+<p>Dieser Einkauf ist abgeschlossen.</p>
+<a href="/de-DE/bestellung/{{.Cart.OrderID.Value}}">Bestellstatus anzeigen</a>
+{{end}}
+{{if can .Cart "change"}}
+{{if index .Form "add"}}
+<form method="post" action="/de-DE/warenkorb/aktion" hx-post="/de-DE/warenkorb/aktion" hx-target="#content" hx-disabled-elt="button">
+  {{template "hidden" .}}
+  <input type="hidden" name="sku" value="{{index .Form "add" 0}}">
+  <input type="hidden" name="quantity" value="1">
+  <p>Variante {{index .Form "add" 0}} hinzufügen?</p>
+  <button name="action" value="add">Zum Warenkorb hinzufügen</button>
+</form>
+{{end}}
+{{end}}
+{{range .Products}}
+<p><a href="{{productURL .Product}}?sku={{.ChosenSKU}}">{{text .Product.Name}} · {{.ChosenSKU}}</a></p>
+{{end}}
+{{range .Cart.Cart.Items}}
+<article>
+  <h2>{{.SKU}}</h2>
+  {{if can $.Cart "change"}}
+  <form method="post" action="/de-DE/warenkorb/aktion" hx-post="/de-DE/warenkorb/aktion" hx-target="#content" hx-disabled-elt="button">
+    {{template "hidden" $}}
+    <input type="hidden" name="sku" value="{{.SKU}}">
+    <label>Menge <input name="quantity" type="number" min="1" value="{{quantity $ .}}" required></label>
+    <button name="action" value="setQuantity">Menge ändern</button>
+    <button name="action" value="remove">Entfernen</button>
+  </form>
+  {{end}}
+</article>
+{{end}}
+{{template "evaluation" .}}
+{{if can .Cart "change"}}
+{{if .Cart.Cart.Items}}
+<section>
+  <h2>Passendes Zubehör</h2>
+  <p>Zubehör ist freiwillig. Zugeordnete Rabatte erscheinen in der aktuellen Bewertung.</p>
+  {{template "cards" .Recommendations}}
+  {{range .Recommendations.Cards}}
+  <form method="post" action="/de-DE/warenkorb/aktion" hx-post="/de-DE/warenkorb/aktion" hx-target="#content" hx-disabled-elt="button">
+    {{template "hidden" $}}
+    <input type="hidden" name="sku" value="{{.SKU}}"><input type="hidden" name="quantity" value="1">
+    <a href="/de-DE/warenkorb?vorschau={{.SKU}}">Rabattvorschau für {{.Name}}</a>
+    <button name="action" value="add">Zubehör {{.Name}} hinzufügen</button>
+  </form>
+  {{end}}
+  <a href="/de-DE/kasse">Ohne weiteres Zubehör zur Kasse</a>
+</section>
+<a class="button" href="/de-DE/kasse">Zum Gastcheckout</a>
+{{end}}
+{{end}}
+{{if can .Cart "startCart"}}
+<form method="post" action="/de-DE/warenkorb/aktion" hx-post="/de-DE/warenkorb/aktion" hx-target="#content" hx-disabled-elt="button">
+  {{template "hidden" .}}
+  <button name="action" value="start">Neuen Einkauf starten</button>
+</form>
+{{end}}
+{{end}}
+
+{{define "evaluation"}}{{if .Cart.Cart.Evaluation.Present}}{{with .Cart.Cart.Evaluation.Value}}{{template "evaluationValue" .}}{{end}}{{end}}{{end}}
+{{define "evaluationValue"}}<section><h2>Aktuelle Bewertung</h2><dl>{{range .Items}}<dt>{{.SKU}} × {{.Quantity}}</dt><dd>Einzelpreis {{money .UnitPrice}}{{range .Discounts}} · Rabatt {{money .Amount}}{{end}}</dd>{{end}}<dt>Zwischensumme</dt><dd>{{money .Subtotal}}</dd>{{range .Discounts}}<dt>Rabatt {{.RuleID}}</dt><dd>{{money .Amount}}</dd>{{end}}<dt>Versand</dt><dd>{{money .ShippingCost}}</dd>{{range .Taxes}}<dt>Enthaltene Steuer {{.Rate}}</dt><dd>{{money .Amount}}</dd>{{end}}<dt>Gesamt</dt><dd><strong>{{money .Total}}</strong></dd></dl></section>{{end}}
+{{define "checkout"}}{{template "simulation" .}}<h1>Gastcheckout</h1>{{if .UnavailableSKU.Present}}<p>Variante {{.UnavailableSKU.Value}} ist nicht verfügbar. Wähle selbst eine verfügbare Alternative:</p>{{range .Alternatives}}<a href="{{.URL}}?sku={{.SKU}}">{{.Name}} – {{.SKU}}</a>{{end}}{{end}}{{if can .Cart "change"}}<form method="post" action="/de-DE/warenkorb/aktion" hx-post="/de-DE/warenkorb/aktion" hx-target="#content" hx-disabled-elt="button">{{template "hidden" .}}<input type="hidden" name="return" value="checkout"><fieldset><legend>Lieferadresse</legend><label>Name <input name="recipient" required autocomplete="name" value="{{field .Form "recipient" .Cart.Cart.Checkout.Value.ShippingAddress.Recipient}}"></label><label>Straße <input name="street" required autocomplete="street-address" value="{{field .Form "street" .Cart.Cart.Checkout.Value.ShippingAddress.Street}}"></label><label>Postleitzahl <input name="postalCode" required value="{{field .Form "postalCode" .Cart.Cart.Checkout.Value.ShippingAddress.PostalCode}}"></label><label>Ort <input name="city" required value="{{field .Form "city" .Cart.Cart.Checkout.Value.ShippingAddress.City}}"></label><label>Land <select name="country"><option value="DE">Deutschland</option></select></label><button name="action" value="address">Adresse speichern</button></fieldset></form><form method="post" action="/de-DE/warenkorb/aktion" hx-post="/de-DE/warenkorb/aktion" hx-target="#content" hx-disabled-elt="button">{{template "hidden" .}}<input type="hidden" name="return" value="checkout"><label>Versand <select name="shipping"><option value="standard">Standard</option><option value="express" {{if eq .Cart.Cart.Checkout.Value.ShippingMethod "express"}}selected{{end}}>Express</option></select></label><button name="action" value="shipping">Versand wählen</button></form><form method="post" action="/de-DE/warenkorb/aktion" hx-post="/de-DE/warenkorb/aktion" hx-target="#content" hx-disabled-elt="button">{{template "hidden" .}}<input type="hidden" name="return" value="checkout"><label>Zahlung <select name="payment"><option value="invoice">Rechnung</option><option value="creditCard" {{if eq .Cart.Cart.Checkout.Value.PaymentMethod "creditCard"}}selected{{end}}>Kreditkarte (Simulation ohne Kartendaten)</option></select></label><button name="action" value="payment">Zahlung wählen</button></form>{{end}}{{template "evaluation" .}}<form method="post" action="/de-DE/warenkorb/aktion" hx-post="/de-DE/warenkorb/aktion" hx-target="#content" hx-disabled-elt="button">{{template "hidden" .}}<input type="hidden" name="return" value="checkout">{{range .Cart.Actions}}{{if eq . "confirm"}}<button name="action" value="confirm">Aktuelle Positionen und Gesamtpreis ausdrücklich bestätigen</button>{{end}}{{if eq . "place"}}<button name="action" value="place">Demo-Bestellung verbindlich abschließen</button>{{end}}{{end}}</form>{{if can .Cart "startCart"}}<form method="post" action="/de-DE/warenkorb/aktion">{{template "hidden" .}}<button name="action" value="start">Neuen Einkauf starten</button></form>{{end}}<a href="/de-DE/kasse" hx-get="/de-DE/kasse" hx-target="#content">Abschlussstatus aktualisieren</a><a href="/de-DE/warenkorb">Zurück zum Warenkorb</a>{{end}}
+{{define "order"}}{{template "simulation" .}}<h1>Deine Demo-Bestellung {{.Order.Purchase.ID}}</h1>{{template "snapshot" .Order.Purchase}}<section><h2>Lieferfortschritt</h2><p>{{.Order.Fulfillment.State}}</p>{{range .Order.Fulfillment.Lines}}<p>{{.SKU}}: gekauft {{.Purchased}}, versandt {{.Shipped}}, geliefert {{.Delivered}}</p>{{end}}</section><a href="{{.Path}}" hx-get="{{.Path}}" hx-target="#content" hx-disabled-elt="this">Status aktualisieren</a>{{end}}
+{{define "snapshot"}}<section><h2>Unveränderlicher Kauf</h2>{{range .Items}}<p>{{.ProductName}} · {{.SKU}} × {{.Quantity}} · {{money .UnitPrice}}</p>{{range .Discounts}}<p>Rabatt {{.RuleID}}: {{money .Amount}}</p>{{end}}{{end}}<p>Gesamt {{money .Total}}, Versand {{money .ShippingCost}}</p><p>Versand {{.ShippingMethod}}, Zahlung {{.PaymentMethod}}</p><address>{{.ShippingAddress.Recipient}}, {{.ShippingAddress.Street}}, {{.ShippingAddress.PostalCode}} {{.ShippingAddress.City}}, {{.ShippingAddress.Country}}</address><p>Bestellt {{.PlacedAt}}</p></section>{{end}}
+{{define "profile"}}<h1>Deine Interessen</h1><nav aria-label="Interessenprofile"><a href="/de-DE/profil?profile=neutral">Neutral</a><a href="/de-DE/profil?profile=mobile">Mobil</a><a href="/de-DE/profil?profile=home">Zuhause</a><a href="/de-DE/profil?profile=coffee">Kaffee</a></nav><p>Die Profile beeinflussen Empfehlungen. Dein Warenkorb bleibt dein eigener.</p>{{if not .Guest.UserID}}{{template "start" .}}{{end}}{{if .Guest.UserID}}<p>Aktuelles Profil: {{.Guest.Profile}}</p><form method="post" action="/de-DE/profil"><input type="hidden" name="csrf" value="{{.CSRF}}"><label>Interessenprofil<select name="profile"><option value="neutral" {{if eq .ProfileChoice "neutral"}}selected{{end}}>Neutral</option><option value="mobile" {{if eq .ProfileChoice "mobile"}}selected{{end}}>Mobil</option><option value="home" {{if eq .ProfileChoice "home"}}selected{{end}}>Zuhause</option><option value="coffee" {{if eq .ProfileChoice "coffee"}}selected{{end}}>Kaffee</option></select></label><button>Profil bestätigen</button></form>{{end}}{{end}}

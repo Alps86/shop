@@ -1,0 +1,6 @@
+baseURL = 'http://localhost/'
+languageCode = 'de-DE'
+title = 'Lichtblick Technik'
+disableKinds = ['taxonomy', 'term', 'RSS']
+[markup.goldmark.renderer]
+unsafe = false

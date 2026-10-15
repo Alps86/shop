@@ -1,0 +1,706 @@
+{
+  "Detail": {
+    "Product": {
+      "ID": "p-phone",
+      "Slug": "testmodell",
+      "FamilyID": "f-phone",
+      "FamilyVersion": 1,
+      "Revision": 1,
+      "Published": true,
+      "PrimaryCategoryID": "c-phone",
+      "Brand": "Alpha",
+      "Name": {
+        "de-DE": "Testmodell <b>"
+      },
+      "Description": {
+        "de-DE": "Eigene kurze Beschreibung"
+      },
+      "Variants": [
+        {
+          "SKU": "BLUE-128",
+          "Attributes": {
+            "color": {
+              "Type": "select",
+              "Options": [
+                "blue"
+              ]
+            },
+            "storageCapacity": {
+              "Type": "number",
+              "Number": {
+                "Present": true,
+                "Value": "128"
+              }
+            }
+          },
+          "Images": [
+            {
+              "URL": "/assets/product.svg",
+              "AltText": {
+                "de-DE": "Galerie BLUE-128"
+              }
+            }
+          ]
+        },
+        {
+          "SKU": "RED-256",
+          "Attributes": {
+            "color": {
+              "Type": "select",
+              "Options": [
+                "red"
+              ]
+            },
+            "storageCapacity": {
+              "Type": "number",
+              "Number": {
+                "Present": true,
+                "Value": "256"
+              }
+            }
+          },
+          "Images": [
+            {
+              "URL": "/assets/product.svg",
+              "AltText": {
+                "de-DE": "Galerie RED-256"
+              }
+            }
+          ]
+        }
+      ],
+      "Manufacturer": {
+        "Name": "Testhersteller",
+        "PostalAddress": {
+          "Street": "Testweg 1",
+          "PostalCode": "10000",
+          "City": "Teststadt",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "kontakt@example.invalid"
+      },
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "Notices": [
+          {
+            "Code": "notice",
+            "Text": {
+              "de-DE": "verified-blue"
+            },
+            "Placement": [
+              "detail",
+              "listing"
+            ]
+          }
+        ]
+      }
+    },
+    "ChosenSKU": "BLUE-128",
+    "Cards": [
+      {
+        "ProductID": "p-phone",
+        "URL": "/de-DE/produkt/testmodell--p-phone",
+        "Name": "Testmodell <b>",
+        "SKU": "BLUE-128",
+        "Image": {
+          "URL": "/assets/product.svg",
+          "AltText": {
+            "de-DE": "Galerie BLUE-128"
+          }
+        },
+        "UnitPrice": {
+          "MinorUnits": 10000,
+          "Currency": "EUR"
+        },
+        "AvailableQuantity": 7,
+        "VariantCount": 2,
+        "TopAttributes": {
+          "storageCapacity": {
+            "Type": "number",
+            "Number": {
+              "Present": true,
+              "Value": "256"
+            }
+          }
+        },
+        "Compliance": {
+          "Context": {
+            "Market": "DE",
+            "Locale": "de-DE",
+            "VerificationStatus": "verified"
+          },
+          "Notices": [
+            {
+              "Code": "notice",
+              "Text": {
+                "de-DE": "verified-blue"
+              },
+              "Placement": [
+                "detail",
+                "listing"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "ProductID": "p-phone",
+        "URL": "/de-DE/produkt/testmodell--p-phone",
+        "Name": "Testmodell <b>",
+        "SKU": "RED-256",
+        "Image": {
+          "URL": "/assets/product.svg",
+          "AltText": {
+            "de-DE": "Galerie RED-256"
+          }
+        },
+        "UnitPrice": {
+          "MinorUnits": 12000,
+          "Currency": "EUR"
+        },
+        "AvailableQuantity": 7,
+        "VariantCount": 2,
+        "TopAttributes": {
+          "storageCapacity": {
+            "Type": "number",
+            "Number": {
+              "Present": true,
+              "Value": "256"
+            }
+          }
+        },
+        "Compliance": {
+          "Context": {
+            "Market": "DE",
+            "Locale": "de-DE",
+            "VerificationStatus": "verified"
+          },
+          "Notices": [
+            {
+              "Code": "notice",
+              "Text": {
+                "de-DE": "verified-blue"
+              },
+              "Placement": [
+                "detail",
+                "listing"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "Category": {
+    "Category": {
+      "ID": "c-phone",
+      "Slug": "smartphones",
+      "Version": 1,
+      "Name": {
+        "de-DE": "Smartphones"
+      },
+      "Description": {
+        "de-DE": "Finde dein passendes Modell"
+      },
+      "FilterAttributes": [
+        "color",
+        "storageCapacity"
+      ]
+    },
+    "Breadcrumb": [
+      {
+        "ID": "c-phone",
+        "Slug": "smartphones",
+        "Version": 1,
+        "Name": {
+          "de-DE": "Smartphones"
+        },
+        "Description": {
+          "de-DE": "Finde dein passendes Modell"
+        },
+        "FilterAttributes": [
+          "color",
+          "storageCapacity"
+        ]
+      }
+    ],
+    "FilterDefinitions": [
+      {
+        "Code": "color",
+        "Type": "select",
+        "Level": "variant",
+        "Name": {
+          "de-DE": "color"
+        },
+        "Options": [
+          {
+            "Code": "blue",
+            "Label": {
+              "de-DE": "blue"
+            }
+          },
+          {
+            "Code": "red",
+            "Label": {
+              "de-DE": "red"
+            }
+          }
+        ]
+      },
+      {
+        "Code": "storageCapacity",
+        "Type": "select",
+        "Level": "variant",
+        "Name": {
+          "de-DE": "storageCapacity"
+        },
+        "Options": [
+          {
+            "Code": "128",
+            "Label": {
+              "de-DE": "128"
+            }
+          },
+          {
+            "Code": "256",
+            "Label": {
+              "de-DE": "256"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "Search": {
+    "TotalProducts": 1,
+    "Cards": [
+      {
+        "ProductID": "p-phone",
+        "URL": "/de-DE/produkt/testmodell--p-phone",
+        "Name": "Testmodell <b>",
+        "SKU": "RED-256",
+        "Image": {
+          "URL": "/assets/product.svg",
+          "AltText": {
+            "de-DE": "Galerie RED-256"
+          }
+        },
+        "UnitPrice": {
+          "MinorUnits": 12000,
+          "Currency": "EUR"
+        },
+        "AvailableQuantity": 7,
+        "VariantCount": 2,
+        "TopAttributes": {
+          "storageCapacity": {
+            "Type": "number",
+            "Number": {
+              "Present": true,
+              "Value": "256"
+            }
+          }
+        },
+        "Compliance": {
+          "Context": {
+            "Market": "DE",
+            "Locale": "de-DE",
+            "VerificationStatus": "verified"
+          },
+          "Notices": [
+            {
+              "Code": "notice",
+              "Text": {
+                "de-DE": "verified-blue"
+              },
+              "Placement": [
+                "detail",
+                "listing"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "Facets": [
+      {
+        "Code": "brand",
+        "Values": [
+          {
+            "Value": "Alpha",
+            "ProductCount": 1,
+            "Selected": true
+          },
+          {
+            "Value": "Beta",
+            "ProductCount": 1
+          }
+        ]
+      },
+      {
+        "Code": "color",
+        "Values": [
+          {
+            "Value": "blue",
+            "ProductCount": 1
+          },
+          {
+            "Value": "red",
+            "ProductCount": 1
+          }
+        ]
+      }
+    ],
+    "Page": 1,
+    "PageSize": 12
+  },
+  "Guest": {
+    "UserID": "guest-a",
+    "CartID": {
+      "Present": true,
+      "Value": "cart-a"
+    },
+    "Profile": "neutral",
+    "Session": "test-session-a"
+  },
+  "Cart": {
+    "Cart": {
+      "ID": "cart-a",
+      "UserID": "guest-a",
+      "Revision": 2,
+      "State": "checkingOut",
+      "Items": [
+        {
+          "SKU": "RED-256",
+          "Quantity": 1
+        }
+      ],
+      "Evaluation": {
+        "Present": true,
+        "Value": {
+          "ID": "evaluation-a",
+          "CartRevision": 2,
+          "RuleSetVersion": "demo-v1",
+          "Items": [
+            {
+              "SKU": "RED-256",
+              "Quantity": 1,
+              "UnitPrice": {
+                "MinorUnits": 12000,
+                "Currency": "EUR"
+              }
+            }
+          ],
+          "Subtotal": {
+            "MinorUnits": 12000,
+            "Currency": "EUR"
+          },
+          "ShippingCost": {
+            "MinorUnits": 0,
+            "Currency": "EUR"
+          },
+          "Taxes": [
+            {
+              "Rate": "19",
+              "Amount": {
+                "MinorUnits": 1916,
+                "Currency": "EUR"
+              }
+            }
+          ],
+          "Total": {
+            "MinorUnits": 12000,
+            "Currency": "EUR"
+          }
+        }
+      },
+      "Checkout": {
+        "Present": true,
+        "Value": {
+          "CartID": "cart-a",
+          "ShippingAddress": {
+            "Recipient": "Max Beispiel",
+            "Street": "Testweg 1",
+            "PostalCode": "10000",
+            "City": "Teststadt",
+            "Country": "DE"
+          },
+          "ShippingMethod": "standard",
+          "PaymentMethod": "invoice"
+        }
+      }
+    },
+    "Actions": [
+      "change",
+      "evaluate",
+      "confirm",
+      "place"
+    ]
+  },
+  "Order": {
+    "Purchase": {
+      "ID": "order-a",
+      "CartID": "cart-a",
+      "UserID": "guest-a",
+      "Items": [
+        {
+          "SKU": "RED-256",
+          "ProductName": "Unveränderlicher Kaufname",
+          "Quantity": 1,
+          "UnitPrice": {
+            "MinorUnits": 12000,
+            "Currency": "EUR"
+          }
+        }
+      ],
+      "ShippingAddress": {
+        "Recipient": "Max Beispiel",
+        "Street": "Testweg 1",
+        "PostalCode": "10000",
+        "City": "Teststadt",
+        "Country": "DE"
+      },
+      "ShippingMethod": "standard",
+      "PaymentMethod": "invoice",
+      "Subtotal": {
+        "MinorUnits": 12000,
+        "Currency": "EUR"
+      },
+      "ShippingCost": {
+        "Currency": "EUR"
+      },
+      "Total": {
+        "MinorUnits": 12000,
+        "Currency": "EUR"
+      }
+    },
+    "Fulfillment": {
+      "State": "partiallyShipped",
+      "Lines": [
+        {
+          "SKU": "RED-256",
+          "Purchased": 1,
+          "Shipped": 1,
+          "Delivered": 0
+        }
+      ]
+    }
+  },
+  "Purchase": {
+    "OrderID": "order-a"
+  },
+  "Recommendations": {
+    "Cards": [],
+    "Label": "Synthetische Demostatistik"
+  },
+  "AdminCatalog": {
+    "Products": [
+      {
+        "ID": "p-phone",
+        "Slug": "testmodell",
+        "FamilyID": "f-phone",
+        "FamilyVersion": 1,
+        "Revision": 1,
+        "Published": true,
+        "PrimaryCategoryID": "c-phone",
+        "Brand": "Alpha",
+        "Name": {
+          "de-DE": "Testmodell <b>"
+        },
+        "Description": {
+          "de-DE": "Eigene kurze Beschreibung"
+        },
+        "Variants": [
+          {
+            "SKU": "BLUE-128",
+            "Attributes": {
+              "color": {
+                "Type": "select",
+                "Options": [
+                  "blue"
+                ]
+              },
+              "storageCapacity": {
+                "Type": "number",
+                "Number": {
+                  "Present": true,
+                  "Value": "128"
+                }
+              }
+            },
+            "Images": [
+              {
+                "URL": "/assets/product.svg",
+                "AltText": {
+                  "de-DE": "Galerie BLUE-128"
+                }
+              }
+            ]
+          },
+          {
+            "SKU": "RED-256",
+            "Attributes": {
+              "color": {
+                "Type": "select",
+                "Options": [
+                  "red"
+                ]
+              },
+              "storageCapacity": {
+                "Type": "number",
+                "Number": {
+                  "Present": true,
+                  "Value": "256"
+                }
+              }
+            },
+            "Images": [
+              {
+                "URL": "/assets/product.svg",
+                "AltText": {
+                  "de-DE": "Galerie RED-256"
+                }
+              }
+            ]
+          }
+        ],
+        "Manufacturer": {
+          "Name": "Testhersteller",
+          "PostalAddress": {
+            "Street": "Testweg 1",
+            "PostalCode": "10000",
+            "City": "Teststadt",
+            "Country": "DE"
+          },
+          "ElectronicAddress": "kontakt@example.invalid"
+        },
+        "Compliance": {
+          "Context": {
+            "Market": "DE",
+            "Locale": "de-DE",
+            "VerificationStatus": "verified"
+          },
+          "Notices": [
+            {
+              "Code": "notice",
+              "Text": {
+                "de-DE": "verified-blue"
+              },
+              "Placement": [
+                "detail",
+                "listing"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "Categories": [
+      {
+        "ID": "c-phone",
+        "Slug": "smartphones",
+        "Version": 1,
+        "Name": {
+          "de-DE": "Smartphones"
+        },
+        "Description": {
+          "de-DE": "Finde dein passendes Modell"
+        },
+        "FilterAttributes": [
+          "color",
+          "storageCapacity"
+        ]
+      }
+    ],
+    "Families": [
+      {
+        "ID": "f-phone",
+        "Version": 1,
+        "Name": {
+          "de-DE": "Smartphonefamilie"
+        }
+      }
+    ],
+    "Inventory": [
+      {
+        "SKU": "RED-256",
+        "Price": {
+          "MinorUnits": 12000,
+          "Currency": "EUR"
+        },
+        "StockQuantity": 7,
+        "Revision": 3
+      }
+    ]
+  },
+  "AdminOrders": {
+    "Orders": [],
+    "Page": 1,
+    "PageSize": 12,
+    "Total": 0
+  },
+  "FrameContent": "Eigener kurzer redaktioneller Hugo-Rahmen.",
+  "Preview": {
+    "ID": "preview-a",
+    "CartRevision": 3,
+    "RuleSetVersion": "demo-v1",
+    "Items": [
+      {
+        "SKU": "RED-256",
+        "Quantity": 1,
+        "UnitPrice": {
+          "MinorUnits": 12000,
+          "Currency": "EUR"
+        }
+      },
+      {
+        "SKU": "CASE",
+        "Quantity": 1,
+        "UnitPrice": {
+          "MinorUnits": 2000,
+          "Currency": "EUR"
+        }
+      }
+    ],
+    "Subtotal": {
+      "MinorUnits": 14000,
+      "Currency": "EUR"
+    },
+    "Discounts": [
+      {
+        "RuleID": "rule-pair",
+        "Amount": {
+          "MinorUnits": 500,
+          "Currency": "EUR"
+        },
+        "ItemSKUs": [
+          "RED-256",
+          "CASE"
+        ]
+      }
+    ],
+    "ShippingCost": {
+      "MinorUnits": 0,
+      "Currency": "EUR"
+    },
+    "Total": {
+      "MinorUnits": 13500,
+      "Currency": "EUR"
+    }
+  },
+  "Routes": [
+    {
+      "Path": "/de-DE/produkt/testmodell--p-phone",
+      "Title": "Testmodell",
+      "Kind": "product"
+    },
+    {
+      "Path": "/de-DE/kategorie/smartphones--c-phone",
+      "Title": "Smartphones",
+      "Kind": "category"
+    }
+  ]
+}

@@ -1,29 +1,37 @@
 # language: de
-@spec-only @frontend
+@http @frontend
 Funktionalität: Zusammenhängende Variantenansicht
-  Als Käufer wechsle ich die vollständige Variante mit oder ohne HTMX.
+  Als Käufer wechsle ich Galerie Preis Verfügbarkeit und Pflichtdaten als eine Einheit.
 
-  Szenariogrundriss: Variantenwechsel ersetzt eine vollständige sichtbare Einheit
-    Angenommen ein explizites ProductDetail enthält Variantenansichten
-      | SKU | Color | StorageGB | Gallery | Price | ComplianceMarker | AccessoryMarker |
-      | BLUE-128 | blue | 128 | gallery-a | 10000 | verified-a | accessory-a |
-      | RED-256 | red | 256 | gallery-b | 12000 | verified-b | accessory-b |
-    Wenn die aktive Variante angefordert wird
-      | SKU | HX-Request |
-      | RED-256 | <htmx> |
-    Dann lautet die sichtbare Variantenansicht
-      | SKU | Gallery | Price | ComplianceMarker | AccessoryMarker | Vary | HistoryURL | ResponseShape |
-      | RED-256 | gallery-b | 12000 | verified-b | accessory-b | HX-Request | ?sku=RED-256 | <form> |
+  Hintergrund:
+    Angenommen explizite HTTPdaten liegen vor
+      | Fixture | Fault |
+      | spec/fixtures/http/shop.json | |
+    Und HTTPportdaten werden ersetzt
+      | JSON |
+      | {"Detail":{"Cards":[{"ProductID":"p-phone","URL":"/de-DE/produkt/testmodell--p-phone","Name":"Testmodell","SKU":"RED-256","Image":{"URL":"/assets/product.svg","AltText":{"de-DE":"gallery-red"}},"UnitPrice":{"MinorUnits":12000,"Currency":"EUR"},"AvailableQuantity":7,"VariantCount":2,"Compliance":{"Context":{"Market":"DE","Locale":"de-DE","VerificationStatus":"verified"},"Notices":[{"Text":{"de-DE":"verified-red"}}]}}]}} |
+
+  Szenariogrundriss: HTML und HTMX zeigen dieselbe vollständige rote Variante
+    Wenn der Shop liefert eine HTTPansicht
+      | Method | URL | HTMX |
+      | GET | /de-DE/produkt/testmodell--p-phone?sku=RED-256 | <htmx> |
+    Dann die HTTPantwort enthält die sichtbaren Vertragswerte
+      | Field | Value |
+      | Status | 200 |
+      | BodyAll | data-sku="RED-256",gallery-red,120&#44;00 EUR,verified-red,Zubehör und Empfehlungen,hx-push-url="true" |
+      | Header:Vary | HX-Request |
+      | Absent | verified-blue |
     Beispiele:
-      | htmx | form |
-      | false | fullPage |
-      | true | completeVariantFragment |
+      | htmx |
+      | false |
+      | true |
 
-  Szenario: Öffentliche Produktkarte nutzt DTO statt interner Rankingdaten
-    Angenommen eine ProductCard liegt vor
-      | ProductID | ChosenSKU | VariantCount | TopAttributes | ComplianceSummary | UnitPrice |
-      | p-phone | RED-256 | 3 | storageCapacity,display,battery | verified-marker | 12000 |
-    Wenn die Modellkarte gerendert wird
-    Dann lautet der Kartenvertrag
-      | CardCount | LinkSKU | VariantCountVisible | TopAttributeCount | ComplianceVisible | MarginVisible | InterestVisible |
-      | 1 | RED-256 | true | 3 | true | false | false |
+  Szenario: Eine Karte je Modell zeigt passende SKU und weitere Varianten
+    Wenn der Shop liefert eine HTTPansicht
+      | Method | URL |
+      | GET | /de-DE/kategorie/smartphones--c-phone |
+    Dann die HTTPantwort enthält die sichtbaren Vertragswerte
+      | Field | Value |
+      | BodyAll | ?sku=RED-256,2 Varianten,storageCapacity,verified-blue |
+      | Absent | MarginSignal |
+      | Absent | InterestWeight |
