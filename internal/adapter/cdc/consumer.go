@@ -27,10 +27,11 @@ func (consumer *Consumer) Stream(ctx context.Context) error {
 
 func (consumer *Consumer) Prepare(ctx context.Context) error {
 	consumer.pending = nil
-	if err := consumer.Close(ctx); err != nil {
-		return err
-	}
 
+	return errors.Join(consumer.Close(ctx), consumer.prepare(ctx))
+}
+
+func (consumer *Consumer) prepare(ctx context.Context) error {
 	if err := consumer.publication(ctx); err != nil {
 		return err
 	}

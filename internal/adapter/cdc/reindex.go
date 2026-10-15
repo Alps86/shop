@@ -41,12 +41,12 @@ func (source *ReindexSource) Snapshot(ctx context.Context, _ time.Time) (event.R
 func (consumer *Consumer) export(ctx context.Context) (event.ReindexSnapshot, error) {
 	slot, err := consumer.createSlot(ctx, "EXPORT_SNAPSHOT")
 	if err != nil {
-		return event.ReindexSnapshot{}, errors.Join(err, consumer.Close(ctx))
+		return event.ReindexSnapshot{}, err
 	}
 
 	events, err := consumer.config.Store.ExportedSnapshot(ctx, slot.SnapshotName)
 	if err != nil {
-		return event.ReindexSnapshot{}, errors.Join(err, consumer.Close(ctx))
+		return event.ReindexSnapshot{}, err
 	}
 
 	state, err := consumer.config.Store.ReplicationSlot(ctx, consumer.config.Slot)

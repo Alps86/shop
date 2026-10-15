@@ -11,7 +11,7 @@ import (
 
 func New(config Config) Adapter {
 	if config.HTTP == nil {
-		config.HTTP = &http.Client{Timeout: 250 * time.Millisecond}
+		config.HTTP = &http.Client{Timeout: 5 * time.Second}
 	}
 
 	if config.Clock == nil {
@@ -22,6 +22,9 @@ func New(config Config) Adapter {
 }
 
 func (adapter Adapter) Search(ctx context.Context, query application.SearchQuery) (application.SearchResult, error) {
+	ctx, cancel := context.WithTimeout(ctx, 250*time.Millisecond)
+	defer cancel()
+
 	body, err := adapter.searchBody(query)
 	if err != nil {
 		return application.SearchResult{}, err

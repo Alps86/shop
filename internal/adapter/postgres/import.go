@@ -166,7 +166,7 @@ func (manifest ImportManifest) insertInventories(ctx context.Context, tx pgx.Tx)
 }
 
 func (store *Store) publishProduct(ctx context.Context, tx pgx.Tx, product catalog.Product) error {
-	if _, err := tx.Exec(ctx, "INSERT INTO projection_versions(product_id,revision) VALUES($1,0) ON CONFLICT DO NOTHING", product.ID); err != nil {
+	if _, err := tx.Exec(ctx, "INSERT INTO projection_versions(product_id,revision) VALUES($1,0) ON CONFLICT(product_id) DO UPDATE SET deleted=false", product.ID); err != nil {
 		return err
 	}
 

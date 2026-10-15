@@ -163,3 +163,15 @@ Funktionalität: Tatsächliche PostgreSQL-Lesefehler
     Dann lautet das öffentliche SQL-Leseergebnis
       | Code |
       | OK |
+
+  Szenariogrundriss: Ein konkurrierender Schreibauftrag respektiert sein tatsächliches SQL-Zeitbudget
+    Wenn eine echte konkurrierende Schreibsperre das Requestbudget überschreitet
+      | Boundary |
+      | <boundary> |
+    Dann lautet das öffentliche SQL-Leseergebnis
+      | Code | Deadline |
+      | DependencyUnavailable | true |
+    Beispiele:
+      | boundary |
+      | StartCart |
+      | Import |

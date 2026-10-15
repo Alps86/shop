@@ -18,6 +18,7 @@ func (current *world) registerReplay(ctx *godog.ScenarioContext) {
 	ctx.Step(`^derselbe frühere Stand erneut an OpenSearch zugestellt wird$`, current.replay)
 	ctx.Step(`^das Produkt mit einem dauerhaften Tombstone gelöscht wird$`, current.deleteProduct)
 	ctx.Step(`^ein vollständiger echter Rebuild durchgeführt wird$`, current.fullRebuild)
+	ctx.Step(`^dasselbe Produkt bewusst als neue Datensatzversion veröffentlicht wird$`, current.republish)
 }
 
 func (current *world) capture(table *godog.Table) error {
@@ -84,4 +85,13 @@ func (current *world) walObserved(table *godog.Table) error {
 	}
 
 	return current.matches(map[string]string{"Plugin": plugin, "Persistent": strconv.FormatBool(persistent), "PublishedTables": strings.Join(tables, ","), "CheckpointPresent": strconv.FormatBool(checkpoint > 0)}, current.rows(table)[0])
+}
+
+func (current *world) republish(table *godog.Table) error {
+	row := current.rows(table)[0]
+	current.Manifest.DatasetVersion = row["DatasetVersion"]
+	current.Manifest.Products[0].Name["de-DE"] = row["Name"]
+	_, err := current.Store.Import(context.Background(), current.Manifest)
+
+	return err
 }

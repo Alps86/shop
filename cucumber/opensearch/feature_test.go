@@ -32,6 +32,7 @@ func (current *world) register(ctx *godog.ScenarioContext) {
 	current.rankingSteps(ctx)
 	current.reindexSteps(ctx)
 	current.failureSteps(ctx)
+	current.budgetSteps(ctx)
 	current.attributeSteps(ctx)
 	ctx.Step(`^der veröffentlichte Kategorienbaum steht bereit$`, current.categories)
 	ctx.Step(`^der Suchindex als leere echte Fixture angelegt wird$`, current.emptyIndex)
@@ -61,7 +62,7 @@ func (current *world) search(table *godog.Table) {
 	}
 
 	current.query = application.SearchQuery{Text: data["Text"], Page: page, Sort: application.Sort(data["Sort"]), Context: current.config.Context}
-	current.result, current.err = current.adapter.Search(context.Background(), current.query)
+	current.measuredSearch()
 }
 
 func (current *world) observed(table *godog.Table) error {

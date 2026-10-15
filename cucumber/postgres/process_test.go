@@ -25,12 +25,12 @@ func (current *world) dispatch(input *godog.Table) {
 }
 
 func (current *world) processObserved(input *godog.Table) error {
-	var pending int
-	if err := current.admin.QueryRow(context.Background(), "SELECT count(*) FROM "+current.schema+".process_outbox WHERE NOT acknowledged").Scan(&pending); err != nil {
+	var pending, checkpoints int
+	if err := current.admin.QueryRow(context.Background(), "SELECT (SELECT count(*) FROM "+current.schema+".process_outbox WHERE NOT acknowledged), (SELECT count(*) FROM "+current.schema+".cdc_checkpoints)").Scan(&pending, &checkpoints); err != nil {
 		return err
 	}
 
-	return check(table(input), map[string]string{"Code": value.Code(current.err), "CartCount": strconv.Itoa(len(current.processCarts)), "OrderCount": strconv.Itoa(len(current.processOrders)), "Pending": strconv.Itoa(pending)})
+	return check(table(input), map[string]string{"Code": value.Code(current.err), "CartCount": strconv.Itoa(len(current.processCarts)), "OrderCount": strconv.Itoa(len(current.processOrders)), "Pending": strconv.Itoa(pending), "SearchCheckpoints": strconv.Itoa(checkpoints)})
 }
 
 func (observer processObserver) EnsureCart(_ context.Context, id value.CartID, _ application.ProcessBinding) error {

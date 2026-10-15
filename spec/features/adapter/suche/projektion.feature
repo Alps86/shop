@@ -106,3 +106,62 @@ Funktionalität: Vollständige Suchprojektion über echte PostgreSQL-WAL-Daten
     Dann die öffentliche Suche den committed Zustand erhält
       | TotalProducts |
       | 0 |
+
+  Szenario: Eine bewusste Wiederveröffentlichung hebt den Tombstone auch für einen späteren Rebuild auf
+    Angenommen PostgreSQL und OpenSearch über echten WAL-CDC verbunden sind
+      | Locale | Currency | Market |
+      | de-DE | EUR | DE |
+    Wenn ein veröffentlichter Produktdatensatz committed wird
+      | Fixture |
+      | spec/fixtures/runtime/katalog.json |
+    Dann die öffentliche Suche den committed Zustand erhält
+      | TotalProducts | SKU | CheckpointAdvanced |
+      | 1 | PHONE | true |
+    Wenn ein früher bestätigter Projektionsstand aus PostgreSQL gesichert wird
+      | ProductID |
+      | p-phone |
+    Und das Produkt mit einem dauerhaften Tombstone gelöscht wird
+      | ProductID |
+      | p-phone |
+    Dann die öffentliche Suche den committed Zustand erhält
+      | TotalProducts | CheckpointAdvanced |
+      | 0 | true |
+    Wenn dasselbe Produkt bewusst als neue Datensatzversion veröffentlicht wird
+      | DatasetVersion | Name |
+      | demo-republished | Bewusst neu veröffentlicht |
+    Dann die öffentliche Suche den committed Zustand erhält
+      | TotalProducts | SKU | Name | CheckpointAdvanced |
+      | 1 | PHONE | Bewusst neu veröffentlicht | true |
+    Wenn der dauerhafte WAL-Verbraucher vorübergehend angehalten wird
+    Und ein vollständiger echter Rebuild durchgeführt wird
+      | IndexSuffix |
+      | republished |
+    Dann die öffentliche Suche den committed Zustand erhält
+      | TotalProducts | SKU | Name |
+      | 1 | PHONE | Bewusst neu veröffentlicht |
+    Wenn derselbe frühere Stand erneut an OpenSearch zugestellt wird
+      | Attempts |
+      | 2 |
+    Dann die öffentliche Suche den committed Zustand erhält
+      | TotalProducts | SKU | Name |
+      | 1 | PHONE | Bewusst neu veröffentlicht |
+
+  Szenario: Eine zurückgerollte Inventorytransaktion verändert weder Outbox noch tatsächliche Suche
+    Angenommen PostgreSQL und OpenSearch über echten WAL-CDC verbunden sind
+      | Locale | Currency | Market |
+      | de-DE | EUR | DE |
+    Wenn ein veröffentlichter Produktdatensatz committed wird
+      | Fixture |
+      | spec/fixtures/runtime/katalog.json |
+    Dann die öffentliche Suche den committed Zustand erhält
+      | TotalProducts | SKU | Price | Available | CheckpointAdvanced |
+      | 1 | PHONE | 10000 | 10 | true |
+    Wenn eine Inventoryänderung an der tatsächlichen Outboxgrenze zurückrollt
+      | SKU | ExpectedRevision | CommandID | Price | Stock |
+      | PHONE | 1 | rollback-a | 12000 | 8 |
+    Dann Quelle und Outbox den bestätigten Zustand behalten
+      | Code | Price | Stock | OutboxDelta |
+      | DependencyUnavailable | 10000 | 10 | 0 |
+    Und die öffentliche Suche den committed Zustand erhält
+      | TotalProducts | SKU | Price | Available | CheckpointAdvanced |
+      | 1 | PHONE | 10000 | 10 | false |

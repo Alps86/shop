@@ -16,6 +16,7 @@ import (
 func (current *world) cancellationSteps(ctx *godog.ScenarioContext) {
 	ctx.Step(`^ein bereits gekündigter Kontext die öffentliche SQL-Grenze erreicht$`, current.cancelledBoundary)
 	ctx.Step(`^die öffentliche SQL-Grenze nach dem Datenbankfehler aufgerufen wird$`, current.failedBoundary)
+	ctx.Step(`^eine echte konkurrierende Schreibsperre das Requestbudget überschreitet$`, current.blockedWrite)
 }
 
 func (current *world) cancelledBoundary(input *godog.Table) {

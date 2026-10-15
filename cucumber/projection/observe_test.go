@@ -58,6 +58,7 @@ func (current *world) searchFields(result application.SearchResult, checkpoint u
 	actual := map[string]string{"TotalProducts": strconv.FormatInt(result.TotalProducts, 10), "CheckpointAdvanced": strconv.FormatBool(checkpoint > current.PreviousCheckpoint)}
 	if len(result.Cards) > 0 {
 		actual["SKU"] = string(result.Cards[0].SKU)
+		actual["Name"] = result.Cards[0].Name
 		actual["Price"] = strconv.FormatInt(result.Cards[0].UnitPrice.MinorUnits, 10)
 		actual["Available"] = strconv.FormatInt(result.Cards[0].AvailableQuantity, 10)
 	}

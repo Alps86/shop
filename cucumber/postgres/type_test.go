@@ -3,11 +3,13 @@ package postgres_test
 import (
 	"github.com/Alps86/shop/internal/adapter/postgres"
 	"github.com/Alps86/shop/internal/application"
+	"github.com/Alps86/shop/internal/domain/sale"
 	"github.com/Alps86/shop/internal/domain/value"
 	"github.com/jackc/pgx/v5"
 )
 
 type world struct {
+	originalOrder  sale.Order
 	processCarts   map[value.CartID]bool
 	processOrders  map[value.OrderID]bool
 	processFailure string

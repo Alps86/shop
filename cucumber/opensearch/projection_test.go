@@ -40,7 +40,7 @@ func (current *world) source(table *godog.Table) error {
 	current.inventory = map[value.ProductID][]sale.Inventory{}
 	current.config = opensearch.Config{Endpoint: os.Getenv("SHOP_TEST_OPENSEARCH_URL"), Index: data["Index"], Context: value.RequestContext{Locale: value.Locale(data["Locale"]), Currency: value.Currency(data["Currency"]), Market: value.CountryCode(data["Market"])}, Clock: current}
 	current.capture = &captureTransport{}
-	current.config.HTTP = &http.Client{Transport: current.capture, Timeout: 250 * time.Millisecond}
+	current.config.HTTP = &http.Client{Transport: current.capture, Timeout: 5 * time.Second}
 	current.template = catalog.Product{FamilyID: value.ProductFamilyID(data["FamilyID"]), FamilyVersion: 1, PrimaryCategoryID: value.CategoryID(data["CategoryID"]), Manufacturer: catalog.EconomicOperator{Name: data["Manufacturer"], PostalAddress: catalog.BusinessAddress{Street: data["Street"], PostalCode: data["PostalCode"], City: data["City"], Country: value.CountryCode(data["Country"])}, ElectronicAddress: data["Email"]}, Compliance: catalog.ProductCompliance{Context: catalog.ComplianceContext{Market: current.config.Context.Market, Locale: current.config.Context.Locale, VerificationStatus: "verified"}}}
 	current.adapter = opensearch.New(current.config)
 

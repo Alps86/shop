@@ -10,6 +10,8 @@ import (
 )
 
 type world struct {
+	IntegrationError   error
+	PreviousOutbox     int64
 	Earlier            application.ProjectionEvent
 	PreviousCheckpoint uint64
 	Store              *postgres.Store

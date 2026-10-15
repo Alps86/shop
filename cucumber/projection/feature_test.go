@@ -28,6 +28,8 @@ func (current *world) register(ctx *godog.ScenarioContext) {
 	ctx.Step(`^Preis und Bestand atomar geändert werden$`, current.inventoryChange)
 	current.registerRebuild(ctx)
 	current.registerReplay(ctx)
+	ctx.Step(`^eine Inventoryänderung an der tatsächlichen Outboxgrenze zurückrollt$`, current.rollbackInventory)
+	ctx.Step(`^Quelle und Outbox den bestätigten Zustand behalten$`, current.rollbackObserved)
 	ctx.Step(`^der echte Replikationspfad dauerhaft quittiert ist$`, current.walObserved)
 	ctx.Step(`^der Suchalias genau den neuen physischen Index adressiert$`, current.aliasObserved)
 }

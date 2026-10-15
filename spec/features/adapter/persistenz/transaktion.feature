@@ -69,20 +69,20 @@ Funktionalität: Aktuelle Daten innerhalb der Kauftransaktion
       | FailureKind |
       | EnsureOrder |
     Dann lautet die dauerhafte Prozessbeobachtung
-      | Code | CartCount | OrderCount | Pending |
-      | DependencyUnavailable | 1 | 0 | 5 |
+      | Code | CartCount | OrderCount | Pending | SearchCheckpoints |
+      | DependencyUnavailable | 1 | 0 | 5 | 0 |
     Wenn die getrennte Prozessoutbox ausgeliefert wird
       | FailureKind |
       | none |
     Dann lautet die dauerhafte Prozessbeobachtung
-      | Code | CartCount | OrderCount | Pending |
-      | OK | 1 | 1 | 0 |
+      | Code | CartCount | OrderCount | Pending | SearchCheckpoints |
+      | OK | 1 | 1 | 0 | 0 |
     Wenn die getrennte Prozessoutbox ausgeliefert wird
       | FailureKind |
       | none |
     Dann lautet die dauerhafte Prozessbeobachtung
-      | Code | CartCount | OrderCount | Pending |
-      | OK | 1 | 1 | 0 |
+      | Code | CartCount | OrderCount | Pending | SearchCheckpoints |
+      | OK | 1 | 1 | 0 | 0 |
 
   Szenariogrundriss: Jeder fehlgeschlagene Transaktionsschritt rollt den Kauf vollständig zurück
     Angenommen ein echter SQL-Schreibfehler gezielt vorbereitet ist
@@ -367,8 +367,8 @@ Funktionalität: Aktuelle Daten innerhalb der Kauftransaktion
       | FailureKind |
       | none |
     Dann lautet die dauerhafte Prozessbeobachtung
-      | Code | CartCount | OrderCount | Pending |
-      | DependencyUnavailable | 0 | 0 | 4 |
+      | Code | CartCount | OrderCount | Pending | SearchCheckpoints |
+      | DependencyUnavailable | 0 | 0 | 4 | 0 |
 
   Szenario: Ein fehlgeschlagenes Prozessack lässt den Auftrag für dieselbe dauerhafte Zielkennung offen
     Angenommen ein echter SQL-Schreibfehler gezielt vorbereitet ist
@@ -378,8 +378,8 @@ Funktionalität: Aktuelle Daten innerhalb der Kauftransaktion
       | FailureKind |
       | none |
     Dann lautet die dauerhafte Prozessbeobachtung
-      | Code | CartCount | OrderCount | Pending |
-      | DependencyUnavailable | 1 | 0 | 4 |
+      | Code | CartCount | OrderCount | Pending | SearchCheckpoints |
+      | DependencyUnavailable | 1 | 0 | 4 | 0 |
 
   Szenario: Eine beschädigte Bestellzeile wird nicht als gültige Adminliste ausgegeben
     Wenn der Gast den bestätigten Kauf wiederholt abschließt

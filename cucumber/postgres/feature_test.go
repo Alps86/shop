@@ -25,16 +25,13 @@ func TestFeatures(t *testing.T) {
 
 func (current *world) register(ctx *godog.ScenarioContext) {
 	current.purchaseSteps(ctx)
+	current.bundleSteps(ctx)
 	current.changeSteps(ctx)
 	current.raceSteps(ctx)
-	current.readSteps(ctx)
+	current.readModelSteps(ctx)
 	current.processSteps(ctx)
 	current.faultSteps(ctx)
 	current.cartSteps(ctx)
-	current.importSteps(ctx)
-	current.publicationSteps(ctx)
-	current.accessorySteps(ctx)
-	current.readFaultSteps(ctx)
 	current.purchaseBoundarySteps(ctx)
 	current.cancellationSteps(ctx)
 	ctx.Step(`^die technische Speichergrenze mit folgender Konfiguration aufgerufen wird$`, current.construction)
@@ -44,6 +41,14 @@ func (current *world) register(ctx *godog.ScenarioContext) {
 	ctx.Step(`^der Datensatz veröffentlicht wird$`, current.publish)
 	ctx.Step(`^die maßgebliche Katalogsicht gelesen wird$`, current.catalog)
 	ctx.Step(`^lautet das persistente Importergebnis$`, current.importObserved)
+}
+
+func (current *world) readModelSteps(ctx *godog.ScenarioContext) {
+	current.readSteps(ctx)
+	current.importSteps(ctx)
+	current.publicationSteps(ctx)
+	current.accessorySteps(ctx)
+	current.readFaultSteps(ctx)
 }
 
 func (current *world) before(ctx context.Context, _ *godog.Scenario) (context.Context, error) {

@@ -7,11 +7,17 @@ import (
 	"github.com/Alps86/shop/internal/domain/catalog"
 	"github.com/Alps86/shop/internal/domain/sale"
 	"github.com/Alps86/shop/internal/domain/value"
+	"net/http"
 	"net/http/httptest"
 	"time"
 )
 
 type row map[string]string
+
+type delayedProxy struct {
+	next  http.Handler
+	delay time.Duration
+}
 
 type captureTransport struct {
 	payload []byte
@@ -38,4 +44,5 @@ type world struct {
 	lateEvents    []application.ProjectionEvent
 	faultServer   *httptest.Server
 	cleanupConfig opensearch.Config
+	elapsed       time.Duration
 }

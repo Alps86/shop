@@ -40,14 +40,16 @@ Ab dem ersten Produktivpackage führt CI die echten Tests einschließlich der st
 ```sh
 export SHOP_PROCESS_COVERDIR="$(mktemp -d)"
 merged_coverage="$(mktemp -d)"
-go test ./... -count=1 -coverpkg=./... -covermode=atomic -coverprofile=cover.out -args -test.gocoverdir="$SHOP_PROCESS_COVERDIR"
+go test -p 1 ./... -count=1 -coverpkg=./... -covermode=atomic -coverprofile=cover.out -args -test.gocoverdir="$SHOP_PROCESS_COVERDIR"
 go tool covdata merge -i="$SHOP_PROCESS_COVERDIR" -o="$merged_coverage" -pcombine
 go tool covdata textfmt -i="$merged_coverage" -o=cover.out
 go run github.com/vladopajic/go-test-coverage/v2@v2.19.0 --config=.testcoverage.yml
-go test -race ./... -count=1
+go test -p 1 -race ./... -count=1
 ```
 
 Das [Standardwerkzeug](https://github.com/vladopajic/go-test-coverage) verlangt durch `.testcoverage.yml` je Datei, Package und insgesamt 100 %. Keine Excludes, Overrides oder `coverage-ignore`-Annotationen verwenden. Fachliche Tests bleiben Cucumber-Blackbox-Verträge. Nicht implementierte Spezifikation bleibt als `@spec-only` sichtbar; aktive Implementierungsslices müssen angebunden und aktiviert werden.
+
+Die vollständigen nativen Dienstläufe führen Packages mit dem Standardparameter `-p 1` nacheinander aus. Damit konkurrieren mehrere unabhängig startende Integrationssuites auf dem begrenzten Runner nicht gleichzeitig um dieselbe Suchinstanz; die echten konkurrierenden Transaktions- und Workflowfälle innerhalb der Suites bleiben aktiv. Das öffentliche Suchbudget bleibt unverändert 250 ms.
 
 Die aktiven Adapterfälle benötigen echte PostgreSQL-, Temporal- und OpenSearchdienste. `SHOP_TEST_POSTGRES_DSN`, `SHOP_TEST_TEMPORAL_ADDRESS`, `TEMPORAL_ADDRESS` und `SHOP_TEST_OPENSEARCH_URL` benennen deren Testverbindungen. `SHOP_PROCESS_COVERDIR` sammelt zusätzlich die native Coverage der tatsächlich gebauten und gestarteten Shopdatei; das Testframework überschreibt seine eigene Variable `GOCOVERDIR`, deshalb wird die Prozessgrenze ausdrücklich verdrahtet. Die Standardbefehle `covdata merge -pcombine` und `textfmt` führen beide nativen Messungen zusammen. Das Coveragegate enthält dadurch auch `cmd/shop`; keine Ausschlüsse und kein eigener Coveragechecker.
 

@@ -199,3 +199,28 @@ Funktionalität: Ehrliche Suchdienstfehler
     Dann liefert die Suchverbindung
       | Code | TotalProducts |
       | OK | 2 |
+
+  Szenariogrundriss: Schreibprojektionen erhalten mehr Zeit während öffentliche Suche ihr Fehlerbudget behält
+    Angenommen der echte Suchdienst über eine verzögerte Verbindung angesprochen wird
+      | Milliseconds | Client |
+      | 600 | <Client> |
+    Wenn der Suchadapter die Verwaltungsoperation ausführt
+      | Operation | ProductID |
+      | apply | p-a |
+    Dann liefert die Suchverbindung
+      | Code |
+      | OK |
+    Wenn die echte öffentliche Suche abgefragt wird
+      | Text | Page | Sort |
+      | Alpha | 1 | relevance |
+    Dann liefert die Suchverbindung
+      | Code |
+      | SearchUnavailable |
+    Und bleibt die öffentliche Suchantwort innerhalb des Fehlerbudgets
+      | MaximumMilliseconds |
+      | 500 |
+
+    Beispiele:
+      | Client |
+      | default |
+      | custom |
