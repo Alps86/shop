@@ -1,0 +1,16 @@
+# Verbindlicher Bestellabschluss
+
+Bestätigung bindet EvaluationID, CartRevision, RuleSetVersion und die bewerteten Inventoryrevisionen. Jede Änderung an Position/Adresse/Versand/Zahlung benötigt erneute Bewertung und ausdrückliche Gesamtbestätigung. Auch eine Preissenkung muss sichtbar bestätigt werden; kein unbemerkter Ersatz. Inventoryrevision allein kann wegen reinem Bestand geändert sein: maßgeblich sind neue Preisbeträge/Regeln und aktuelle Verfügbarkeit, nicht pauschales Ablehnen jeder Revision.
+
+1. Gastfähigkeit/Cartbesitz prüfen, Cart vor Ablauf, vollständige Adresse/Versand/Zahlung und bestätigte aktuelle Evaluation verlangen.
+2. Kreditkarte über Temporal-Activity simuliert autorisieren (`approved` Default, ausdrücklich wählbarer Demofehler `declined`), keine Kartendaten erheben. Rechnung überspringt ausschließlich Freigabe, bleibt im Temporalprozess.
+3. PurchaseTransaction in PostgreSQL: Cartrow sperren, Idempotenzkey prüfen, alle Inventoryrows in lexikografischer SKU-Reihenfolge sperren, aktuelle Katalogfreigabe/Pflichtdaten und Preise/Regeln bewerten. Bei verändertem Preis/Total neue Evaluation speichern und PriceConfirmationRequired zurückgeben, keine Reservierung/Order.
+4. Fehlbestand ergibt Unavailable mit betroffener SKU und verfügbaren Varianten **desselben** Product. Gast wählt aktiv Ersatz, Cartrevision/Bewertung/Bestätigung neu. Keine automatische Änderung.
+5. Nur bei weiterhin passender Bestätigung/Verfügbarkeit atomar Reservierungen aller Positionen, unveränderliche Order, Cart ordered, CommandID-Ergebnis und Outboxereignisse einschließlich EnsureOrderauftrag committen. Alles oder nichts; PostgreSQL-Transaktion darf mehrere Roots für diesen expliziten Anwendungsfall koordinieren.
+6. Temporal übernimmt Ergebnis. Absturz nach Commit: Retry derselben CommandID liefert bestehende OrderID. Absturz vor Commit: keine Teildaten, derselbe Versuch kann neu laufen. Orderstart unabhängig über Outbox nachholen.
+
+Gleiche CartID darf nur eine Order erzeugen (Unique Constraint Order.CartID). Gleiche CommandID+identische Eingabe liefert dasselbe Ergebnis. Andere CommandID nach Erfolg liefert dieselbe zugehörige Order als AlreadyOrdered-Ergebnis, niemals zweite Reservierung. Dieselbe ID mit abweichender Eingabe Conflict. Zwei Gäste bei Bestand1: genau ein Commit gewinnt, anderer Unavailable; kein negativer verfügbarer Bestand. Keine Datenbanktransaktion während externer/Temporal-IO offenhalten.
+
+PaymentAuthorization ist technisches simuliertes Freigabeergebnis mit CartID/Revision/Total/CommandID; bindet exakt den Versuch. Preis-/Mengenänderung nach Freigabe macht sie ungültig. Da vor Commit kein echter Geldfluss und keine Reservierung existiert, besteht Kompensation aus Verwerfen der Simulation. Nach Ordercommit ist ein HTTP-Timeout kein Abbruch/Storno. Statusseite zeigt angenommenen Kauf, auch wenn Orderworkflowstart gerade nachgeholt wird.
+
+Sichtbar: veraltete Bewertung → 409 mit neuer Aufschlüsselung und Aktion „Neuen Gesamtpreis bestätigen“; Fehlbestand → nicht bestellbare SKU plus Ersatzwahl; declined → Hinweis „Simulierte Freigabe abgelehnt“, andere Zahlungsart/erneuter Versuch; technische Störung → Status prüfen/wiederholen mit gleicher CommandID. Abschlussbutton bis Antwort deaktivieren ist Komfort, Idempotenz bleibt serverseitig verantwortlich.
