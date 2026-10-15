@@ -1,0 +1,4 @@
+ruleDirs:
+  - .qlty/ast-grep/go
+testConfigs:
+  - testDir: .qlty/ast-grep-test/go

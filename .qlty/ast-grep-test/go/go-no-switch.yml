@@ -1,0 +1,7 @@
+id: shop-go-no-switch
+valid:
+  - |
+    func valid() { return }
+invalid:
+  - |
+    func invalid() { switch value { case 1: return } }

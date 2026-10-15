@@ -1,0 +1,9 @@
+id: shop-go-no-coverage-ignore
+language: Go
+severity: error
+message: "Coverage-Ausnahmen sind unzulässig; benötigtes Verhalten fachlich spezifizieren."
+files:
+  - "**/*.go"
+rule:
+  kind: comment
+  regex: 'coverage-ignore'

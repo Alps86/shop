@@ -1,0 +1,7 @@
+id: shop-go-types-in-type-file
+valid:
+  - |
+    var value int
+invalid:
+  - |
+    type Value int

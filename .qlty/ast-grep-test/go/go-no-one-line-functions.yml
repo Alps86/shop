@@ -1,0 +1,9 @@
+id: shop-go-no-one-line-functions
+valid:
+  - |
+    func valid() {
+     return
+    }
+invalid:
+  - |
+    func invalid() { return }

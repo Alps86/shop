@@ -1,0 +1,70 @@
+config_version = "0"
+
+exclude_patterns = [
+  "**/.git/**",
+  "**/node_modules/**",
+  "**/vendor/**",
+  "**/dist/**",
+  "**/coverage/**",
+]
+
+test_patterns = [
+  "cucumber/**",
+  "spec/features/**",
+  "**/*_test.go",
+]
+
+[smells]
+mode = "block"
+
+[smells.nested_control_flow]
+# Qlty meldet ab einschließlich Schwelle: zwei Ebenen erlaubt, dritte verboten.
+threshold = 3
+
+[smells.function_parameters]
+threshold = 5
+
+[smells.return_statements]
+threshold = 6
+
+[smells.file_complexity]
+threshold = 50
+
+[smells.function_complexity]
+threshold = 15
+
+[smells.identical_code]
+threshold = 12
+
+[smells.similar_code]
+threshold = 12
+
+[[source]]
+name = "default"
+default = true
+
+[[plugin]]
+name = "actionlint"
+mode = "block"
+
+[[plugin]]
+name = "ast-grep"
+mode = "block"
+config_files = ["sgconfig.yml"]
+
+[[plugin]]
+name = "gitleaks"
+mode = "block"
+
+[[plugin]]
+name = "gofmt"
+mode = "block"
+
+[[plugin]]
+name = "golangci-lint"
+mode = "block"
+config_files = [".qlty/configs/.golangci.yml"]
+
+[[plugin]]
+name = "osv-scanner"
+mode = "block"

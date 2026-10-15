@@ -1,0 +1,45 @@
+id: shop-go-error-types
+language: Go
+severity: error
+message: "Typdeklarationen in errors.go müssen eigene Fehlertypen mit Error() string sein; Fehlerwerte und Meldungsdeklarationen bleiben zulässig."
+files:
+  - "**/errors.go"
+utils:
+  error-method:
+    any:
+      - pattern: "func ($RECEIVER $NAME) Error() string { $$$ }"
+      - pattern: "func ($RECEIVER $NAME) Error() (string) { $$$ }"
+      - pattern: "func ($RECEIVER $NAME) Error() ($RESULT string) { $$$ }"
+      - pattern: "func ($RECEIVER *$NAME) Error() string { $$$ }"
+      - pattern: "func ($RECEIVER *$NAME) Error() (string) { $$$ }"
+      - pattern: "func ($RECEIVER *$NAME) Error() ($RESULT string) { $$$ }"
+      - pattern: "func ($NAME) Error() string { $$$ }"
+      - pattern: "func ($NAME) Error() (string) { $$$ }"
+      - pattern: "func ($NAME) Error() ($RESULT string) { $$$ }"
+      - pattern: "func (*$NAME) Error() string { $$$ }"
+      - pattern: "func (*$NAME) Error() (string) { $$$ }"
+      - pattern: "func (*$NAME) Error() ($RESULT string) { $$$ }"
+      - pattern: "func ($RECEIVER $NAME[$$$ARGS]) Error() string { $$$ }"
+      - pattern: "func ($RECEIVER $NAME[$$$ARGS]) Error() (string) { $$$ }"
+      - pattern: "func ($RECEIVER $NAME[$$$ARGS]) Error() ($RESULT string) { $$$ }"
+      - pattern: "func ($RECEIVER *$NAME[$$$ARGS]) Error() string { $$$ }"
+      - pattern: "func ($RECEIVER *$NAME[$$$ARGS]) Error() (string) { $$$ }"
+      - pattern: "func ($RECEIVER *$NAME[$$$ARGS]) Error() ($RESULT string) { $$$ }"
+rule:
+  any:
+    - kind: type_alias
+    - all:
+        - pattern:
+            context: "type $NAME $BODY"
+            selector: type_spec
+        - not:
+            inside:
+              all:
+                - kind: type_declaration
+                - any:
+                    - precedes:
+                        matches: error-method
+                        stopBy: end
+                    - follows:
+                        matches: error-method
+                        stopBy: end
