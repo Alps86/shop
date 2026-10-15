@@ -73,14 +73,16 @@ func (current *scenario) purchaseSequence(table *godog.Table) error {
 
 func (current *scenario) purchaseAction(row map[string]string) {
 	actions := map[string]func(map[string]string){
-		"configure":        current.configureAction,
-		"configureInvalid": current.configureAction,
-		"evaluate":         current.setEvaluation,
-		"confirm":          current.confirmAction,
-		"markOrdered":      current.markOrderedAction,
-		"createOrder":      current.createOrderAction,
-		"createEmptyOrder": current.createOrderAction,
-		"expire":           current.expireAction,
+		"configure":             current.configureAction,
+		"configureInvalid":      current.configureAction,
+		"evaluate":              current.setEvaluation,
+		"confirm":               current.confirmAction,
+		"markOrdered":           current.markOrderedAction,
+		"createOrder":           current.createOrderAction,
+		"createEmptyOrder":      current.createOrderAction,
+		"expire":                current.expireAction,
+		"completePurchase":      current.completePurchaseAction,
+		"completeEmptyPurchase": current.completePurchaseAction,
 	}
 
 	actions[row["Operation"]](row)
@@ -210,4 +212,15 @@ func (current *scenario) snapshotDiscount(table *godog.Table) error {
 
 func checkoutInput(row map[string]string) sale.Checkout {
 	return sale.Checkout{ShippingAddress: sale.Address{Recipient: input(row["Recipient"]), Street: input(row["Street"]), PostalCode: row["PostalCode"], City: input(row["City"]), Country: value.CountryCode(row["Country"])}, ShippingMethod: sale.ShippingMethod(row["ShippingMethod"]), PaymentMethod: sale.PaymentMethod(row["PaymentMethod"])}
+}
+
+func (current *scenario) completePurchaseAction(row map[string]string) {
+	items := []sale.OrderItem{}
+	if row["Operation"] != "completeEmptyPurchase" {
+		for _, item := range current.cart.Evaluation.Value.Items {
+			items = append(items, sale.OrderItem{SKU: item.SKU, Quantity: item.Quantity, UnitPrice: item.UnitPrice, Discounts: item.Discounts})
+		}
+	}
+
+	current.order, current.cart, current.err = sale.NewPurchase("o-new", current.cart, items, instant())
 }

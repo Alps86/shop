@@ -11,12 +11,11 @@ func (product Product) ResolveCompliance(sku value.SKU, context value.RequestCon
 		return ResolvedCompliance{}, err
 	}
 
-	variant, err := product.Variant(sku)
+	resolved, err := product.ResolveRoles(sku)
 	if err != nil {
 		return ResolvedCompliance{}, err
 	}
 
-	resolved := product.resolveRoles(variant)
 	if err := resolved.Validate(sku, context, at); err != nil {
 		return ResolvedCompliance{}, err
 	}
@@ -24,7 +23,7 @@ func (product Product) ResolveCompliance(sku value.SKU, context value.RequestCon
 	return resolved, nil
 }
 
-func (product Product) resolveRoles(variant Variant) ResolvedCompliance {
+func (variant Variant) ResolveRoles(product Product) ResolvedCompliance {
 	resolved := ResolvedCompliance{Manufacturer: product.Manufacturer, ResponsiblePerson: product.ResponsiblePerson, Compliance: product.Compliance}
 	if variant.Compliance.Present {
 		resolved.Compliance = variant.Compliance.Value
@@ -161,4 +160,13 @@ func (operator EconomicOperator) validResponsiblePerson() bool {
 	}
 
 	return operator.inEuropeanUnion()
+}
+
+func (product Product) ResolveRoles(sku value.SKU) (ResolvedCompliance, error) {
+	variant, err := product.Variant(sku)
+	if err != nil {
+		return ResolvedCompliance{}, err
+	}
+
+	return variant.ResolveRoles(product), nil
 }

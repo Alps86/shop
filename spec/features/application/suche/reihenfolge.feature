@@ -1,17 +1,20 @@
 # language: de
-@application @app
+@application
 Funktionalität: Sortierung Vorschläge und Ausfallgrenzen
   Als Käufer behalte ich nachvollziehbare Suchreihenfolge und verfügbare Kaufpfade.
 
-  @spec-only
+  @opensearch
   Szenariogrundriss: Explizite Sortierung gewinnt gegen Boosts
-    Angenommen vergleichbare synthetische Suchkandidaten liegen vor
-      | ProductID | Name | Price | TextScore | InterestWeight | MarginSignal |
-      | p-a | Alpha | 10000 | 1 | 0 | 0 |
-      | p-b | Beta | 12000 | 1 | 1 | 1 |
+    Angenommen eine synthetische Suchquelle mit vollständigen Lieferantendaten besteht
+      | Index | Locale | Currency | Market | At | CategoryID | FamilyID | Manufacturer | Street | PostalCode | City | Country | Email |
+      | shop-runtime-ranking-scored | de-DE | EUR | DE | 2026-10-15T00:00:00Z | phones | smartphones | Testlieferant | Testweg 1 | 12345 | Teststadt | DE | demo@example.invalid |
+    Und vergleichbare synthetische Suchkandidaten liegen vor
+      | ProductID | Name | Slug | Brand | SKU | Color | StorageGB | Price | Stock | Published | CategoryID | PurchaseCost | InterestWeight |
+      | p-a | Alpha | alpha | Alpha | a-red | red | 128 | 10000 | 1 | true | phones | 10000 | 0 |
+      | p-b | Beta | beta | Beta | b-red | red | 128 | 12000 | 1 | true | home | 0 | 1 |
     Wenn die Suche sortiert wird
-      | Sort |
-      | <sortierung> |
+      | Text | Sort | Page |
+      | | <sortierung> | 1 |
     Dann lautet die öffentliche Ergebnisreihenfolge
       | ProductIDs | ExposedMargin | ExposedInterestWeight |
       | <reihenfolge> | false | false |
@@ -22,15 +25,18 @@ Funktionalität: Sortierung Vorschläge und Ausfallgrenzen
       | priceDesc | p-b,p-a |
       | nameAsc | p-a,p-b |
 
-  @spec-only
+  @opensearch
   Szenariogrundriss: Präfix und begrenzte Tippfehler
-    Angenommen veröffentlichte Suchbegriffe sind vorhanden
-      | Name | ID |
-      | Smartphone | p-phone |
-      | Smartwatch | p-watch |
+    Angenommen eine synthetische Suchquelle mit vollständigen Lieferantendaten besteht
+      | Index | Locale | Currency | Market | At | CategoryID | FamilyID | Manufacturer | Street | PostalCode | City | Country | Email |
+      | shop-runtime-suggestions-scored | de-DE | EUR | DE | 2026-10-15T00:00:00Z | phones | smartphones | Testlieferant | Testweg 1 | 12345 | Teststadt | DE | demo@example.invalid |
+    Und veröffentlichte Suchbegriffe sind vorhanden
+      | ProductID | Name | Slug | Brand | SKU | Color | StorageGB | Price | Stock | Published |
+      | p-phone | Smartphone | smartphone | Alpha | phone-red | red | 128 | 10000 | 1 | true |
+      | p-watch | Smartwatch | smartwatch | Alpha | watch-red | red | 128 | 10000 | 1 | true |
     Wenn Vorschläge angefragt werden
-      | Query |
-      | <eingabe> |
+      | Query | Sort | Page |
+      | <eingabe> | relevance | 1 |
     Dann lauten die Vorschläge
       | Names | Correction | QueryReplaced | MaximumCount |
       | <namen> | <korrektur> | false | 5 |
@@ -42,6 +48,7 @@ Funktionalität: Sortierung Vorschläge und Ausfallgrenzen
       | Xmartphone | [] | false |
       | empty | [] | false |
 
+  @app
   Szenariogrundriss: Kuratierte Filter und Eingabegrenzen
     Wenn ein Suchrequest validiert wird
       | Field | Value |
@@ -58,22 +65,23 @@ Funktionalität: Sortierung Vorschläge und Ausfallgrenzen
       | Attribute | notCurated | InvalidFilter |
       | FilterOperator | unknown | InvalidFilter |
 
-  @spec-only
+  @commerce-runtime
   Szenario: Suchausfall sperrt den maßgeblichen Kaufpfad nicht
     Angenommen nur OpenSearch ist nicht erreichbar
-      | PostgreSQL | Temporal | OpenSearch |
-      | ready | ready | down |
+      | PostgreSQL | Temporal | OpenSearch | SearchEndpoint | Fixture | Namespace | Locale | Currency | Market |
+      | ready | ready | down | http://127.0.0.1:1 | spec/fixtures/runtime/katalog.json | default | de-DE | EUR | DE |
     Wenn die öffentlichen Ports aufgerufen werden
-      | Operation |
-      | SearchPort.Search |
-      | CatalogReader.Product |
-      | CheckoutService.Place |
+      | Operation | ProductID | SKU | StartCommandID | ChangeCommandID | AddressCommandID | PaymentCommandID | ConfirmCommandID | PlaceCommandID | Recipient | Street | PostalCode | City | Country | PaymentMethod | Quantity |
+      | SearchPort.Search | | | | | | | | | | | | | | | |
+      | CatalogReader.Product | p-phone | PHONE | | | | | | | | | | | | | |
+      | CheckoutService.Place | p-phone | PHONE | start | add | address | payment | confirm | place | Demo Gast | Testweg 1 | 12345 | Teststadt | DE | invoice | 1 |
     Dann lauten die Portantworten
-      | Operation | Code |
-      | SearchPort.Search | SearchUnavailable |
-      | CatalogReader.Product | OK |
-      | CheckoutService.Place | OK |
+      | Operation | Code | SearchTotal | Cards | ProductID | SKU | OrderCount | Quantity | Total | Pending | ProcessState |
+      | SearchPort.Search | SearchUnavailable | 0 | 0 | | | | | | | |
+      | CatalogReader.Product | OK | | | p-phone | | | | | | |
+      | CheckoutService.Place | OK | | | | PHONE | 1 | 1 | 10490 | false | running |
 
+  @app
   Szenariogrundriss: Typisierte Auswahl und Bereichsgrenzen werden vor dem Suchadapter geprüft
     Wenn ein strukturierter Suchrequest angefragt wird
       | Type | Attribute | Options | Minimum | Maximum | CurrencyMinimum | CurrencyMaximum | Fault |
@@ -109,6 +117,7 @@ Funktionalität: Sortierung Vorschläge und Ausfallgrenzen
       | dirtyPrice | none | [] | absent | absent | EUR | EUR | none | InvalidFilter |
       | plain | none | [] | absent | absent | EUR | EUR | search | SearchUnavailable |
 
+  @app
   Szenariogrundriss: Der Suchkontext bleibt vom gültigen ISO-Wert getrennt
     Wenn die Suche mit einem Verkaufskontext angefragt wird
       | Locale | Currency | Market |

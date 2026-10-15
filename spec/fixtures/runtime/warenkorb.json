@@ -1,0 +1,8 @@
+{
+  "ID": "c-test", "UserID": "u-a", "State": "open", "Revision": 1,
+  "DefinitionVersion": "cart-v1", "RuleSetVersion": "demo-v1",
+  "Checkout": {"Present": true, "Value": {
+    "ShippingAddress": {"Recipient": "Demo Gast", "Street": "Testweg 1", "PostalCode": "12345", "City": "Teststadt", "Country": "DE"},
+    "ShippingMethod": "standard", "PaymentMethod": "invoice"
+  }}
+}

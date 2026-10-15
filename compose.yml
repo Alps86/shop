@@ -1,0 +1,68 @@
+name: shop
+services:
+  postgres:
+    image: postgres:16.15-alpine3.23
+    environment:
+      POSTGRES_USER: shop
+      POSTGRES_PASSWORD: local-demo-only
+      POSTGRES_DB: shop
+    command: [postgres, -c, wal_level=logical, -c, max_replication_slots=10, -c, max_wal_senders=10]
+    ports: ["127.0.0.1:15432:5432"]
+    volumes: [postgres-data:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U shop -d shop"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+  temporal:
+    image: temporalio/temporal:1.9.1
+    command: [server, start-dev, --ip, 0.0.0.0, --db-filename, /home/temporal/temporal.db]
+    ports: ["127.0.0.1:17233:7233", "127.0.0.1:18233:8233"]
+    volumes: [temporal-data:/home/temporal]
+    healthcheck:
+      test: [CMD, temporal, operator, cluster, health, --address, "127.0.0.1:7233"]
+      interval: 2s
+      timeout: 3s
+      retries: 40
+  opensearch:
+    image: opensearchproject/opensearch:3.9.0
+    environment:
+      discovery.type: single-node
+      DISABLE_SECURITY_PLUGIN: "true"
+      DISABLE_INSTALL_DEMO_CONFIG: "true"
+      OPENSEARCH_JAVA_OPTS: -Xms512m -Xmx512m
+      node.store.allow_mmap: "false"
+    ports: ["127.0.0.1:19200:9200"]
+    volumes: [search-data:/usr/share/opensearch/data]
+    healthcheck:
+      test: [CMD, curl, --fail, --silent, "http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=1s"]
+      interval: 2s
+      timeout: 3s
+      retries: 60
+  shop:
+    build: .
+    environment:
+      SHOP_POSTGRES_DSN: postgres://shop:local-demo-only@postgres:5432/shop?sslmode=disable
+      SHOP_SCHEMA: demo
+      SHOP_TEMPORAL_ADDRESS: temporal:7233
+      SHOP_TEMPORAL_NAMESPACE: default
+      SHOP_TASK_QUEUE: shop
+      SHOP_OPENSEARCH_URL: http://opensearch:9200
+      SHOP_SEARCH_INDEX: shop-products
+      SHOP_CDC_PUBLICATION: shop_demo
+      SHOP_CDC_SLOT: shop_demo
+      SHOP_LISTEN: 0.0.0.0:8080
+      SHOP_SEED_FILE: /demo/synthetic-start.json
+    ports: ["127.0.0.1:8080:8080"]
+    depends_on:
+      postgres: {condition: service_healthy}
+      temporal: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, /shop, healthcheck]
+      interval: 2s
+      timeout: 3s
+      retries: 60
+volumes:
+  postgres-data:
+  temporal-data:
+  search-data:

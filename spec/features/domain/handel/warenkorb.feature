@@ -290,3 +290,18 @@ Funktionalität: Warenkorbpositionen und Kaufkopien
     Dann lautet der fachliche Lieferzustand
       | State | Shipped | Delivered | PackedQuantity |
       | delivered | 2 | 2 | 0 |
+
+  Szenario: Ein fachlicher Kauf erzeugt Snapshot und terminalen Cart gemeinsam
+    Angenommen ein offener Warenkorb enthält eine Position
+      | SKU | Quantity | CartRevision | PositionCount | Reserved |
+      | PHONE | 1 | 1 | 1 | 0 |
+    Wenn der fachliche Kaufablauf schrittweise ausgeführt wird
+      | Operation | EvaluationID | Revision | RuleSetVersion | ExpectedCode | ExpectedState |
+      | configure | e-a | 1 | demo-v1 | OK | checkingOut |
+      | evaluate | e-a | 2 | demo-v1 | OK | checkingOut |
+      | confirm | e-a | 2 | demo-v1 | OK | checkingOut |
+      | completeEmptyPurchase | e-a | 2 | demo-v1 | InvalidInput | checkingOut |
+      | completePurchase | e-a | 2 | demo-v1 | OK | ordered |
+    Dann enthält der erzeugte Kauf seine eigenen Preiswerte
+      | OrderID | SKU | Quantity | UnitPrice | Total |
+      | o-new | PHONE | 1 | 10000 | 10490 |

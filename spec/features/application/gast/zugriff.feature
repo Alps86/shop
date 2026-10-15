@@ -22,26 +22,6 @@ Funktionalität: Gastfähigkeit und Interessenprofile
       | home |
       | coffee |
 
-  @spec-only
-  Szenariogrundriss: Besitz und zustandsändernde Requests
-    Angenommen eine Ressource gehört einem anderen Gast
-      | Owner | CartID | OrderID |
-      | u-a | c-a | o-a |
-    Wenn ein Gastrequest ausgeführt wird
-      | SessionUser | Resource | Method | CSRF |
-      | <gast> | <ressource> | <methode> | <csrf> |
-    Dann lautet die HTTPantwort ohne Seiteneffekt
-      | Status | CacheControl | MutationCount |
-      | <status> | no-store | 0 |
-    Beispiele:
-      | gast | ressource | methode | csrf | status |
-      | u-b | cart:c-a | GET | absent | 404 |
-      | u-b | order:o-a | GET | absent | 404 |
-      | u-b | order:missing | GET | absent | 404 |
-      | u-a | profile:mobile | GET-confirmation | absent | 200 |
-      | u-a | cart:c-a:add | GET | absent | 405 |
-      | u-a | cart:c-a:add | POST | invalid | 403 |
-
   Szenariogrundriss: Wiederaufnahme und getrennte Fristen
     Angenommen eine Gastsession mit aktivem Cart besteht
       | IssuedAt | LastActivityAt |
@@ -59,12 +39,3 @@ Funktionalität: Gastfähigkeit und Interessenprofile
       | 2026-10-09T00:00:01Z | valid | Expired | true | expired |
       | 2026-10-31T00:00:00Z | expired | NotFound | false | inaccessible |
       | 2026-10-03T00:00:00Z | absent | NotFound | false | inaccessible |
-
-  @spec-only
-  Szenario: Cookiegrenzen im echten HTTPadapter
-    Wenn ein neuer Gast über HTTP gestartet wird
-      | Operation |
-      | GuestService.Open |
-    Dann besitzt das lokale Democookie die vereinbarten Sicherheitswerte
-      | CookieName | HttpOnly | SameSite | Path | TokenBits | StoredToken | MaxAgeDays |
-      | shop_session | true | Lax | / | 256 | hash-only | 30 |

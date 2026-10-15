@@ -38,11 +38,25 @@ Vor Push Qlty-Checks, Smells und Metrics tatsächlich prüfen. Smells müssen oh
 Ab dem ersten Produktivpackage führt CI die echten Tests einschließlich der strikten Godog-Anbindung aus und misst alle vom aktuellen Go-Build erfassten Packages dynamisch:
 
 ```sh
-go test ./... -count=1 -coverpkg=./... -covermode=atomic -coverprofile=cover.out
+export SHOP_PROCESS_COVERDIR="$(mktemp -d)"
+merged_coverage="$(mktemp -d)"
+go test ./... -count=1 -coverpkg=./... -covermode=atomic -coverprofile=cover.out -args -test.gocoverdir="$SHOP_PROCESS_COVERDIR"
+go tool covdata merge -i="$SHOP_PROCESS_COVERDIR" -o="$merged_coverage" -pcombine
+go tool covdata textfmt -i="$merged_coverage" -o=cover.out
 go run github.com/vladopajic/go-test-coverage/v2@v2.19.0 --config=.testcoverage.yml
 go test -race ./... -count=1
 ```
 
 Das [Standardwerkzeug](https://github.com/vladopajic/go-test-coverage) verlangt durch `.testcoverage.yml` je Datei, Package und insgesamt 100 %. Keine Excludes, Overrides oder `coverage-ignore`-Annotationen verwenden. Fachliche Tests bleiben Cucumber-Blackbox-Verträge. Nicht implementierte Spezifikation bleibt als `@spec-only` sichtbar; aktive Implementierungsslices müssen angebunden und aktiviert werden.
+
+Die aktiven Adapterfälle benötigen echte PostgreSQL-, Temporal- und OpenSearchdienste. `SHOP_TEST_POSTGRES_DSN`, `SHOP_TEST_TEMPORAL_ADDRESS`, `TEMPORAL_ADDRESS` und `SHOP_TEST_OPENSEARCH_URL` benennen deren Testverbindungen. `SHOP_PROCESS_COVERDIR` sammelt zusätzlich die native Coverage der tatsächlich gebauten und gestarteten Shopdatei; das Testframework überschreibt seine eigene Variable `GOCOVERDIR`, deshalb wird die Prozessgrenze ausdrücklich verdrahtet. Die Standardbefehle `covdata merge -pcombine` und `textfmt` führen beide nativen Messungen zusammen. Das Coveragegate enthält dadurch auch `cmd/shop`; keine Ausschlüsse und kein eigener Coveragechecker.
+
+## Laufzeit im Aufbau
+
+`docker compose up --detach --build --wait` startet den technischen Laufzeitstand aus [compose.yml](compose.yml). `cmd/shop` verbindet dieselben Applicationports mit PostgreSQL, echten Temporalworkern, Prozessoutbox und WAL-Projektor. `SHOP_SEED_FILE` importiert vor der Adapterbindung eine versionierte Quelle mit den bestehenden Validierungs-/Noop-/Transaktionsgrenzen. Der aktuelle Container enthält ausdrücklich einen synthetischen technischen Startkatalog; er ersetzt keine verifizierten Pflichtdaten für die abschließende Demo. `GET /health` prüft die Fach-DB, `GET /ready` zusätzlich die tatsächliche Prozessannahme; Suchstörungen bleiben als eigener Diagnosestatus sichtbar und sperren die Kaufbereitschaft nicht. Storefront und separater Backendlistener werden mit #11 und dem anschließenden Integrationspaket verbunden. Der technische Start ist noch kein vollständiger Gastshopnachweis.
+
+Gepinnt sind [PostgreSQL 16.15](https://hub.docker.com/_/postgres), [Temporal CLI 1.9.1 mit echtem Entwicklungsserver](https://github.com/temporalio/cli), [OpenSearch 3.9.0](https://docs.opensearch.org/latest/install-and-configure/install-opensearch/docker/) und [Go 1.26.9](https://hub.docker.com/_/golang). Temporal speichert seine History in einem eigenen SQLitevolume des echten Servers, der Fachzustand liegt in PostgreSQL. Alle veröffentlichten Ports binden Loopback. Das ausdrücklich lokale Demopasswort ist keine produktive Zugangskonfiguration. Persistente Volumes bleiben bei `docker compose down` erhalten; `docker compose down --volumes` löscht ausschließlich die eigenen Demodaten und Prozesse endgültig.
+
+Die aktuelle Entwicklungsmaschine erlaubt keinen Dockerzugriff. Native echte Dienstfälle sind zusätzliche Adapterbelege; der tatsächliche Compose-Start und Restart werden im berechtigten CI-Runner ausgeführt und erst nach erfolgreichem Lauf als erfüllt gewertet.
 
 **Aussagegrenze:** Native Packageermittlung und Standard-Coverageprüfung erfassen den aktuellen buildfähigen Go-Umfang. Sie sind kein unabhängiger AST-Blockvergleich aller Repositoryquellen oder aller Plattform-/Build-Tag-Kombinationen und kein automatischer Beweis vollständiger Slicezuordnung. Solche zusätzliche Härtung ist offen. Review prüft deshalb insbesondere neue Quellen, Build-Tags, zusätzliche Module und unzulässige `spec-only`-Markierungen. Es gibt keine frei konfigurierbare Bootstrap-Abschaltung.

@@ -33,6 +33,10 @@ type GuestStore interface {
 	Profile(context.Context, value.UserID, ProfileCode) (GuestView, error)
 }
 
+type InterestStore interface {
+	ForUser(context.Context, value.UserID) ([]sale.CategoryInterest, error)
+}
+
 type CartStore interface {
 	Get(context.Context, value.CartID) (sale.Cart, error)
 }
@@ -47,6 +51,8 @@ type Clock interface {
 }
 
 type Service struct {
+	Interests   InterestStore
+	Commands    CartCommandReader
 	Guests      GuestStore
 	Carts       CartStore
 	Orders      OrderStore
@@ -175,6 +181,10 @@ type ProductDetail struct {
 	Product   catalog.Product
 	ChosenSKU value.SKU
 	Cards     []ProductCard
+}
+
+type VariantReader interface {
+	ProductForSKU(context.Context, value.SKU, value.RequestContext) (ProductDetail, error)
 }
 
 type CatalogReader interface {
@@ -397,4 +407,9 @@ type AdminCatalogSnapshot struct {
 
 type AdminCatalogReader interface {
 	Snapshot(context.Context) (AdminCatalogSnapshot, error)
+}
+
+type CartCommandReader interface {
+	ReplayChange(context.Context, ChangeCommand) (CartView, bool, error)
+	ReplayConfirm(context.Context, ConfirmCommand) (CartView, bool, error)
 }

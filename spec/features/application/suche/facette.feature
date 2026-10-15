@@ -1,20 +1,27 @@
 # language: de
-@spec-only @application
+@application @opensearch
 Funktionalität: Variantenkonsistente disjunktive Suche
   Als Käufer erweitere ich Markenauswahl ohne falsche Variantenkombinationen.
 
   Hintergrund:
-    Angenommen ein synthetischer Smartphonekatalog ist projiziert
-      | ProductID | Brand | SKU | Color | StorageGB | Price | Available |
-      | p-a | Alpha | a-red | red | 128 | 10000 | true |
-      | p-a | Alpha | a-blue | blue | 256 | 15000 | true |
-      | p-b | Beta | b-red | red | 256 | 12000 | true |
-      | p-c | Gamma | c-blue | blue | 128 | 9000 | true |
+    Angenommen eine synthetische Suchquelle mit vollständigen Lieferantendaten besteht
+      | Index | Locale | Currency | Market | At | CategoryID | FamilyID | Manufacturer | Street | PostalCode | City | Country | Email |
+      | shop-runtime-facets-scored | de-DE | EUR | DE | 2026-10-15T00:00:00Z | phones | smartphones | Testlieferant | Testweg 1 | 12345 | Teststadt | DE | demo@example.invalid |
+    Und die kuratierten Suchdefinitionen stehen bereit
+      | Code | Type | Options | Minimum | Maximum | Top |
+      | color | select | red,blue | absent | absent | true |
+      | storageCapacity | number | [] | 1 | 1024 | true |
+    Und der synthetische Produktkatalog wird tatsächlich projiziert
+      | ProductID | Name | Slug | Brand | SKU | Color | StorageGB | Price | Stock | Published |
+      | p-a | Alpha Testtelefon | alpha | Alpha | a-red | red | 128 | 10000 | 1 | true |
+      | p-a | Alpha Testtelefon | alpha | Alpha | a-blue | blue | 256 | 15000 | 1 | true |
+      | p-b | Beta Testtelefon | beta | Beta | b-red | red | 256 | 12000 | 1 | true |
+      | p-c | Gamma Testtelefon | gamma | Gamma | c-blue | blue | 128 | 9000 | 1 | true |
 
   Szenariogrundriss: Treffer und exakte Markenzählungen
     Wenn die öffentliche Suche ausgeführt wird
-      | Brand | Color | StorageGB | MaxPrice |
-      | <marken> | <farbe> | <speicher> | <preis> |
+      | Brand | Color | StorageGB | MaxPrice | Sort | Page |
+      | <marken> | <farbe> | <speicher> | <preis> | relevance | 1 |
     Dann lautet das Suchergebnis
       | ProductIDs | TotalProducts | BrandAlpha | BrandBeta | BrandGamma | SelectedZeroChip |
       | <treffer> | <anzahl> | <alpha> | <beta> | <gamma> | <nullchip> |
@@ -29,8 +36,8 @@ Funktionalität: Variantenkonsistente disjunktive Suche
 
   Szenario: Facetten ignorieren jeweils nur ihren eigenen Filter
     Wenn die öffentliche Suche ausgeführt wird
-      | Brand | Color | StorageGB |
-      | Alpha | red | 256 |
+      | Brand | Color | StorageGB | Sort | Page |
+      | Alpha | red | 256 | relevance | 1 |
     Dann lauten die kontextuellen Attributzählungen
       | Facet | Value | ProductCount |
       | color | blue | 1 |
@@ -38,8 +45,8 @@ Funktionalität: Variantenkonsistente disjunktive Suche
 
   Szenario: Zwei passende Varianten ergeben nur eine Modellkarte
     Wenn die öffentliche Suche ausgeführt wird
-      | Brand | Sort |
-      | Alpha | priceAsc |
+      | Brand | Sort | Page |
+      | Alpha | priceAsc | 1 |
     Dann lautet die Modellkarte
       | ProductID | ChosenSKU | VariantCount | CardCount |
       | p-a | a-red | 2 | 1 |

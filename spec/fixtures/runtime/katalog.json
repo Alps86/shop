@@ -1,0 +1,17 @@
+{
+  "DatasetVersion": "demo-v1",
+  "SourceURL": "https://example.invalid/synthetic",
+  "RetrievedAt": "2026-10-01T00:00:00Z",
+  "LicenseNote": "synthetic-only",
+  "Products": [{
+    "ID": "p-phone", "FamilyID": "f-phone", "FamilyVersion": 1,
+    "Name": {"de-DE": "Synthetisches Testtelefon"}, "Brand": "Synthetic",
+    "PrimaryCategoryID": "mobile", "Variants": [{"SKU": "PHONE"}],
+    "Manufacturer": {"Name": "Fiktiver Testhersteller", "PostalAddress": {"Street": "Testweg 1", "PostalCode": "12345", "City": "Teststadt", "Country": "DE"}, "ElectronicAddress": "synthetic@example.invalid"},
+    "Compliance": {"Context": {"Market": "DE", "Locale": "de-DE", "VerificationStatus": "verified"}},
+    "Revision": 1, "Published": true, "Slug": "testmodell"
+  }],
+  "Families": [{"ID": "f-phone", "Version": 1}],
+  "Categories": [{"ID": "mobile", "Version": 1}],
+  "Inventories": [{"SKU": "PHONE", "Price": {"MinorUnits": 10000, "Currency": "EUR"}, "StockQuantity": 10, "Revision": 1}]
+}
