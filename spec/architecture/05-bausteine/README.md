@@ -7,6 +7,7 @@ Die fünf bestätigten Verkaufsroots bleiben Product, Inventory, Cart, User und 
 - [Handel](commerce.md): Inventory/Cart/User/Order, Geld, Rabatt und Kauf-Snapshots.
 - [Pflichtdaten](compliance.md): Datenauflösung und datierte Anwendbarkeitsmatrix.
 - [Öffentliche Ports](ports.md): verbindliche Application-/Adapterverträge.
+- [Konkrete Kern-API](core-api.md): implementierte Go-Grenzen, tokenfreier Prozesseingang, Activities und Persistenzsemantik.
 - [Suche](search.md): Varianten, disjunktive Facetten und Ranking.
 - [Empfehlung](recommendation.md): nachvollziehbare synthetische Co-Purchase-Statistik.
 

@@ -1,11 +1,12 @@
 # Öffentliche Application- und Adapterports
 
-Diese Operationen sind der verbindliche semantische Vertrag; SDK-Typen bleiben außerhalb. Technische Methoden nehmen `context.Context`, konkrete Commands/Queries und liefern Ergebnis plus `error`. Kein generisches Repositoryframework. Readoperationen verändern nichts. Domainmethoden bekommen reine Fakten/Werte, niemals Repositorys.
+Die [konkrete Kern-API](core-api.md) präzisiert die implementierten Signaturen, Fassaden und Activitygrenzen. Diese Operationen sind der verbindliche semantische Vertrag; SDK-Typen bleiben außerhalb. Technische Methoden nehmen `context.Context`, konkrete Commands/Queries und liefern Ergebnis plus `error`. Kein generisches Repositoryframework. Readoperationen verändern nichts. Domainmethoden bekommen reine Fakten/Werte, niemals Repositorys.
 
 | Port / Operation | Eingabe → Ausgabe / beobachtbare Wirkung |
 | --- | --- |
 | CatalogReader.Product | ProductID, SKU optional, Context → aufgelöstes ProductDetail mit Variant, Pflichtdaten, aktuellen Inventorywerten; NotFound/InvalidVariant/ComplianceIncomplete |
-| CatalogReader.Category | CategoryID, Context → Baum/Breadcrumb/Filterdefinition/Topmerkmale; keine Suchindexabhängigkeit für Navigation |
+| CatalogReader.Category | CategoryID, Context → CategoryView mit Kategorie/Kindern/Breadcrumb/Filterdefinition/Topmerkmalen; keine Suchindexabhängigkeit für Navigation |
+| AdminCatalogReader.Snapshot | Lokale Verwaltung → kleiner maßgeblicher Demokatalog mit Products/Family/Category/DiscountRules/Inventory; keine Suchindexwahrheit |
 | GuestService.Open | vorhandene Sessionfähigkeit optional → UserID, neue opaque Sessionfähigkeit falls nötig, CartID optional; Defaultprofil neutral |
 | GuestService.SelectProfile | Session, ProfileCode → eigene Userinteressen aktualisiert, Cart unverändert, Bestätigung nicht durch Interessen ungültig |
 | CartReader.Get | Session, CartID → eigener CartView einschließlich aktueller Bewertung/zulässiger Aktionen; NotFound/Expired, Read verlängert Aktivität nicht |
@@ -21,7 +22,7 @@ Diese Operationen sind der verbindliche semantische Vertrag; SDK-Typen bleiben a
 | FulfillmentService.Report | OrderID, ShipmentID, Status, Lines, CommandID → bestätigter separater Status; InvalidQuantity/InvalidTransition/Conflict |
 | PurchaseTransaction.Commit | CartID, UserID, CommandID, bestätigte Evaluation, PaymentAuthorization optional, Now → OrderID; atomare aktuelle Prüfung/Reservierung/Order/Cartabschluss/Outbox |
 | ProcessPort.EnsureCart | CartID, gebundene Definition/Regeln → dauerhaft vorhandener Cartprozess; idempotent auf WorkflowID |
-| ProcessPort.UpdateCart | CartID, CommandID, Command → bestätigtes Application-Ergebnis oder vorläufig Pending |
+| ProcessPort.UpdateCart/EvaluateCart/ConfirmEvaluation/PlaceOrder | Autorisierter Command mit UserID/CartID und Fachwerten, niemals rohe Sessionfähigkeit → bestätigtes Application-Ergebnis oder vorläufig Pending |
 | ProcessPort.EnsureOrder | OrderID, gebundene Versionen → dauerhaft vorhandener Orderprozess; idempotent |
 | ProcessPort.ReportDelivery | OrderID, CommandID, FulfillmentUpdate → quittierte Aufnahme, tatsächlicher Status über OrderReader |
 | ProjectionPort.Apply | vollständiges ProductProjectionEvent → versioniertes Upsert/Tombstone; Duplicate/Stale als erfolgreicher Noop |

@@ -1,6 +1,7 @@
 # Ausführbare Shop-Verträge
 
-Diese Verträge konkretisieren die abgenommene [arc42](../architecture/README.md) und das Epic vollständig für die lokale Demo. Sie implementieren noch kein Verhalten. Alle Featuredateien sind `@spec-only`; der echte Gherkinparser prüft jede Datei rekursiv. Erfolgreicher Parse ist **kein fachliches Green**, kein Stepbindungs-, Dienst- oder Performancenachweis. Produktive Coverage ist weiterhin **nicht anwendbar**.
+Diese Verträge konkretisieren die abgenommene [arc42](../architecture/README.md) und das Epic für die lokale Demo. Sämtliche Domainverträge und die reinen Applicationfälle sind aktiv. Rekursive Strict-Godog-Suites `@value`, `@catalog`, `@sale` und `@app` binden ihre öffentlichen Verträge; der zentrale Gherkinparser prüft zusätzlich jede noch als `@spec-only` markierte Datei beziehungsweise jedes offene Szenario. Syntaxerfolg ist kein fachliches Green. Native Coverage misst den gesamten buildfähigen Kern, ohne Excludes.
+
 
 ## Inventar und Aktivierung
 
@@ -16,6 +17,8 @@ Jede Zeile benennt einen öffentlichen Blackbox-Vertrag, seine maßgebliche Arch
 | [Warenkorbpositionen und Kaufkopien](domain/handel/warenkorb.feature) | [05-bausteine/commerce.md](../architecture/05-bausteine/commerce.md) | `core` |
 | [Kontextgebundene verifizierte Pflichtangaben](domain/pflichtangabe/aufloesung.feature) | [05-bausteine/compliance.md](../architecture/05-bausteine/compliance.md) | `core` |
 | [Fachliche Gastinteressen](domain/gast/profil.feature) | [05-bausteine/commerce.md](../architecture/05-bausteine/commerce.md) | `core` |
+| [Gastkoordination und Fehlergrenzen](application/gast/koordination.feature) | [08-querschnitt/guest.md](../architecture/08-querschnitt/guest.md) | `application`, aktiv |
+| [Activityzustände und Portfehler](application/checkout/koordination.feature) | [05-bausteine/core-api.md](../architecture/05-bausteine/core-api.md) | `application`, aktiv |
 | [Gastfähigkeit und Interessenprofile](application/gast/zugriff.feature) | [08-querschnitt/guest.md](../architecture/08-querschnitt/guest.md) | `application` |
 | [Bestätigter Gastabschluss](application/checkout/abschluss.feature) | [06-laufzeit/checkout.md](../architecture/06-laufzeit/checkout.md) | `application` |
 | [Atomarer und idempotenter Kauf](application/checkout/atomaritaet.feature) | [06-laufzeit/checkout.md](../architecture/06-laufzeit/checkout.md) | `application` |
@@ -48,7 +51,9 @@ UI prüft Komponenten, Navigation und DTO-Verwendung. Rabatt-/Steuer-/Mengen-/Su
 
 ## Schrittweise echte Ausführung
 
-Die Folgepakete bündeln Core A (`core` und reine `application`-Verträge), Runtime B (echte Adapter einschließlich tatsächlicher OpenSearch-Queryausführung), Frontend C und Integration D. Such-/Empfehlungsportverträge dürfen Applicationfälle bleiben; ihre adapterabhängigen Examples werden erst mit Runtime B aktiviert, niemals durch Selbstvergleiche scheinbar erfüllt.
+Core A implementiert alle acht Domainfeatures und reine Applicationverträge. Gastprofil-/Session-/Besitz-/Activityfälle sowie Checkout/Atomicity/Lieferung/Empfehlung sind aktiv; HTTPstatus, CSRF und Cookieattribute bleiben im Gastfeature ausdrücklich szenarioweise `@spec-only` für C. Im Suchfeature sind Request-, Kontext-, Auswahl- und Intervallvalidierung aktiv, tatsächliches Ranking/Autocomplete und Ausfallintegration bleiben `@spec-only` für B. Das Facettenfeature wartet vollständig auf echtes OpenSearch. Atomicity verwendet ausdrücklich Transaktionsdoubles und benötigt zusätzlich reale PostgreSQL-/Temporalabnahme in B.
+
+Die Folgepakete bündeln Runtime B (echte Adapter einschließlich tatsächlicher OpenSearch-Queryausführung), Frontend C und Integration D. Such-/Empfehlungsportverträge dürfen Applicationfälle bleiben; ihre adapterabhängigen Examples werden erst mit Runtime B aktiviert, niemals durch Selbstvergleiche scheinbar erfüllt.
 
 1. `core`: kohärente öffentliche Katalog-/Wert-/Pflichtdaten-/Handelsslices einzeln vollständig anbinden. Vor fachlichem Red das `@spec-only` des tatsächlich implementierten Vertrags entfernen; gemischte Implementierung innerhalb einer Datei verlangt entsprechend sichtbare szenarioweise Markierung der noch fehlenden Teile, keine Verstecke aktiver Regeln.
 2. `application`: Gastzugriff, Bewertung/Abschluss, Suche/Empfehlung und Lieferung an die öffentlichen Ports anbinden. Nach stabilen Ports können unabhängige Adapter parallel entstehen.

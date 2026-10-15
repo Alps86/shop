@@ -1,5 +1,5 @@
 # language: de
-@spec-only @core
+@core @sale
 Funktionalität: Fachliche Gastinteressen
   Als Gast verwende ich eindeutige gültige Kategorieinteressen.
 
@@ -17,3 +17,13 @@ Funktionalität: Fachliche Gastinteressen
       | mobile | 1.1 | InvalidInput |
       | mobile,mobile | 0.5,0.5 | InvalidInput |
       | missing | 0.5 | InvalidReference |
+      | mobile | invalid | InvalidInput |
+      | mobile | NaN | InvalidInput |
+
+  Szenario: Fehlende Gastkennung ist ungültig
+    Wenn die Kategorieinteressen eines Users validiert werden
+      | UserID | CategoryIDs | Weights | ExistingCategories |
+      | empty | mobile | 0.5 | mobile,home,coffee |
+    Dann lautet das Interessenvalidierungsergebnis
+      | Code |
+      | InvalidInput |

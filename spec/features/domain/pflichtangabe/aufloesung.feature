@@ -1,5 +1,5 @@
 # language: de
-@spec-only @core
+@core @catalog
 Funktionalität: Kontextgebundene verifizierte Pflichtangaben
   Als Käufer erhalte ich nur freigegebene Angaben für die gewählte Variante.
 
@@ -30,20 +30,20 @@ Funktionalität: Kontextgebundene verifizierte Pflichtangaben
       | Case | VariantOverride | RequiredFields | SuppliedFields |
       | <fall> | <override> | <pflicht> | <geliefert> |
     Dann lautet das Prüfungsergebnis
-      | Code | InheritSharedCompliance |
-      | <code> | <erben> |
+      | Code | ResolvedRequiredFields |
+      | <code> | <resolved> |
     Beispiele:
-      | fall | override | pflicht | geliefert | code | erben |
-      | base | absent | Manufacturer | Manufacturer | OK | true |
-      | variant | present | Manufacturer,Warnings | Manufacturer | ComplianceIncomplete | false |
-      | energy | present | Class,Scale,Label,InformationSheet,Model,EPREL | Class,Scale,Label,InformationSheet,Model,EPREL | OK | false |
-      | energy | present | Class,Scale,Label,InformationSheet,Model,EPREL | Class,Label | ComplianceIncomplete | false |
-      | chemical | present | VerifiedClassification,Supplier,Pictograms,SignalWord,Statements | unknown | ComplianceIncomplete | false |
-      | nonApplicable | absent | RuleReference,Reason | RuleReference,Reason | OK | true |
-      | nonApplicable | absent | RuleReference,Reason | unknown | ComplianceIncomplete | true |
-      | connected | present | dataActInformation | absent | ComplianceIncomplete | false |
-      | electrical | present | DisposalNotice | absent | ComplianceIncomplete | false |
-      | battery | present | ApplicableBatteryNotice | absent | ComplianceIncomplete | false |
+      | fall | override | pflicht | geliefert | code | resolved |
+      | base | absent | Manufacturer | Manufacturer | OK | Manufacturer |
+      | variant | present | Manufacturer,Warnings | Manufacturer | ComplianceIncomplete |  |
+      | energy | present | Class,Scale,Label,InformationSheet,Model,EPREL | Class,Scale,Label,InformationSheet,Model,EPREL | OK | Class,Scale,Label,InformationSheet,Model,EPREL |
+      | energy | present | Class,Scale,Label,InformationSheet,Model,EPREL | Class,Label | ComplianceIncomplete |  |
+      | chemical | present | VerifiedClassification,Supplier,Pictograms,SignalWord,Statements | unknown | ComplianceIncomplete |  |
+      | nonApplicable | absent | RuleReference,Reason | RuleReference,Reason | OK | RuleReference,Reason |
+      | nonApplicable | absent | RuleReference,Reason | unknown | ComplianceIncomplete |  |
+      | connected | present | dataActInformation | absent | ComplianceIncomplete |  |
+      | electrical | present | DisposalNotice | absent | ComplianceIncomplete |  |
+      | battery | present | ApplicableBatteryNotice | absent | ComplianceIncomplete |  |
 
   Szenariogrundriss: Grundpreis folgt aktuellem Inventorypreis
     Wenn ein mengenbezogenes Testangebot bewertet wird
@@ -101,3 +101,83 @@ Funktionalität: Kontextgebundene verifizierte Pflichtangaben
     Dann enthält es sichtbare Prüfhinweise unabhängig vom PDF
       | NoticeText | PictogramCode | AltText | VisibleWithoutPDF | ClaimsRealHazardClassification |
       | Fiktiver Testhinweis – kein reales Produkt verwenden | TEST-PIC | Fiktives Testpiktogramm | true | false |
+
+  Szenariogrundriss: Rollen Kontext und Dokumente müssen zum Angebot passen
+    Wenn ein öffentliches Pflichtdatenpaket mit einer Änderung geprüft wird
+      | Field | Value |
+      | <feld> | <wert> |
+    Dann lautet das Pflichtdatenergebnis
+      | Code | Purchasable |
+      | <code> | <kaufbar> |
+    Beispiele:
+      | feld | wert | code | kaufbar |
+      | SKU | OTHER | InvalidReference | false |
+      | ResponsiblePerson.Name | empty | ComplianceIncomplete | false |
+      | ResponsiblePerson.Country | US | ComplianceIncomplete | false |
+      | Manufacturer.Country | FR | OK | true |
+      | Context.Market | FR | ComplianceIncomplete | false |
+      | Context.Locale | fr-FR | ComplianceIncomplete | false |
+      | EnergyLabel | present | OK | true |
+      | Energy.Model | empty | ComplianceIncomplete | false |
+      | Energy.Class | empty | ComplianceIncomplete | false |
+      | Energy.Class | invalid | ComplianceIncomplete | false |
+      | Energy.ScaleMin | invalid | ComplianceIncomplete | false |
+      | Energy.ScaleMax | invalid | ComplianceIncomplete | false |
+      | Energy.Class | Z | ComplianceIncomplete | false |
+      | Energy.LabelModel | OTHER | ComplianceIncomplete | false |
+      | Energy.LabelLocale | fr-FR | ComplianceIncomplete | false |
+      | Energy.LabelURL | http://example.invalid/label.pdf | ComplianceIncomplete | false |
+      | Energy.InformationSheet | absent | ComplianceIncomplete | false |
+
+  Szenariogrundriss: Mengenbezug und Preisgrenzen
+    Wenn ein mengenbezogenes Testangebot bewertet wird
+      | Price | Currency | NetContent | UnitPriceBasis |
+      | <preis> | <waehrung> | <inhalt> | <basis> |
+    Dann lautet das Grundpreisergebnis
+      | Code | UnitPrice | Unit |
+      | <code> | <grundpreis> | EUR/l |
+    Beispiele:
+      | preis | waehrung | inhalt | basis | code | grundpreis |
+      | 1000 | EUR | 500:ml | 0:l | InvalidAttribute | absent |
+      | 1000 | ZZZ | 500:ml | 1:l | InvalidMoney | absent |
+      | 9223372036854775807 | EUR | 500:ml | 1:l | AmountOverflow | absent |
+
+  Szenariogrundriss: Freigabemarkierungen ersetzen keine strukturierten Pflichtdaten
+    Wenn ein Pflichtpaket nur eine behauptete Vollständigkeit enthält
+      | RequiredFields | SuppliedFields |
+      | <pflicht> | <behauptet> |
+    Dann lautet das Pflichtdatenergebnis
+      | Code | Purchasable |
+      | ComplianceIncomplete | false |
+    Beispiele:
+      | pflicht | behauptet |
+      | Class,Scale,Label,InformationSheet,Model,EPREL | Class,Scale,Label,InformationSheet,Model,EPREL |
+      | VerifiedClassification,Supplier,Pictograms,SignalWord,Statements | VerifiedClassification,Supplier,Pictograms,SignalWord,Statements |
+      | RuleReference,Reason | RuleReference,Reason |
+
+  Szenariogrundriss: Strukturierte Chemie- und Hinweispakete sind vollständig
+    Wenn eine strukturierte Pflichtdatengruppe geprüft wird
+      | Case | Value |
+      | <fall> | <wert> |
+    Dann lautet das Pflichtdatenergebnis
+      | Code | Purchasable |
+      | <code> | <kaufbar> |
+    Beispiele:
+      | fall | wert | code | kaufbar |
+      | chemical | valid | OK | true |
+      | supplier | empty | ComplianceIncomplete | false |
+      | identifier | empty | ComplianceIncomplete | false |
+      | signal | empty | ComplianceIncomplete | false |
+      | pictograms | absent | ComplianceIncomplete | false |
+      | statements | absent | ComplianceIncomplete | false |
+      | pictogramCode | empty | ComplianceIncomplete | false |
+      | pictogramURL | http://example.invalid/pic.svg | ComplianceIncomplete | false |
+      | pictogramAlt | empty | ComplianceIncomplete | false |
+      | statementCode | empty | ComplianceIncomplete | false |
+      | statementText | empty | ComplianceIncomplete | false |
+      | dataActInformation | valid | OK | true |
+      | dataActInformation | fr-FR | ComplianceIncomplete | false |
+      | DisposalNotice | valid | OK | true |
+      | ApplicableBatteryNotice | valid | OK | true |
+      | DisposalNotice | wrongCode | ComplianceIncomplete | false |
+      | unknownRequirement | valid | ComplianceIncomplete | false |

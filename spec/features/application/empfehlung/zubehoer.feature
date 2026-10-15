@@ -1,5 +1,5 @@
 # language: de
-@spec-only @application
+@application @app
 Funktionalität: Häufig zusammen gekauft aus Demostatistik
   Als Gast erhalte ich kompatible Empfehlungen ohne profilspezifische Rabattpreise.
 
@@ -57,3 +57,49 @@ Funktionalität: Häufig zusammen gekauft aus Demostatistik
       | import | duplicateUnorderedPair | InvalidInput | [] | [] |
       | import | inconsistentWindow | InvalidInput | [] | [] |
       | import | unknownProduct | InvalidReference | [] | [] |
+
+  Szenariogrundriss: Ungültige interne Interessen werden nicht als Rankinggewicht verwendet
+    Wenn ein internes Empfehlungsgewicht geprüft wird
+      | Weight |
+      | <gewicht> |
+    Dann lautet das Empfehlungsergebnis
+      | Code | ProductIDs | Label | Degraded |
+      | InvalidInput | [] | absent | false |
+    Beispiele:
+      | gewicht |
+      | -0.1 |
+      | 1.1 |
+      | not-a-decimal |
+
+  Szenario: Technischer Kandidatenausfall blockiert das Angebot nicht
+    Wenn die Kandidatenquelle technisch ausfällt
+      | Fault |
+      | Candidates |
+    Dann lautet das Empfehlungsergebnis
+      | Code | ProductIDs | Label | Degraded |
+      | OK | [] | absent | true |
+
+  Szenario: Die günstigste Zielvariante gewinnt unabhängig von der Quellreihenfolge
+    Angenommen Kandidaten besitzen gleiche Paarhäufigkeit
+      | ProductID | SKU | Price | BasketCount | Compatible | Available |
+      | p-a | a-expensive | 3000 | 5 | true | true |
+      | p-a | a-cheap | 1000 | 5 | true | true |
+      | p-a | a-middle | 2000 | 5 | true | true |
+    Wenn die Statistik validiert oder ausgewertet wird
+      | Operation | Input |
+      | recommend | neutral |
+    Dann lautet das Statistikergebnis
+      | Code | ProductIDs | SelectedSKUs |
+      | OK | p-a | a-cheap |
+
+  Szenario: Vollständig gültige Paarstatistik ist publizierbar
+    Angenommen Kandidaten besitzen gleiche Paarhäufigkeit
+      | ProductID | SKU | Price | BasketCount | Compatible | Available |
+      | p-a | a-1 | 1000 | 5 | true | true |
+      | p-b | b-1 | 2000 | 5 | true | true |
+    Wenn die vollständige Paarstatistik validiert wird
+      | ProductIDs |
+      | p-phone,p-a,p-b |
+    Dann lautet das Statistikergebnis
+      | Code | ProductIDs | SelectedSKUs |
+      | OK | [] | [] |

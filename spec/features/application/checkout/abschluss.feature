@@ -1,5 +1,5 @@
 # language: de
-@spec-only @application
+@application @app
 Funktionalität: Bestätigter Gastabschluss
   Als Gast bestelle ich bewusst mit aktuellen Preisen und simulierter Zahlung.
 
@@ -34,8 +34,8 @@ Funktionalität: Bestätigter Gastabschluss
       | CommandID | EvaluationID |
       | cmd-a | e-a |
     Dann lautet das Abschlussergebnis
-      | Code | OrderCount | Reserved | NewTotal | ConfirmationPresent |
-      | <code> | 0 | 0 | <gesamt> | false |
+      | Code | OrderCount | Reserved | NewTotal | ConfirmationPresent | CartPresent | ReturnedConfirmationPresent | ReturnedEvaluationPresent |
+      | <code> | 0 | 0 | <gesamt> | false | true | false | true |
     Beispiele:
       | aenderung | wert | code | gesamt |
       | inventoryPrice | 11000 | PriceConfirmationRequired | 11490 |
@@ -53,8 +53,8 @@ Funktionalität: Bestätigter Gastabschluss
       | CartID | CommandID |
       | c-a | cmd-a |
     Dann wird ein unveränderter Cart mit Ersatzangebot geliefert
-      | Code | CartSKU | ProposedSKU | OrderCount | Reserved |
-      | Unavailable | PHONE | PHONE-BLUE-256 | 0 | 0 |
+      | Code | CartSKU | ProposedSKU | OrderCount | Reserved | UnavailableSKU | AlternativeCount |
+      | Unavailable | PHONE | PHONE-BLUE-256 | 0 | 0 | PHONE | 1 |
     Wenn der Gast die Ersatzvariante wählt und den neuen Preis bestätigt
       | SKU | ConfirmedTotal | CommandID |
       | PHONE-BLUE-256 | 12490 | cmd-b |
@@ -98,3 +98,26 @@ Funktionalität: Bestätigter Gastabschluss
     Dann lautet das Abschlussergebnis
       | Code | OrderCount | Reserved |
       | PriceConfirmationRequired | 0 | 0 |
+
+  Szenario: Der Prozesseingang authentisiert vor dauerhaftem Workflowaufruf
+    Wenn der Gast den Abschluss über den Prozesseingang anfordert
+      | Session | CartID | CommandID |
+      | a | c-a | cmd-a |
+    Dann enthält der Prozessaufruf ausschließlich autorisierte Fachkennungen
+      | ProcessCalls |
+      | 1 |
+
+
+  Szenario: Ersatzangebote gehören zum selben Produkt und sind verfügbar
+    Angenommen der maßgebliche Variantenbestand lautet
+      | SKU | ProductID | UnitPrice | StockQuantity |
+      | PHONE | p-phone | 10000 | 0 |
+      | PHONE-ALT | p-phone | 12000 | 1 |
+      | PHONE-EMPTY | p-phone | 9000 | 0 |
+      | OTHER-CHEAP | p-other | 1000 | 10 |
+    Wenn der bestätigte Abschluss versucht wird
+      | CartID | CommandID |
+      | c-a | cmd-a |
+    Dann wird ein unveränderter Cart mit Ersatzangebot geliefert
+      | Code | CartSKU | UnavailableSKU | ProposedSKU | AlternativeCount | OrderCount | Reserved |
+      | Unavailable | PHONE | PHONE | PHONE-ALT | 1 | 0 | 0 |

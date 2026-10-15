@@ -1,8 +1,9 @@
 # language: de
-@spec-only @application
+@application @app
 Funktionalität: Sortierung Vorschläge und Ausfallgrenzen
   Als Käufer behalte ich nachvollziehbare Suchreihenfolge und verfügbare Kaufpfade.
 
+  @spec-only
   Szenariogrundriss: Explizite Sortierung gewinnt gegen Boosts
     Angenommen vergleichbare synthetische Suchkandidaten liegen vor
       | ProductID | Name | Price | TextScore | InterestWeight | MarginSignal |
@@ -21,6 +22,7 @@ Funktionalität: Sortierung Vorschläge und Ausfallgrenzen
       | priceDesc | p-b,p-a |
       | nameAsc | p-a,p-b |
 
+  @spec-only
   Szenariogrundriss: Präfix und begrenzte Tippfehler
     Angenommen veröffentlichte Suchbegriffe sind vorhanden
       | Name | ID |
@@ -56,6 +58,7 @@ Funktionalität: Sortierung Vorschläge und Ausfallgrenzen
       | Attribute | notCurated | InvalidFilter |
       | FilterOperator | unknown | InvalidFilter |
 
+  @spec-only
   Szenario: Suchausfall sperrt den maßgeblichen Kaufpfad nicht
     Angenommen nur OpenSearch ist nicht erreichbar
       | PostgreSQL | Temporal | OpenSearch |
@@ -70,3 +73,52 @@ Funktionalität: Sortierung Vorschläge und Ausfallgrenzen
       | SearchPort.Search | SearchUnavailable |
       | CatalogReader.Product | OK |
       | CheckoutService.Place | OK |
+
+  Szenariogrundriss: Typisierte Auswahl und Bereichsgrenzen werden vor dem Suchadapter geprüft
+    Wenn ein strukturierter Suchrequest angefragt wird
+      | Type | Attribute | Options | Minimum | Maximum | CurrencyMinimum | CurrencyMaximum | Fault |
+      | <typ> | <attribut> | <optionen> | <minimum> | <maximum> | <wl> | <wr> | <fehler> |
+    Dann lautet das Suchvalidierungsergebnis
+      | Code | PageSize |
+      | <code> | 12 |
+    Beispiele:
+      | typ | attribut | optionen | minimum | maximum | wl | wr | fehler | code |
+      | options | color | red,blue | absent | absent | EUR | EUR | none | OK |
+      | options | color | red,red | absent | absent | EUR | EUR | none | InvalidFilter |
+      | options | color | green | absent | absent | EUR | EUR | none | InvalidFilter |
+      | options | color | [] | absent | absent | EUR | EUR | none | InvalidFilter |
+      | range | storageCapacity | [] | 128 | 256 | EUR | EUR | none | OK |
+      | range | storageCapacity | [] | 256 | 128 | EUR | EUR | none | InvalidFilter |
+      | range | storageCapacity | [] | absent | 256 | EUR | EUR | none | OK |
+      | range | storageCapacity | [] | 128 | absent | EUR | EUR | none | OK |
+      | range | storageCapacity | [] | absent | absent | EUR | EUR | none | OK |
+      | range | storageCapacity | [] | invalid | 256 | EUR | EUR | none | InvalidFilter |
+      | range | storageCapacity | [] | 128 | invalid | EUR | EUR | none | InvalidFilter |
+      | range | storageCapacity | [] | dirty | 256 | EUR | EUR | none | InvalidFilter |
+      | range | color | [] | 1 | 2 | EUR | EUR | none | InvalidFilter |
+      | range | notCurated | [] | 1 | 2 | EUR | EUR | none | InvalidFilter |
+      | price | none | [] | 100 | 200 | EUR | EUR | none | OK |
+      | price | none | [] | 200 | 100 | EUR | EUR | none | InvalidFilter |
+      | price | none | [] | 100 | 200 | EUR | USD | none | InvalidFilter |
+      | price | none | [] | 100 | 200 | USD | USD | none | InvalidFilter |
+      | price | none | [] | absent | 200 | EUR | EUR | none | OK |
+      | price | none | [] | 100 | absent | EUR | EUR | none | OK |
+      | price | none | [] | -1 | 200 | EUR | EUR | none | InvalidFilter |
+      | price | none | [] | 100 | 200 | ZZZ | EUR | none | InvalidFilter |
+      | price | none | [] | dirty | 200 | EUR | EUR | none | InvalidFilter |
+      | dirtyPrice | none | [] | absent | absent | EUR | EUR | none | InvalidFilter |
+      | plain | none | [] | absent | absent | EUR | EUR | search | SearchUnavailable |
+
+  Szenariogrundriss: Der Suchkontext bleibt vom gültigen ISO-Wert getrennt
+    Wenn die Suche mit einem Verkaufskontext angefragt wird
+      | Locale | Currency | Market |
+      | <sprache> | <waehrung> | <markt> |
+    Dann lautet das Suchvalidierungsergebnis
+      | Code | PageSize |
+      | <code> | 12 |
+    Beispiele:
+      | sprache | waehrung | markt | code |
+      | de-DE | EUR | DE | OK |
+      | fr-FR | EUR | DE | UnsupportedContext |
+      | de-DE | USD | DE | UnsupportedContext |
+      | de-DE | EUR | FR | UnsupportedContext |
