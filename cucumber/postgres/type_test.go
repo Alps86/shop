@@ -9,26 +9,28 @@ import (
 )
 
 type world struct {
-	originalOrder  sale.Order
-	processCarts   map[value.CartID]bool
-	processOrders  map[value.OrderID]bool
-	processFailure string
-	observed       map[string]string
-	paymentOutcome string
-	commands       []application.PlaceCommand
-	results        []application.PurchaseResult
-	errors         []error
-	store          *postgres.Store
-	admin          *pgx.Conn
-	schema         string
-	manifest       postgres.ImportManifest
-	imported       postgres.ImportResult
-	service        application.Service
-	guest          application.GuestView
-	cart           application.CartView
-	result         application.PurchaseResult
-	inventoryPrice int64
-	err            error
+	permissionDatabase string
+	permissionRole     string
+	originalOrder      sale.Order
+	processCarts       map[value.CartID]bool
+	processOrders      map[value.OrderID]bool
+	processFailure     string
+	observed           map[string]string
+	paymentOutcome     string
+	commands           []application.PlaceCommand
+	results            []application.PurchaseResult
+	errors             []error
+	store              *postgres.Store
+	admin              *pgx.Conn
+	schema             string
+	manifest           postgres.ImportManifest
+	imported           postgres.ImportResult
+	service            application.Service
+	guest              application.GuestView
+	cart               application.CartView
+	result             application.PurchaseResult
+	inventoryPrice     int64
+	err                error
 }
 
 type processObserver struct{ current *world }

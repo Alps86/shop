@@ -13,6 +13,7 @@ func (current *world) cartSteps(ctx *godog.ScenarioContext) {
 	ctx.Step(`^der persistente Ablauf unter erneuter Sperre geprüft wird$`, current.expireCart)
 	ctx.Step(`^derselbe Gast ausdrücklich einen Einkauf startet$`, current.startAgain)
 	ctx.Step(`^der Cartschreibport eine typisierte Originaländerung erhält$`, current.directCartWrite)
+	ctx.Step(`^der dauerhafte Cartstarter eine explizite Userkennung erhält$`, current.directStart)
 }
 
 func (current *world) expireCart(input *godog.Table) error {
@@ -65,4 +66,9 @@ func (current *world) directCartWrite(input *godog.Table) error {
 	_, current.err = current.store.Carts().Save(context.Background(), write)
 
 	return nil
+}
+
+func (current *world) directStart(input *godog.Table) {
+	row := table(input)
+	_, current.err = current.store.Carts().Start(context.Background(), value.UserID(row["UserID"]), value.CommandID(row["CommandID"]), current.Now())
 }

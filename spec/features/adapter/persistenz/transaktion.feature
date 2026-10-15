@@ -288,13 +288,17 @@ Funktionalität: Aktuelle Daten innerhalb der Kauftransaktion
       | add-a | 2 | Conflict |
       | new-a | 1 | Conflict |
 
-  Szenario: Eine Bestätigungswiederholung liest den ursprünglichen dauerhaften Beleg
+  Szenariogrundriss: Eine Bestätigungswiederholung prüft die ursprüngliche Bewertung im dauerhaften Beleg
     Wenn dieselbe Bestätigung nach dem Commit erneut ausgeführt wird
-      | CommandID |
-      | confirm-a |
+      | CommandID | Evaluation |
+      | confirm-a | <evaluation> |
     Dann lautet die persistente Zustandsbeobachtung
       | Code | OrderCount | Reserved |
-      | OK | 0 | 0 |
+      | <code> | 0 | 0 |
+    Beispiele:
+      | evaluation | code |
+      | original | OK |
+      | other | Conflict |
 
   Szenariogrundriss: Ein fehlgeschlagener Cartwrite rollt Prozessauftrag und Beleg zusammen zurück
     Angenommen ein echter SQL-Schreibfehler gezielt vorbereitet ist
@@ -409,3 +413,93 @@ Funktionalität: Aktuelle Daten innerhalb der Kauftransaktion
     Dann lautet die persistente Zustandsbeobachtung
       | Code | OrderCount | ReturnedCart | UnavailableSKU | Alternatives | AlternativeSKU |
       | Unavailable | 0 | true | PHONE | 1 | PHONE-BLUE |
+
+  Szenario: Ein fehlender Cartbelegspeicher wird innerhalb des Schreibports sichtbar
+    Angenommen folgende SQL-Fixtureänderung nur im eigenen Schema erfolgt
+      | SQL |
+      | DROP TABLE $schema.commands |
+    Wenn der Cartschreibport eine typisierte Originaländerung erhält
+      | CommandID | ExpectedRevision | Quantity |
+      | new-a | 3 | 1 |
+    Dann lautet die persistente Zustandsbeobachtung
+      | Code | OrderCount | Reserved |
+      | DependencyUnavailable | 0 | 0 |
+
+  Szenariogrundriss: Fehlende Lieferabhängigkeiten verursachen keinen Reservierungsverbrauch
+    Wenn der Gast den bestätigten Kauf wiederholt abschließt
+      | CommandID | Attempts |
+      | place-a | 1 |
+    Und folgende SQL-Fixtureänderung nur im eigenen Schema erfolgt
+      | SQL |
+      | <sql> |
+    Und die dauerhafte Liefertransaktionsgrenze direkt aufgerufen wird
+      | ShipmentID | CommandID | LookupCommandID | Status | SKU | Quantity |
+      | shipment-a | ship-a | ship-a | shipped | PHONE | 1 |
+    Dann lautet die persistente Zustandsbeobachtung
+      | Code | OrderCount | Reserved | Stock |
+      | <code> | <orders> | 1 | 2 |
+    Beispiele:
+      | sql | code | orders |
+      | DROP TABLE $schema.commands | DependencyUnavailable | 1 |
+      | DELETE FROM $schema.orders | NotFound | 0 |
+
+  Szenario: Ein Ablaufauftrag kann einen bereits bestellten Cart nicht verändern
+    Wenn der Gast den bestätigten Kauf wiederholt abschließt
+      | CommandID | Attempts |
+      | place-a | 1 |
+    Und der persistente Ablauf unter erneuter Sperre geprüft wird
+      | ID | Hours |
+      | current | 168 |
+    Dann lautet das öffentliche SQL-Leseergebnis
+      | Code | State | Confirmed |
+      | AlreadyOrdered | ordered | true |
+
+  Szenario: Eine fehlende SKU-Produktzuordnung verhindert auch die Inventorypublikation
+    Angenommen folgende SQL-Fixtureänderung nur im eigenen Schema erfolgt
+      | SQL |
+      | DELETE FROM $schema.sku_registry WHERE sku='PHONE' |
+    Wenn der Bestand atomar geändert wird
+      | SKU | CommandID | Revision | SetPrice | Price | SetStock | Stock |
+      | PHONE | inventory-a | 1 | true | 12000 | false | 0 |
+    Dann lautet die persistente Zustandsbeobachtung
+      | Code | OrderCount | Reserved | Stock | ProjectionRevision |
+      | NotFound | 0 | 0 | 2 | 1 |
+
+  Szenario: Eine beschädigte Positionsmenge erhält keine Reservierung
+    Angenommen folgende SQL-Fixtureänderung nur im eigenen Schema erfolgt
+      | SQL |
+      | UPDATE $schema.carts SET payload=jsonb_set(payload,'{Items,0,Quantity}','0') |
+    Wenn der Gast den bestätigten Kauf wiederholt abschließt
+      | CommandID | Attempts |
+      | place-a | 1 |
+    Dann lautet die persistente Zustandsbeobachtung
+      | Code | OrderCount | Reserved | Stock |
+      | InvalidInput | 0 | 0 | 2 |
+
+  Szenario: Ein beschädigter Bestellverweis wird nicht durch eine zweite Bestellung repariert
+    Wenn der Gast den bestätigten Kauf wiederholt abschließt
+      | CommandID | Attempts |
+      | place-a | 1 |
+    Und folgende SQL-Fixtureänderung nur im eigenen Schema erfolgt
+      | SQL |
+      | DELETE FROM $schema.orders |
+    Und der Gast den bestätigten Kauf wiederholt abschließt
+      | CommandID | Attempts |
+      | place-other | 1 |
+    Dann lautet die persistente Zustandsbeobachtung
+      | Code | OrderCount | Reserved | Stock |
+      | NotFound | 0 | 1 | 2 |
+
+  Szenario: Fehlende Alternativdaten erzeugen bei Ausverkauf kein erfundenes Angebot
+    Wenn der Bestand atomar geändert wird
+      | SKU | CommandID | Revision | SetPrice | Price | SetStock | Stock |
+      | PHONE | inventory-a | 1 | false | 0 | true | 0 |
+    Und folgende SQL-Fixtureänderung nur im eigenen Schema erfolgt
+      | SQL |
+      | DELETE FROM $schema.records WHERE kind='category' |
+    Und der Gast den bestätigten Kauf wiederholt abschließt
+      | CommandID | Attempts |
+      | place-a | 1 |
+    Dann lautet die persistente Zustandsbeobachtung
+      | Code | OrderCount | Reserved | Stock | Alternatives |
+      | NotFound | 0 | 0 | 0 | 0 |

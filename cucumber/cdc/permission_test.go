@@ -75,10 +75,22 @@ func (current *world) configureRestriction(permission, root, limited string) err
 		return errors.Join(err, connection.Close(context.Background()))
 	}
 
-	_, err = connection.Exec(context.Background(), "REVOKE SELECT ON pg_catalog.pg_replication_slots FROM PUBLIC")
+	err = current.revokeMetadata(connection, permission, limited)
 	current.source = cdc.NewReindexSource(current.config)
 
 	return errors.Join(err, connection.Close(context.Background()))
+}
+
+func (current *world) revokeMetadata(connection *pgx.Conn, permission, limited string) error {
+	table := "pg_catalog.pg_replication_slots"
+	if permission == "PublicationMetadata" {
+		table = "pg_catalog.pg_publication_tables"
+		current.config.DSN = limited
+	}
+
+	_, err := connection.Exec(context.Background(), "REVOKE SELECT ON "+table+" FROM PUBLIC")
+
+	return err
 }
 
 func (current *world) dropRestrictedRole(ctx context.Context) error {

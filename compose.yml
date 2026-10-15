@@ -30,7 +30,7 @@ services:
       discovery.type: single-node
       DISABLE_SECURITY_PLUGIN: "true"
       DISABLE_INSTALL_DEMO_CONFIG: "true"
-      OPENSEARCH_JAVA_OPTS: -Xms512m -Xmx512m
+      OPENSEARCH_JAVA_OPTS: -Xms1g -Xmx1g
       node.store.allow_mmap: "false"
     ports: ["127.0.0.1:19200:9200"]
     volumes: [search-data:/usr/share/opensearch/data]

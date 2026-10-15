@@ -7,6 +7,7 @@ import (
 	"github.com/jackc/pglogrepl"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -19,6 +20,51 @@ func (current *world) databaseFaultSteps(ctx *godog.ScenarioContext) {
 	ctx.Step(`^ein echter Reindexsnapshot versucht wird$`, current.attemptSnapshot)
 	ctx.Step(`^meldet die WAL-Vorbereitung ihren tatsächlichen Fehler$`, current.snapshotError)
 	ctx.Step(`^der eigene SQL-Verbindungspool geschlossen wird$`, current.closeStore)
+	ctx.Step(`^die eigene exportierte Replikationsverbindung serverseitig beendet wird$`, current.terminateSnapshot)
+	ctx.Step(`^ein schon gekündigter nativer Runnerstart versucht wird$`, current.canceledRunner)
+	ctx.Step(`^der eigene laufende Replikationsbefehl serverseitig gekündigt wird$`, current.cancelReplication)
+	ctx.Step(`^ein ungültiger eigener Slotname konfiguriert ist$`, current.invalidSlot)
+	ctx.Step(`^ein langer gültiger eigener Slotname konfiguriert ist$`, current.longSlot)
+}
+
+func (current *world) longSlot(input *godog.Table) error {
+	row := current.fields(input)
+	length, err := strconv.Atoi(row["Length"])
+	if err != nil {
+		return err
+	}
+
+	current.config.Slot = strings.Repeat(row["Character"], length)
+	current.source = cdc.NewReindexSource(current.config)
+
+	return nil
+}
+
+func (current *world) invalidSlot(input *godog.Table) {
+	current.config.Slot = current.fields(input)["Slot"]
+	current.source = cdc.NewReindexSource(current.config)
+}
+
+func (current *world) cancelReplication() error {
+	_, err := current.admin.Exec(context.Background(), "SELECT pg_cancel_backend(active_pid) FROM pg_replication_slots WHERE slot_name=$1", current.config.Slot)
+
+	return err
+}
+
+func (current *world) canceledRunner() {
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	current.consumer = cdc.New(current.config)
+	current.err = current.consumer.Run(ctx)
+}
+
+func (current *world) terminateSnapshot() error {
+	_, err := current.admin.Exec(context.Background(), "SELECT pg_terminate_backend(active_pid) FROM pg_replication_slots WHERE slot_name=$1", current.snapshot.Cursor)
+	if err != nil {
+		return err
+	}
+
+	return current.slotReleased()
 }
 
 func (current *world) sqlFixture(input *godog.Table) error {

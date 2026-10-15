@@ -20,13 +20,14 @@ type Config struct {
 }
 
 type Consumer struct {
-	retryDelay   time.Duration
-	config       Config
-	connection   *pgconn.PgConn
-	relations    map[uint32]*pglogrepl.RelationMessage
-	pending      []event.ProjectionEnvelope
-	acknowledged pglogrepl.LSN
-	stop         pglogrepl.LSN
+	retryDelay       time.Duration
+	config           Config
+	connection       *pgconn.PgConn
+	connectionConfig *pgconn.Config
+	relations        map[uint32]*pglogrepl.RelationMessage
+	pending          []event.ProjectionEnvelope
+	acknowledged     pglogrepl.LSN
+	stop             pglogrepl.LSN
 }
 
 type ReindexSource struct {

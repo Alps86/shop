@@ -9,12 +9,40 @@ import (
 	"github.com/Alps86/shop/internal/adapter/postgres"
 	"github.com/Alps86/shop/internal/domain/value"
 	"github.com/cucumber/godog"
+	"github.com/jackc/pgx/v5/pgproto3"
 	"strconv"
 )
 
 func (current *world) protocolSteps(ctx *godog.ScenarioContext) {
 	ctx.Step(`^ergänzend Slotmetadatenwerte für eine Fortsetzung geprüft werden$`, current.slotMetadata)
 	ctx.Step(`^ergänzend folgende Protokollframes durch denselben Decoder laufen$`, current.decodeFrames)
+	ctx.Step(`^ergänzend ein gültiger Keepalive nach geschlossener echter Verbindung Antwort verlangt$`, current.closedKeepalive)
+	ctx.Step(`^ergänzend eine standardisierte Notice durch denselben Nachrichtendecoder läuft$`, current.decodeNotice)
+}
+
+func (current *world) decodeNotice() {
+	consumer := cdc.New(current.config)
+	current.err = consumer.DecodeMessage(context.Background(), &pgproto3.NoticeResponse{Severity: "NOTICE", Code: "00000", Message: "ergänzende Protokollfixture"})
+}
+
+func (current *world) closedKeepalive() error {
+	current.consumer = cdc.New(current.config)
+	if err := current.consumer.Prepare(context.Background()); err != nil {
+		return err
+	}
+
+	if err := current.consumer.Close(context.Background()); err != nil {
+		return err
+	}
+
+	frame, err := hex.DecodeString("6b0000000000000000000000000000000001")
+	if err != nil {
+		return err
+	}
+
+	current.err = current.consumer.DecodeFrame(context.Background(), frame)
+
+	return nil
 }
 
 func (current *world) decodeFrames(input *godog.Table) error {

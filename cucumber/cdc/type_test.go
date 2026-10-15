@@ -27,5 +27,6 @@ type world struct {
 	events          []application.ProjectionEvent
 	cancel          context.CancelFunc
 	stopped         chan error
+	done            chan struct{}
 	err             error
 }

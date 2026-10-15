@@ -141,6 +141,40 @@ Funktionalität: SQL-Lesesichten und Gastidentität
     Beispiele:
       | sql | operation | id | sku | code |
       | SELECT 1 | product | p-phone | MISSING | InvalidReference |
+      | UPDATE $schema.records SET payload=jsonb_set(payload,'{Variants}','[]') WHERE kind='product' | product | p-phone | PHONE | NotFound |
       | SELECT 1 | category | missing | | NotFound |
       | DELETE FROM $schema.records WHERE kind='inventory' | product | p-phone | PHONE | NotFound |
       | DELETE FROM $schema.records WHERE kind='category' | product | p-phone | PHONE | NotFound |
+
+  Szenariogrundriss: Variantenbilder haben Vorrang und direkte Unterkategorien bleiben navigierbar
+    Angenommen Modellbilder und eine Unterkategorie vorbereitet werden
+      | ProductImage | VariantImage | AltText | ChildID |
+      | https://example.invalid/model.svg | <variant> | Neutrale Darstellung | mobile-child |
+    Und ein Importfeld vor der Veröffentlichung geändert wird
+      | Field | Value |
+      | DatasetVersion | demo-v2 |
+    Wenn der Datensatz veröffentlicht wird
+    Und ein persistenter Lesevertrag aufgerufen wird
+      | Operation | ID | SKU |
+      | product | p-phone | PHONE |
+    Dann lautet das öffentliche SQL-Leseergebnis
+      | Code | ImageURL |
+      | OK | <image> |
+    Wenn ein persistenter Lesevertrag aufgerufen wird
+      | Operation | ID |
+      | category | mobile |
+    Dann lautet das öffentliche SQL-Leseergebnis
+      | Code | Children |
+      | OK | 1 |
+    Beispiele:
+      | variant | image |
+      | | https://example.invalid/model.svg |
+      | https://example.invalid/variant.svg | https://example.invalid/variant.svg |
+
+  Szenario: Die administrative Orderliste akzeptiert keine Seite null
+    Wenn ein persistenter Lesevertrag aufgerufen wird
+      | Operation | Page |
+      | adminOrders | 0 |
+    Dann lautet das öffentliche SQL-Leseergebnis
+      | Code |
+      | InvalidInput |

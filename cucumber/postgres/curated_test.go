@@ -28,3 +28,14 @@ func (current *world) curated(input *godog.Table) error {
 
 	return nil
 }
+
+func (current *world) productPresentation(input *godog.Table) {
+	row := table(input)
+	current.manifest.Products[0].Images = []catalog.Image{{URL: row["ProductImage"], AltText: catalog.LocalizedText{"de-DE": row["AltText"]}}}
+	if row["VariantImage"] != "" {
+		current.manifest.Products[0].Variants[0].Images = []catalog.Image{{URL: row["VariantImage"], AltText: catalog.LocalizedText{"de-DE": row["AltText"]}}}
+	}
+
+	child := catalog.Category{ID: value.CategoryID(row["ChildID"]), Version: 1, ParentID: value.Optional[value.CategoryID]{Present: true, Value: "mobile"}}
+	current.manifest.Categories = append(current.manifest.Categories, child)
+}

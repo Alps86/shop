@@ -3,8 +3,10 @@ package cdc_test
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/Alps86/shop/internal/adapter/cdc"
 	"github.com/cucumber/godog"
+	"github.com/jackc/pgx/v5"
 	"time"
 )
 
@@ -33,14 +35,19 @@ func (current *world) startStream() error {
 	}
 
 	current.projected = make(chan struct{}, 10)
-	current.stopped = make(chan error, 1)
-	ctx, cancel := context.WithCancel(context.Background())
-	current.cancel = cancel
-	go func() {
-		current.stopped <- current.consumer.Stream(ctx)
-	}()
+	current.launch(current.consumer.Stream)
 
 	return nil
+}
+
+func (current *world) launch(action func(context.Context) error) {
+	ctx, cancel := context.WithCancel(context.Background())
+	stopped, done := make(chan error, 1), make(chan struct{})
+	current.cancel, current.stopped, current.done = cancel, stopped, done
+	go func() {
+		defer close(done)
+		stopped <- action(ctx)
+	}()
 }
 
 func (current *world) failTarget() {
@@ -52,12 +59,22 @@ func (current *world) failedStream() error {
 	case err := <-current.stopped:
 		current.err = err
 	case <-time.After(10 * time.Second):
-		return context.DeadlineExceeded
+		return errors.Join(current.streamDeadline(), current.closeStream())
 	}
 
 	current.cancel()
 
 	return current.closeStream()
+}
+
+func (current *world) streamDeadline() error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	var diagnosis string
+	table := pgx.Identifier{current.config.Schema, "outbox"}.Sanitize()
+	err := current.admin.QueryRow(ctx, "SELECT json_build_object('SourceEvents',(SELECT count(*) FROM "+table+"),'CurrentLSN',pg_current_wal_lsn(),'Slot',(SELECT row_to_json(s) FROM pg_replication_slots s WHERE slot_name=$1))::text", current.config.Slot).Scan(&diagnosis)
+
+	return errors.Join(context.DeadlineExceeded, err, fmt.Errorf("CDC-Wartezustand: %s", diagnosis))
 }
 
 func (current *world) restartStream() error {
@@ -128,12 +145,7 @@ func (current *world) startRunner() error {
 
 	current.projected = make(chan struct{}, 10)
 	current.attempted = make(chan struct{}, 10)
-	current.stopped = make(chan error, 1)
-	ctx, cancel := context.WithCancel(context.Background())
-	current.cancel = cancel
-	go func() {
-		current.stopped <- current.consumer.Run(ctx)
-	}()
+	current.launch(current.consumer.Run)
 
 	return nil
 }
@@ -149,6 +161,18 @@ func (current *world) restoreAfterAttempt() error {
 }
 
 func (current *world) closeStream() error {
+	if current.cancel != nil {
+		current.cancel()
+	}
+
+	if current.done != nil {
+		select {
+		case <-current.done:
+		case <-time.After(10 * time.Second):
+			return context.DeadlineExceeded
+		}
+	}
+
 	if err := current.consumer.Close(context.Background()); err != nil {
 		return err
 	}

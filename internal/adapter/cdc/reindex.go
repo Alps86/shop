@@ -18,7 +18,7 @@ func NewReindexSource(config Config) *ReindexSource {
 
 func (source *ReindexSource) Snapshot(ctx context.Context, _ time.Time) (event.ReindexSnapshot, error) {
 	config := source.Config
-	config.Slot = "reindex_" + strings.ToLower(rand.Text())
+	config.Slot = config.Slot[:min(len(config.Slot), 24)] + "_reindex_" + strings.ToLower(rand.Text())
 	consumer := New(config)
 	if err := consumer.publication(ctx); err != nil {
 		return event.ReindexSnapshot{}, err

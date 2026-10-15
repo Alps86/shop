@@ -18,7 +18,7 @@ func (current *world) importSteps(ctx *godog.ScenarioContext) {
 
 func (current *world) mutateImport(input *godog.Table) error {
 	row := table(input)
-	mutations := map[string]func(string) error{"DatasetVersion": current.importVersion, "SourceURL": current.importSource, "LicenseNote": current.importLicense, "RetrievedAt": current.importTime, "FamilyVersion": current.importFamily, "CategoryParent": current.importParent, "Inventory": current.importInventory, "DocumentURL": current.importDocument, "SKU": current.importSKU, "ProductName": current.importName, "Discount": current.importDiscount, "FamilyReference": current.importReference, "AttributeLevel": current.importLevel, "Duplicate": current.importDuplicate}
+	mutations := map[string]func(string) error{"DatasetVersion": current.importVersion, "SourceURL": current.importSource, "LicenseNote": current.importLicense, "RetrievedAt": current.importTime, "FamilyVersion": current.importFamily, "CategoryParent": current.importParent, "Inventory": current.importInventory, "DocumentURL": current.importDocument, "SKU": current.importSKU, "ProductName": current.importName, "Discount": current.importDiscount, "FamilyReference": current.importReference, "AttributeLevel": current.importLevel, "Duplicate": current.importDuplicate, "ProductID": current.importProductID, "VariantDocumentURL": current.importVariantDocument}
 
 	return mutations[row["Field"]](row["Value"])
 }
@@ -177,6 +177,19 @@ func (current *world) orphanInventory() error {
 	inventory := current.manifest.Inventories[0]
 	inventory.SKU = "ORPHAN"
 	current.manifest.Inventories = append(current.manifest.Inventories, inventory)
+
+	return nil
+}
+
+func (current *world) importProductID(raw string) error {
+	current.manifest.Products[0].ID = value.ProductID(raw)
+	return nil
+}
+
+func (current *world) importVariantDocument(raw string) error {
+	compliance := current.manifest.Products[0].Compliance
+	compliance.Documents = []catalog.ProductDocument{{Kind: "manual", Locale: "de-DE", SKU: "PHONE", URL: raw}}
+	current.manifest.Products[0].Variants[0].Compliance = value.Optional[catalog.ProductCompliance]{Present: true, Value: compliance}
 
 	return nil
 }

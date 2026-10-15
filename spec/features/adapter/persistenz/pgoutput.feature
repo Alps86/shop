@@ -62,6 +62,7 @@ Funktionalität: Echter logischer PostgreSQL-Nachlauf
       | 77000000000000000000000000000000000000000000000000 | InvalidInput |
       | 770000000000000000000000000000000000000000000000003f | InternalError |
       | 6b0000000000000000000000000000000000 | OK |
+      | 770000000000000000000000000000000000000000000000004d0000000000000000000000000000 | OK |
       | 7700000000000000000000000000000000000000000000000049000000014e0000 | InvalidInput |
       | 7700000000000000000000000000000000000000000000000052000000017075626c6963006f7574626f780064000100656e76656c6f70650000000edaffffffff | OK |
       | 7700000000000000000000000000000000000000000000000049000000014e0000 | InvalidInput |
@@ -302,6 +303,7 @@ Funktionalität: Echter logischer PostgreSQL-Nachlauf
       | permission | code |
       | SlotMetadata | DependencyUnavailable |
       | Replication | InternalError |
+      | PublicationMetadata | InternalError |
 
   Szenario: Fehlende Slotmetadatenrechte verhindern die Übernahme eines exportierten Snapshots
     Angenommen eine eigene Testdatenbank ohne folgende Berechtigung besteht
@@ -311,3 +313,72 @@ Funktionalität: Echter logischer PostgreSQL-Nachlauf
     Dann meldet die Snapshotgrenze ihren tatsächlichen Fehler
       | Code |
       | DependencyUnavailable |
+
+  Szenario: Fehlendes Replikationsrecht verhindert schon die exportierte Verbindung
+    Angenommen eine eigene Testdatenbank ohne folgende Berechtigung besteht
+      | Permission |
+      | Replication |
+    Wenn ein echter Reindexsnapshot versucht wird
+    Dann meldet die Snapshotgrenze ihren tatsächlichen Fehler
+      | Code |
+      | InternalError |
+
+  Szenario: Eine serverseitig beendete eigene Snapshotverbindung kann keinen Nachlauf vortäuschen
+    Angenommen ein exportierter PostgreSQL-Snapshot mit eigenem pgoutput-Slot besteht
+    Und die eigene exportierte Replikationsverbindung serverseitig beendet wird
+    Wenn der WAL-Nachlauf bis zur aktuellen Grenze erfolgt
+    Dann meldet die Snapshotgrenze ihren tatsächlichen Fehler
+      | Code |
+      | InternalError |
+
+  Szenario: Ein gekündigter Runnerstart scheitert schon an seiner tatsächlichen SQL-Verbindung
+    Wenn ein schon gekündigter nativer Runnerstart versucht wird
+    Dann meldet die WAL-Vorbereitung ihren tatsächlichen Fehler
+      | Code |
+      | InternalError |
+
+  Szenario: Der ergänzende Keepalive-Decoder meldet den Fehler einer geschlossenen echten Verbindung
+    Wenn ergänzend ein gültiger Keepalive nach geschlossener echter Verbindung Antwort verlangt
+    Dann meldet die WAL-Vorbereitung ihren tatsächlichen Fehler
+      | Code |
+      | InternalError |
+
+  Szenario: Ein ungültiger Slotname wird bei tatsächlicher Slotanlage abgelehnt
+    Angenommen ein ungültiger eigener Slotname konfiguriert ist
+      | Slot |
+      | Invalid-Slot |
+    Wenn derselbe Verbraucher erneut vorbereitet wird
+    Dann meldet die WAL-Vorbereitung ihren tatsächlichen Fehler
+      | Code |
+      | InternalError |
+
+  Szenario: Auch die tatsächliche Reindexslotanlage erhält den diagnostischen Consumerpräfix
+    Angenommen ein ungültiger eigener Slotname konfiguriert ist
+      | Slot |
+      | Invalid-Slot |
+    Wenn ein echter Reindexsnapshot versucht wird
+    Dann meldet die Snapshotgrenze ihren tatsächlichen Fehler
+      | Code |
+      | InternalError |
+
+  Szenario: Ein maximal langer gültiger Consumername bleibt beim temporären Slot unterstützt
+    Angenommen ein langer gültiger eigener Slotname konfiguriert ist
+      | Character | Length |
+      | s | 63 |
+    Und ein exportierter PostgreSQL-Snapshot mit eigenem pgoutput-Slot besteht
+    Wenn der exportierte Snapshot wiederholt abgebrochen wird
+    Dann ist der temporäre Reindexslot freigegeben
+
+  Szenario: Ein serverseitig gekündigter eigener Replikationsbefehl meldet seinen Serverfehler
+    Angenommen ein eigener dauerhafter pgoutput-Verbraucher vorbereitet ist
+    Wenn der eigene laufende Replikationsbefehl serverseitig gekündigt wird
+    Und der Verbraucher seinen Diagnosefehler meldet
+    Dann bleibt der WAL-Checkpoint mit Diagnose unverändert
+      | Code | LSN | EventCount |
+      | InternalError | 0/0 | 0 |
+
+  Szenario: Der ergänzende Nachrichtendecoder ignoriert eine standardisierte Notice
+    Wenn ergänzend eine standardisierte Notice durch denselben Nachrichtendecoder läuft
+    Dann meldet die WAL-Vorbereitung ihren tatsächlichen Fehler
+      | Code |
+      | OK |

@@ -2,6 +2,7 @@ package postgres_test
 
 import (
 	"context"
+	"github.com/Alps86/shop/internal/domain/value"
 	"github.com/cucumber/godog"
 	"github.com/jackc/pgx/v5"
 	"strings"
@@ -9,6 +10,7 @@ import (
 
 func (current *world) readFaultSteps(ctx *godog.ScenarioContext) {
 	ctx.Step(`^folgende SQL-Fixtureänderung nur im eigenen Schema erfolgt$`, current.sqlFixture)
+	ctx.Step(`^die Produktquelle mit versioniertem Tombstone gelöscht werden soll$`, current.deleteProduct)
 }
 
 func (current *world) sqlFixture(input *godog.Table) error {
@@ -29,4 +31,8 @@ func (current *world) readDiagnostics(_ map[string]string) error {
 	}
 
 	return nil
+}
+
+func (current *world) deleteProduct(input *godog.Table) {
+	current.err = current.store.DeleteProduct(context.Background(), value.ProductID(table(input)["ProductID"]))
 }

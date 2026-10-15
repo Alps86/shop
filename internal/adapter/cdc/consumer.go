@@ -61,12 +61,7 @@ func (consumer *Consumer) receive(ctx context.Context) error {
 			return err
 		}
 
-		data, ok := message.(*pgproto3.CopyData)
-		if !ok {
-			continue
-		}
-
-		if err := consumer.DecodeFrame(ctx, data.Data); err != nil {
+		if err := consumer.DecodeMessage(ctx, message); err != nil {
 			return err
 		}
 
@@ -74,6 +69,18 @@ func (consumer *Consumer) receive(ctx context.Context) error {
 			return nil
 		}
 	}
+}
+
+func (consumer *Consumer) DecodeMessage(ctx context.Context, message pgproto3.BackendMessage) error {
+	if response, ok := message.(*pgproto3.ErrorResponse); ok {
+		return consumer.classify(pgconn.ErrorResponseToPgError(response))
+	}
+
+	if data, ok := message.(*pgproto3.CopyData); ok {
+		return consumer.DecodeFrame(ctx, data.Data)
+	}
+
+	return nil
 }
 
 func (consumer *Consumer) DecodeFrame(ctx context.Context, data []byte) error {

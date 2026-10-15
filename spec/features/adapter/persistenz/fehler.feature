@@ -175,3 +175,30 @@ Funktionalität: Tatsächliche PostgreSQL-Lesefehler
       | boundary |
       | StartCart |
       | Import |
+
+  Szenario: Ein unbekanntes Produkt erzeugt keinen erfundenen Tombstone
+    Wenn die Produktquelle mit versioniertem Tombstone gelöscht werden soll
+      | ProductID |
+      | p-missing |
+    Dann lautet das öffentliche SQL-Leseergebnis
+      | Code |
+      | NotFound |
+
+  Szenario: Ein Fehler beim Löschen der Produktzeile rollt auch ihren neuen Versionsstand zurück
+    Angenommen ein echter SQL-Schreibfehler gezielt vorbereitet ist
+      | Table | Operation | MatchField | MatchValue | SQLState |
+      | records | DELETE | | | P0001 |
+    Wenn die Produktquelle mit versioniertem Tombstone gelöscht werden soll
+      | ProductID |
+      | p-phone |
+    Dann lautet die persistente Zustandsbeobachtung
+      | Code | OrderCount | Stock | ProjectionRevision |
+      | DependencyUnavailable | 0 | 2 | 1 |
+
+  Szenario: Eine ungültige Userkennung erzeugt keinen neuen dauerhaften Warenkorb
+    Wenn der dauerhafte Cartstarter eine explizite Userkennung erhält
+      | UserID | CommandID |
+      | invalid user | start-invalid |
+    Dann lautet das öffentliche SQL-Leseergebnis
+      | Code |
+      | InvalidInput |

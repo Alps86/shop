@@ -15,12 +15,9 @@ func New(config Config) *Consumer {
 }
 
 func (consumer *Consumer) connect(ctx context.Context) error {
-	config, err := pgconn.ParseConfig(consumer.config.DSN)
-	if err != nil {
-		return err
-	}
-
+	config := consumer.connectionConfig.Copy()
 	config.RuntimeParams["replication"] = "database"
+	var err error
 	consumer.connection, err = pgconn.ConnectConfig(ctx, config)
 
 	return err
@@ -32,6 +29,7 @@ func (consumer *Consumer) publication(ctx context.Context) error {
 		return err
 	}
 
+	consumer.connectionConfig = connection.Config().Config.Copy()
 	err = consumer.configurePublication(ctx, connection)
 
 	return errors.Join(err, connection.Close(ctx))

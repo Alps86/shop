@@ -22,6 +22,10 @@ func (ranking Ranking) query(base JSON) JSON {
 		functions = append(functions, JSON{"filter": JSON{"term": JSON{"category_ids": interest.CategoryID}}, "weight": weight})
 	}
 
+	if len(functions) == 1 {
+		return base
+	}
+
 	return JSON{"function_score": JSON{"query": base, "functions": functions, "boost_mode": "sum", "score_mode": "sum"}}
 }
 

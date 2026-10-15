@@ -38,3 +38,39 @@ Funktionalität: Atomare Lieferungen mehrerer gekaufter Varianten
       | Code | SKU | Stock | Reserved | OrderUnchanged |
       | OK | PHONE | 1 | 0 | true |
       | OK | PHONE-BLUE | 2 | 0 | true |
+
+  Szenario: Eine unvollständige Produktprojektion rollt auch die Inventoryänderung zurück
+    Angenommen folgende SQL-Fixtureänderung nur im eigenen Schema erfolgt
+      | SQL |
+      | DELETE FROM $schema.records WHERE kind='inventory' AND id='PHONE-BLUE' |
+    Wenn der Bestand atomar geändert wird
+      | SKU | CommandID | Revision | SetPrice | Price | SetStock | Stock |
+      | PHONE | inventory-a | 2 | true | 12000 | false | 0 |
+    Dann Einzelbestände und unveränderlicher Kauf übereinstimmen
+      | Code | SKU | Stock | Reserved | OrderUnchanged |
+      | NotFound | PHONE | 2 | 1 | true |
+
+  Szenario: Ein fehlender Reservierungsbeleg erzeugt keinen erfolgreichen Versand
+    Angenommen folgende SQL-Fixtureänderung nur im eigenen Schema erfolgt
+      | SQL |
+      | UPDATE $schema.records SET payload=jsonb_set(payload,'{Reservations}','[]') WHERE kind='inventory' AND id='PHONE' |
+    Wenn eine gemeinsame Lieferung für mehrere Positionen verarbeitet wird
+      | ShipmentID | CommandID | Status | SKU | Quantity |
+      | shipment-a | ship-a | shipped | PHONE-BLUE | 1 |
+      | shipment-a | ship-a | shipped | PHONE | 1 |
+    Dann Einzelbestände und unveränderlicher Kauf übereinstimmen
+      | Code | SKU | Stock | Reserved | OrderUnchanged |
+      | InvalidQuantity | PHONE | 2 | 0 | true |
+      | InvalidQuantity | PHONE-BLUE | 3 | 1 | true |
+
+  Szenario: Eine fehlende Inventoryzeile verbraucht auch keine andere Position
+    Angenommen folgende SQL-Fixtureänderung nur im eigenen Schema erfolgt
+      | SQL |
+      | DELETE FROM $schema.records WHERE kind='inventory' AND id='PHONE' |
+    Wenn eine gemeinsame Lieferung für mehrere Positionen verarbeitet wird
+      | ShipmentID | CommandID | Status | SKU | Quantity |
+      | shipment-a | ship-a | shipped | PHONE-BLUE | 1 |
+      | shipment-a | ship-a | shipped | PHONE | 1 |
+    Dann Einzelbestände und unveränderlicher Kauf übereinstimmen
+      | Code | SKU | Stock | Reserved | OrderUnchanged |
+      | NotFound | PHONE-BLUE | 3 | 1 | true |

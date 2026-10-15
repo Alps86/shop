@@ -38,6 +38,7 @@ func (current *world) observeChosen(detail application.ProductDetail) {
 		}
 
 		current.observed["URL"] = card.URL
+		current.observed["ImageURL"] = card.Image.URL
 		current.observed["Available"] = strconv.FormatInt(card.AvailableQuantity, 10)
 		current.observed["VerificationStatus"] = card.Compliance.Context.VerificationStatus
 		current.observed["Warnings"] = strconv.Itoa(len(card.Compliance.Safety.Warnings))

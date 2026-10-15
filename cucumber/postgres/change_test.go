@@ -89,9 +89,14 @@ func (current *world) replayChange(input *godog.Table) error {
 	return nil
 }
 
-func (current *world) replayConfirm(_ *godog.Table) {
+func (current *world) replayConfirm(input *godog.Table) {
+	row := table(input)
 	cart := current.cart.Cart
-	command := application.ConfirmCommand{UserID: current.guest.UserID, CartID: cart.ID, CommandID: "confirm-a", EvaluationID: cart.Evaluation.Value.ID, ExpectedRevision: cart.Revision}
+	command := application.ConfirmCommand{UserID: current.guest.UserID, CartID: cart.ID, CommandID: value.CommandID(row["CommandID"]), EvaluationID: cart.Evaluation.Value.ID, ExpectedRevision: cart.Revision}
+	if row["Evaluation"] == "other" {
+		command.EvaluationID = "e-other"
+	}
+
 	current.cart, current.err = current.service.ApplyConfirm(context.Background(), command)
 }
 

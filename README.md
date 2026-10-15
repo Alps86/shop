@@ -61,4 +61,6 @@ Gepinnt sind [PostgreSQL 16.15](https://hub.docker.com/_/postgres), [Temporal CL
 
 Die aktuelle Entwicklungsmaschine erlaubt keinen Dockerzugriff. Native echte Dienstfälle sind zusätzliche Adapterbelege; der tatsächliche Compose-Start und Restart werden im berechtigten CI-Runner ausgeführt und erst nach erfolgreichem Lauf als erfüllt gewertet.
 
+Die Compose-Suchinstanz verwendet einen festen Java-Heap von 1 GiB; PostgreSQL, Temporal, Go und gegebenenfalls der Build benötigen zusätzlich Arbeitsspeicher. Das öffentliche Suchbudget bleibt unabhängig davon 250 ms. Fehlende oder ausschließlich unwirksame Interessensignale erzeugen keinen zusätzlichen Rankingausdruck.
+
 **Aussagegrenze:** Native Packageermittlung und Standard-Coverageprüfung erfassen den aktuellen buildfähigen Go-Umfang. Sie sind kein unabhängiger AST-Blockvergleich aller Repositoryquellen oder aller Plattform-/Build-Tag-Kombinationen und kein automatischer Beweis vollständiger Slicezuordnung. Solche zusätzliche Härtung ist offen. Review prüft deshalb insbesondere neue Quellen, Build-Tags, zusätzliche Module und unzulässige `spec-only`-Markierungen. Es gibt keine frei konfigurierbare Bootstrap-Abschaltung.

@@ -3,6 +3,7 @@ package postgres_test
 import (
 	"context"
 	"crypto/rand"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -35,6 +36,7 @@ func (current *world) register(ctx *godog.ScenarioContext) {
 	current.purchaseBoundarySteps(ctx)
 	current.cancellationSteps(ctx)
 	ctx.Step(`^die technische Speichergrenze mit folgender Konfiguration aufgerufen wird$`, current.construction)
+	ctx.Step(`^eine eigene Testdatenbank nur die Digestberechnung verweigert$`, current.isolatedDigestPermission)
 	ctx.Before(current.before)
 	ctx.After(current.after)
 	ctx.Step(`^ein kohärenter Demodatensatz in echter PostgreSQL vorbereitet ist$`, current.prepare)
@@ -80,12 +82,13 @@ func (current *world) after(ctx context.Context, _ *godog.Scenario, _ error) (co
 	}
 
 	_, err := current.admin.Exec(ctx, "DROP SCHEMA "+pgx.Identifier{current.schema}.Sanitize()+" CASCADE")
+	permissionErr := current.cleanupPermission(ctx)
 	closeErr := current.admin.Close(ctx)
 	if err != nil {
 		return ctx, err
 	}
 
-	return ctx, closeErr
+	return ctx, errors.Join(permissionErr, closeErr)
 }
 
 func table(table *godog.Table) map[string]string {

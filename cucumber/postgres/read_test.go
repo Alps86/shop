@@ -11,6 +11,7 @@ import (
 func (current *world) readSteps(ctx *godog.ScenarioContext) {
 	ctx.Step(`^eine neue echte Gastfähigkeit geöffnet wird$`, current.openGuest)
 	ctx.Step(`^kuratierte Produkt- und Variantenattribute vorbereitet werden$`, current.curated)
+	ctx.Step(`^Modellbilder und eine Unterkategorie vorbereitet werden$`, current.productPresentation)
 	ctx.Step(`^ein persistenter Lesevertrag aufgerufen wird$`, current.readContract)
 	ctx.Step(`^lautet das öffentliche SQL-Leseergebnis$`, current.readObserved)
 	ctx.Step(`^das persistierte Gastprofil gewählt wird$`, current.selectProfile)
