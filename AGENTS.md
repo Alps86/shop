@@ -25,7 +25,7 @@ Für jede Story einen frischen unabhängigen Review-Subagenten einsetzen; der Um
 
 Am aktuellen PR-Head müssen alle fünf Jobs `static`, `build`, `cucumber-and-coverage`, `race` und `quality-gate` tatsächlich erfolgreich abgeschlossen sein, auch bei Dokumentationsänderungen. Fehlende, laufende, übersprungene und fehlgeschlagene Jobs sowie frühere grüne Commits genügen nicht. Draft erst nach vollständiger Abnahme und unabhängiger Freigabe aufheben. Keine Fertigmeldung, Mergefreigabe oder Auto-Merge vorher. Diese Regel gilt auch ohne technische Branchsperre und für jeden Zielbranch.
 
-`make check` führt die lokalen Prüfungen aus. Die einzelnen Aufrufe und der Bootstrapvertrag stehen im [Go-Styleguide](spec/styleguide/02-go.md). Bootstrap bedeutet bei dynamisch nachgewiesen leerem Produktivinventar Coverage **nicht anwendbar**, niemals 100 %. Alle Jobs führen weiterhin tatsächliche technische Prüfungen aus. Ab erstem eigenen Produktivcode sind echte fachliche Cucumber-Ausführung, vollständiger Coverage-Inventarvergleich und Race-Erkennung verbindlich. Fehlende Bindungen, Inventarlücken, fehlende Blöcke oder unzulässiger Bootstrap-Rückfall müssen fehlschlagen. Keine Dummylogik oder künstlichen Tests einführen.
+Die dokumentierten nativen Prüfungen und der [Go-Styleguide](spec/styleguide/02-go.md) legen den Umfang fest. Im leeren Bootstrap lautet produktive Coverage **nicht anwendbar**, niemals 100 %. Alle fünf Jobs führen tatsächliche begrenzte Prüfungen aus. Ab erstem Produktivpackage gelten echte Strict-Cucumber-Verträge, native dynamische Coverage mit 100 % pro Datei/Package/gesamt und Race. Keine Dummylogik oder künstlichen Fachtests. Zusätzliche Repository-/AST-/Slice-Antibypasshärtung ist als offene Grenze dokumentiert; Standardwerkzeuge belegen diese nicht vollständig.
 
 Jeden PR ausschließlich per Squash-Merge zusammenführen (`gh pr merge --squash`); genau ein Commit je PR im Zielbranch. Branches beginnen mit `codex/`.
 
@@ -40,3 +40,9 @@ Features liegen unter `spec/features/`, geordnet nach öffentlichem Vertrag: `do
 ## Neue Arbeitspakete
 
 Vor jedem neuen Issue und seiner Umsetzung prüft ein unabhängiger Agent den Plan. Größere eigenständig abarbeitbare Pakete bevorzugen; keine kleinen Vorratsissues erstellen. Unabhängige Abschlussreview bleibt zusätzlich erforderlich.
+
+## Standardwerkzeuge für Qualität
+
+Qlty-Checks, Smells und Metrics vor Push und bei Abnahme tatsächlich umfassend verwenden. Native Go-Befehle und konfigurative Standardwerkzeuge bevorzugen. Keine eigenen Shellskripte, Go-Checker oder Python-/anderen Quality-Harnessprogramme pflegen. Deklarative AST-grep-Regeln sind nur für echte Lücken der Standardplugins zulässig. Exakt 20 Körperzeilen und das Verbot von else bleiben verbindlich. Standard-Godog/Gherkin-Testanbindung für Fachverträge ist zulässig.
+
+Die dokumentierte native Coveragegrenze gilt: kein unabhängiger vollständiger Repository-/AST-Inventar- oder Slice-Antibypassbeweis behaupten. Zusätzliche Härtung bleibt offen; eine vorführbare Demo hat vor hypothetischer Produktionshärtung Vorrang. Alle aktuellen fünf CI-Pflichtjobs, Review und echte 100-%-Coverage des gemessenen produktiven Go-Umfangs bleiben verbindlich.

@@ -22,7 +22,7 @@ Tests liegen getrennt von Produktivcode und beobachten öffentlich vereinbarte D
 | Konsistenz | Szenarien, öffentliche Interfaces und arc42 gemeinsam pflegen; offene fachliche Fragen nicht durch Step-Code entscheiden. |
 | Unabhängigkeit | Keine unnötige Abhängigkeit von Netzwerk, realer Uhr oder Szenarioreihenfolge. |
 
-Die breite Basis sind Komponentenfälle gegen öffentliche Verträge, ergänzt durch wenige gezielte Integrationsfälle mit echten Adaptern. Beide Ebenen verwenden Cucumber. Keine fachlichen Unit-Tests oder zusätzlichen tabellengetriebenen Unit-Tests. Technische Go-/Python-Regressionen des Prüftoolings sind ausschließlich für Parser, Stilchecker und Quality-Gate-Mechanik zulässig; sie ersetzen keine fachlichen Szenarien.
+Die breite Basis sind Komponentenfälle gegen öffentliche Verträge, ergänzt durch wenige gezielte Integrationsfälle mit echten Adaptern. Beide Ebenen verwenden Cucumber. Keine fachlichen Unit-Tests oder zusätzlichen tabellengetriebenen Unit-Tests. Die minimale Godog-/Gherkin-Standardanbindung ist Frameworkintegration; eigene Quality-Harnessprogramme werden nicht gepflegt.
 
 UI-Verträge prüfen sichtbare Nutzung des Fachvertrags und duplizieren seine Regeln nicht. Eine breite Template-/Render-Basis verwendet explizite DTOs und Fixtures; wenige Browserfälle prüfen Navigation und Browsersemantik. Daraus folgt keine zweite Anwendung und keine zusätzliche Clientbibliotheksentscheidung.
 
@@ -50,12 +50,10 @@ Große strukturierte Daten können unter `spec/fixtures/` liegen und über konkr
 
 ## Coverage und Mutation
 
-100 % Coverage des gesamten eigenen Produktivcodes aus fachlichen Cucumber-Blackbox-Läufen sind verbindlich. Für Go gilt der vollständige dynamische Statement-/Inventarvergleich im [Go-Styleguide](02-go.md#bootstrap-und-vollständige-coverage). Nicht abgedeckter benötigter Code verlangt präzisere fachliche Szenarien; unbegründeter Code wird entfernt oder vereinfacht. Keine künstlichen Szenarien, Test-Hooks, Sonderpfade oder Coverage-Ausnahmen.
+100 % Coverage des gesamten eigenen Produktivcodes aus fachlichen Cucumber-Blackbox-Läufen sind verbindlich. Für Go gilt die dynamische native Statement-Messung und das Standard-100-%-Gate im [Go-Styleguide](02-go.md#bootstrap-und-vollständige-coverage). Nicht abgedeckter benötigter Code verlangt präzisere fachliche Szenarien; unbegründeter Code wird entfernt oder vereinfacht. Keine künstlichen Szenarien, Test-Hooks, Sonderpfade oder Coverage-Ausnahmen.
 
 Regelmäßig und besonders nach relevanten Verhaltensänderungen gezielte verhaltensrelevante Mutationen prüfen: vorhandene Szenarien müssen den Fehler entdecken. Anschließend Originalzustand wiederherstellen. Überlebende Mutationen auf fehlende Assertions oder fachliche Äquivalenz prüfen, echte Fehler nicht pauschal unterdrücken. Umfang und Einschränkungen berichten; vollständige Statement-Coverage allein beweist keine Testwirksamkeit. Ein automatisiertes Mutationstool ist dadurch noch nicht eingerichtet.
 
 ## Ausführung und Aussagegrenzen
 
-`python3 scripts/quality.py cucumber-and-coverage` prüft die vorgesehenen Syntax-/Verhaltens-/Coverage-Grenzen, `python3 scripts/quality.py race` die Nebenläufigkeitsprüfung. Im leeren Bootstrap sind nur tatsächliche technische Prüfungen und Coverage **nicht anwendbar** nachweisbar. Kein Parserlauf wird als fachlicher Erfolg ausgegeben. Mit Produktivcode müssen echte gebundene Cucumber-Verträge laufen und vollständig gemessen werden. Review prüft zusätzlich fachliche Vollständigkeit, Tabellen, Grenzfälle, Index und Vertragskonsistenz; grüne Technik allein genügt nicht.
-
-[Styleguide](README.md)
+Die direkten nativen [Prüfaufrufe](../../README.md#werkzeuge-und-lokale-prüfung) und die [Coveragegrenzen](02-go.md#bootstrap-und-vollständige-coverage) sind maßgeblich. Im leeren Bootstrap sind tatsächliche technische Prüfungen und produktive Coverage **nicht anwendbar** nachweisbar. Mit Produktivcode laufen echte gebundene Strict-Cucumber-Verträge, native Coverage mit Dateis-/Package-/Gesamtschwelle 100 % und Race. Syntax ist kein fachliches Green. Review prüft fachliche Vollständigkeit, aktive Slices, Tabellen, Grenzfälle, Index, Buildumfang und Vertragskonsistenz; Standardwerkzeuge allein beweisen keinen vollständigen Repository-/AST-/Slice-Antibypass.

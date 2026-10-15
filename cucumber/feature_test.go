@@ -21,7 +21,7 @@ func TestFeatureSyntax(t *testing.T) {
 }
 
 func TestFeatures(t *testing.T) {
-	current := &suite{}
+	current := suite{}
 	if err := current.run(); err != nil {
 		t.Fatal(err)
 	}
@@ -59,17 +59,12 @@ func (current suite) parseFile(path string) error {
 	return err
 }
 
-func (current *suite) run() error {
+func (current suite) run() error {
 	options := &godog.Options{
-		Format: "cucumber", Paths: []string{"../spec/features"},
-		Tags: "~@spec-only", Strict: true, Output: &current.output,
+		Format: "pretty", Paths: []string{"../spec/features"},
+		Tags: "~@spec-only", Strict: true,
 	}
 	status := (godog.TestSuite{Name: "shop", Options: options}).Run()
-	// Der Pfad stammt ausschließlich vom vertrauenswürdigen lokalen Gate, nie aus Shop-Eingaben.
-	if err := os.WriteFile(os.Getenv("SHOP_CUCUMBER_REPORT"), current.output.Bytes(), 0600); err != nil { //nolint:gosec
-		return err
-	}
-
 	if status != 0 {
 		return fmt.Errorf("cucumber exit status: %d", status)
 	}

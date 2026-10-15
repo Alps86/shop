@@ -1,0 +1,5 @@
+id: shop-go-no-coverage-ignore
+valid:
+  - 'func valid() { /* fachlicher Vertrag */ }'
+invalid:
+  - 'func invalid() { // coverage-ignore'

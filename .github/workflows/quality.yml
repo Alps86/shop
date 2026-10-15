@@ -22,81 +22,101 @@ jobs:
           go-version-file: go.mod
       - name: Qlty installieren
         run: curl -fsSL https://qlty.sh | bash
-      - name: Statische Regeln und echte technische Regressionen
-        run: PATH="$HOME/.qlty/bin:$PATH" python3 scripts/quality.py static
+      - name: Qlty-Konfiguration und Standardchecks
+        run: |
+          export PATH="$HOME/.qlty/bin:$PATH"
+          qlty config validate
+          qlty check --all --no-cache --no-fix --summary
+      - name: Smells und Metrics als vollständige Qualitätsnachweise
+        run: |
+          export PATH="$HOME/.qlty/bin:$PATH"
+          qlty smells --all --json > /tmp/smells.json
+          jq -e 'length == 0' /tmp/smells.json
+          qlty metrics --all --functions --json > /tmp/metrics.json
+          qlty metrics --all --dirs
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Deklarative AST-Regeltests mit Standardwerkzeug
+        run: npm exec --yes --package=@ast-grep/cli@0.40.0 -- ast-grep test --skip-snapshot-tests
+      - name: Tatsächlichen PR-Diff prüfen
+        run: git diff --check "$SHOP_BASE_SHA...HEAD"
       - uses: actions/upload-artifact@v4
         with:
-          include-hidden-files: true
-          name: static-result
-          path: .quality/results/static.json
+          name: qlty-smells-and-metrics
+          path: |
+            /tmp/smells.json
+            /tmp/metrics.json
   build:
     name: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
           ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
-      - run: python3 scripts/quality.py build
-      - uses: actions/upload-artifact@v4
-        with:
-          include-hidden-files: true
-          name: build-result
-          path: .quality/results/build.json
+      - run: go mod verify
+      - run: go build ./...
+      - name: Tatsächlich vorhandene Standardtestanbindung übersetzen
+        run: go test ./... -run '^$' -count=1
   cucumber-and-coverage:
     name: cucumber-and-coverage
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
           ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
-      - run: python3 scripts/quality.py cucumber-and-coverage
-      - uses: actions/upload-artifact@v4
-        with:
-          include-hidden-files: true
-          name: cucumber-and-coverage-result
-          path: .quality/results/cucumber-and-coverage.json
+      - name: Sämtliches Gherkin ohne Verhaltensbehauptung parsen
+        run: go test ./... -run '^TestFeatureSyntax$' -count=1
+      - name: Native Packageermittlung, fachliches Verhalten und vollständige Coveragequote
+        run: |
+          packages="$(go list -f '{{if or .GoFiles .CgoFiles}}{{.ImportPath}}{{end}}' ./... | sed '/^$/d')"
+          if [ -z "$packages" ]; then
+            echo 'Bootstrap: keine buildfähigen Produktivpackages; produktive Coverage nicht anwendbar.'
+            echo 'Syntaxprüfung belegt kein fachliches Verhalten.'
+            exit 0
+          fi
+          printf 'Produktivpackages laut Go:\n%s\n' "$packages"
+          go test ./... -count=1 -coverpkg=./... -covermode=atomic -coverprofile=cover.out
+          go run github.com/vladopajic/go-test-coverage/v2@v2.19.0 --config=.testcoverage.yml
   race:
     name: race
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
           ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
-      - run: python3 scripts/quality.py race
-      - uses: actions/upload-artifact@v4
-        with:
-          include-hidden-files: true
-          name: race-result
-          path: .quality/results/race.json
+      - name: Echte Standardtestanbindung mit Race-Erkennung
+        run: |
+          packages="$(go list -f '{{if or .GoFiles .CgoFiles}}{{.ImportPath}}{{end}}' ./... | sed '/^$/d')"
+          if [ -z "$packages" ]; then
+            go test -race ./... -run '^TestFeatureSyntax$' -count=1
+            echo 'Bootstrap: Race-Prüfung der tatsächlichen Testanbindung; keine Shop-Fachlogik vorhanden.'
+            exit 0
+          fi
+          go test -race ./... -count=1
   quality-gate:
     name: quality-gate
     if: always()
     needs: [static, build, cucumber-and-coverage, race]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
       - name: Jeder Pflichtjob muss erfolgreich sein
         env:
-          RESULTS: ${{ toJSON(needs) }}
-        run: python3 -c 'import json,os; assert all(x["result"] == "success" for x in json.loads(os.environ["RESULTS"]).values())'
-      - uses: actions/download-artifact@v4
-        with:
-          pattern: '*-result'
-          path: .quality/results
-          merge-multiple: true
-      - run: python3 scripts/quality.py quality-gate
+          STATIC_RESULT: ${{ needs.static.result }}
+          BUILD_RESULT: ${{ needs.build.result }}
+          CUCUMBER_RESULT: ${{ needs.cucumber-and-coverage.result }}
+          RACE_RESULT: ${{ needs.race.result }}
+        run: |
+          test "$STATIC_RESULT" = success
+          test "$BUILD_RESULT" = success
+          test "$CUCUMBER_RESULT" = success
+          test "$RACE_RESULT" = success

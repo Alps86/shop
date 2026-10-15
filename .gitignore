@@ -1,4 +1,2 @@
-.quality/results/
-.qlty/out/
+cover.out
 *.test
-__pycache__/
