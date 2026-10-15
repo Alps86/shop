@@ -1,5 +1,5 @@
 # language: de
-@spec-only @application
+@application @app
 Funktionalität: Gastfähigkeit und Interessenprofile
   Als Gast behalte ich meinen eigenen Einkauf über Besuche hinweg.
 
@@ -9,8 +9,8 @@ Funktionalität: Gastfähigkeit und Interessenprofile
       | a | u-a | c-a | neutral |
       | b | u-b | c-b | neutral |
     Wenn das Profil in einem Browser bestätigt wird
-      | Browser | Profile | Method | CSRF |
-      | a | <profil> | POST | valid |
+      | Browser | Profile |
+      | a | <profil> |
     Dann lautet die Gastansicht
       | Browser | UserID | CartID | Profile |
       | a | u-a | c-a | <profil> |
@@ -22,6 +22,7 @@ Funktionalität: Gastfähigkeit und Interessenprofile
       | home |
       | coffee |
 
+  @spec-only
   Szenariogrundriss: Besitz und zustandsändernde Requests
     Angenommen eine Ressource gehört einem anderen Gast
       | Owner | CartID | OrderID |
@@ -43,8 +44,8 @@ Funktionalität: Gastfähigkeit und Interessenprofile
 
   Szenariogrundriss: Wiederaufnahme und getrennte Fristen
     Angenommen eine Gastsession mit aktivem Cart besteht
-      | IssuedAt | LastActivityAt | CookieName | HttpOnly | SameSite | Path | TokenBits | StoredToken |
-      | 2026-10-01T00:00:00Z | 2026-10-02T00:00:00Z | shop_session | true | Lax | / | 256 | hash-only |
+      | IssuedAt | LastActivityAt |
+      | 2026-10-01T00:00:00Z | 2026-10-02T00:00:00Z |
     Wenn der Einkauf erneut gelesen wird
       | At | Cookie |
       | <zeit> | <cookie> |
@@ -58,3 +59,12 @@ Funktionalität: Gastfähigkeit und Interessenprofile
       | 2026-10-09T00:00:01Z | valid | Expired | true | expired |
       | 2026-10-31T00:00:00Z | expired | NotFound | false | inaccessible |
       | 2026-10-03T00:00:00Z | absent | NotFound | false | inaccessible |
+
+  @spec-only
+  Szenario: Cookiegrenzen im echten HTTPadapter
+    Wenn ein neuer Gast über HTTP gestartet wird
+      | Operation |
+      | GuestService.Open |
+    Dann besitzt das lokale Democookie die vereinbarten Sicherheitswerte
+      | CookieName | HttpOnly | SameSite | Path | TokenBits | StoredToken | MaxAgeDays |
+      | shop_session | true | Lax | / | 256 | hash-only | 30 |

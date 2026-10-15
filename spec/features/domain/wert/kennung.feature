@@ -1,5 +1,5 @@
 # language: de
-@spec-only @core
+@core @value
 Funktionalität: Validierte Kennungen und Kontexte
   Als Aufrufer erhalte ich validierte Werte statt stiller Ersatzwerte.
 
@@ -54,3 +54,71 @@ Funktionalität: Validierte Kennungen und Kontexte
       | fr-FR | EUR | DE | UnsupportedContext |
       | de-DE | USD | DE | UnsupportedContext |
       | de-DE | EUR | FR | UnsupportedContext |
+
+  Szenariogrundriss: Register- und Präzisionsgrenzen
+    Wenn ein Wert konstruiert wird
+      | Type | Input |
+      | <typ> | <eingabe> |
+    Dann lautet das Wertergebnis
+      | Code | Canonical |
+      | <code> | <kanonisch> |
+    Beispiele:
+      | typ | eingabe | code | kanonisch |
+      | Locale | und | InvalidLocale | absent |
+      | CountryCode | EU | InvalidInput | absent |
+      | CountryCode | ?? | InvalidInput | absent |
+      | CountryCode | DEU | InvalidInput | absent |
+      | CountryCode | XK | InvalidInput | absent |
+      | Decimal | 999999999999.999999 | OK | 999999999999.999999 |
+      | Money | 100:eur | OK | 100:EUR |
+      | Money | 100:ZZZ | InvalidMoney | absent |
+      | Money | -1:EUR | InvalidMoney | absent |
+
+  Szenariogrundriss: Explizite JSON-Präsenz an der Eingangsgrenze
+    Wenn ein JSON-Wert geprüft wird
+      | Kind | Input |
+      | <art> | <eingabe> |
+    Dann lautet das Wertergebnis
+      | Code | Canonical |
+      | <code> | <kanonisch> |
+    Beispiele:
+      | art | eingabe | code | kanonisch |
+      | required | 0 | OK | 0 |
+      | required | broken | InvalidInput | absent |
+      | replacement | "text" | OK | text |
+      | replacement | broken | InvalidInput | absent |
+
+  Szenario: Technischer Fehler wird nicht als fachlicher Erfolg ausgegeben
+    Wenn ein technischer Fehler eingeordnet wird
+      | Message |
+      | storage unavailable |
+    Dann lautet das Wertergebnis
+      | Code | Canonical |
+      | InternalError | absent |
+
+  Szenariogrundriss: Exakte skalierte Darstellung ohne stillen Ersatzwert
+    Wenn eine skalierte Zahl angefragt wird
+      | Input |
+      | <eingabe> |
+    Dann lautet das Wertergebnis
+      | Code | Canonical |
+      | <code> | <kanonisch> |
+    Beispiele:
+      | eingabe | code | kanonisch |
+      | 1.23 | OK | 1230000 |
+      | invalid | InvalidInput | absent |
+
+  Szenariogrundriss: Exakte Dezimalvergleiche validieren beide Operanden
+    Wenn zwei exakte Dezimalwerte verglichen werden
+      | Left | Right |
+      | <left> | <right> |
+    Dann lautet das Wertergebnis
+      | Code | Canonical |
+      | <code> | <result> |
+    Beispiele:
+      | left | right | code | result |
+      | 1.00 | 1 | OK | 0 |
+      | 0.9 | 1 | OK | -1 |
+      | 1.1 | 1 | OK | 1 |
+      | invalid | 1 | InvalidInput | absent |
+      | 1 | invalid | InvalidInput | absent |

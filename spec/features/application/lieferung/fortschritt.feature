@@ -1,5 +1,5 @@
 # language: de
-@spec-only @application
+@application @app
 Funktionalität: Begrenzte Liefer- und Teilliefersimulation
   Als Gast sehe ich Lieferfortschritt getrennt von unveränderlichen Kaufwerten.
 
@@ -52,3 +52,16 @@ Funktionalität: Begrenzte Liefer- und Teilliefersimulation
     Dann lautet die endgültige Lieferansicht
       | State | Shipped | Delivered | Reserved | PurchaseSnapshotChanged |
       | delivered | 2 | 2 | 0 | false |
+
+  Szenario: Kauf- und Lieferansicht bleiben getrennt und geordnet
+    Angenommen eine Bestellung enthält unterschiedliche Positionen
+      | OrderID | UserID | SKU | Purchased |
+      | o-a | u-a | Z-CABLE | 1 |
+      | o-a | u-a | A-PHONE | 2 |
+    Wenn der Eigentümer die Bestellansicht liest
+      | Session | OrderID |
+      | a | o-a |
+    Dann enthält die separate Lieferansicht geordnete Positionen
+      | SKU | Purchased | Shipped | Delivered |
+      | A-PHONE | 2 | 0 | 0 |
+      | Z-CABLE | 1 | 0 | 0 |

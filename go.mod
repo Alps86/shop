@@ -6,6 +6,7 @@ require (
 	github.com/cucumber/gherkin/go/v26 v26.2.0
 	github.com/cucumber/godog v0.15.1
 	github.com/cucumber/messages/go/v21 v21.0.1
+	golang.org/x/text v0.43.0
 )
 
 require (

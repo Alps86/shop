@@ -1,5 +1,5 @@
 # language: de
-@spec-only @core
+@core @catalog
 Funktionalität: Produktmodell und Varianten
   Als Betreiber publiziere ich gültige Modelle mit eindeutig verkaufbaren Varianten.
 
@@ -59,3 +59,76 @@ Funktionalität: Produktmodell und Varianten
       | PrimaryCategoryID | empty | InvalidInput | false |
       | Variant.GTIN | 4006381333931 | OK | true |
       | Variant.GTIN | 4006381333932 | InvalidInput | false |
+
+  Szenariogrundriss: Vollständige Referenz- und Attributprüfung
+    Wenn ein vorbereitetes Produkt mit einer Katalogbeziehung publiziert wird
+      | Case | Input |
+      | <fall> | <eingabe> |
+    Dann lautet das Feldvalidierungsergebnis
+      | Code | Published |
+      | <code> | <publiziert> |
+    Beispiele:
+      | fall | eingabe | code | publiziert |
+      | additional | c-extra | OK | true |
+      | additional | missing | InvalidReference | false |
+      | accessory | p-accessory | OK | true |
+      | unpublishedAccessory | p-accessory | InvalidReference | false |
+      | accessoryCompatibility | PHONE | OK | true |
+      | accessoryCompatibility | OTHER | InvalidReference | false |
+      | accessoryCompatibility | PHONE,PHONE | InvalidReference | false |
+      | duplicateAccessory | p-accessory | InvalidReference | false |
+      | variantSKU | bad sku | InvalidInput | false |
+      | gtin | 123 | InvalidInput | false |
+      | gtin | 400638133393x | InvalidInput | false |
+      | productAttribute | unknown | InvalidAttribute | false |
+      | variantAttribute | unknown | InvalidAttribute | false |
+      | existingProduct | p-other | OK | true |
+      | republish | p-phone | OK | true |
+
+  Szenariogrundriss: Kategorien dürfen nur ohne Referenzen entfernt werden
+    Wenn eine Kategorie auf Entfernung geprüft wird
+      | Reference |
+      | <referenz> |
+    Dann lautet die Definitionsvalidierung
+      | Code |
+      | <code> |
+    Beispiele:
+      | referenz | code |
+      | none | OK |
+      | additional | Conflict |
+      | other | OK |
+
+  Szenariogrundriss: Kategoriedefinitionen und fehlende Eltern
+    Wenn eine öffentliche Kategorieprüfung angefragt wird
+      | ID | Parent |
+      | <kennung> | <eltern> |
+    Dann lautet die Definitionsvalidierung
+      | Code |
+      | <code> |
+    Beispiele:
+      | kennung | eltern | code |
+      | bad id | absent | InvalidInput |
+      | c-child | missing | InvalidReference |
+
+  Szenariogrundriss: Kategorien veröffentlichen nur definierte eindeutige Merkmale
+    Wenn eine Kategorienkonfiguration veröffentlicht werden soll
+      | Version | Filters | TopAttributes | ExistingAttributes |
+      | <version> | <filter> | <top> | color,storage |
+    Dann lautet die Definitionsvalidierung
+      | Code |
+      | <code> |
+    Beispiele:
+      | version | filter | top | code |
+      | 1 | color | storage | OK |
+      | 0 | color | storage | InvalidAttribute |
+      | 1 | unknown | storage | InvalidAttribute |
+      | 1 | color,color | storage | InvalidAttribute |
+      | 1 | color | unknown | InvalidAttribute |
+
+  Szenario: Eine Elternkategorie bleibt erhalten solange ein Kind sie referenziert
+    Wenn eine Elternkategorie mit vorhandenem Kind gelöscht werden soll
+      | ParentID | ChildID |
+      | c-parent | c-child |
+    Dann lautet die Definitionsvalidierung
+      | Code |
+      | Conflict |
