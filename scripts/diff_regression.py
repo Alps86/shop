@@ -8,6 +8,8 @@ class DiffRegression:
     def prepare(self):
         gate = self.regression.gate
         gate.run('git', 'init', '-q')
+        gate.run('git', 'config', 'gc.auto', '0')
+        gate.run('git', 'config', 'maintenance.auto', 'false')
         gate.run('git', 'config', 'user.name', 'Quality Regression')
         gate.run('git', 'config', 'user.email', 'quality@example.invalid')
         gate.run('git', 'add', '.')
