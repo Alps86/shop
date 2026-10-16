@@ -1,5 +1,7 @@
 # Shop
 
+Die abschließende [Gesamtintegration #14](https://github.com/Alps86/shop/issues/14) verbindet die getrennt abgenommenen Runtime- und Storefrontpakete. Dieser Startstand ist noch keine vollständige Demofreigabe.
+
 Entwicklungsgrundlage für einen B2C-Elektroshop: eine Go-Anwendung in einem Root-Modul `github.com/Alps86/shop`, intern als modularer Monolith mit DDD und hexagonalen Ports und Adaptern.
 
 - [Agentenregeln](AGENTS.md): Umsetzung, unabhängige Plan- und Abschlussreview, Nachweise und Squash-Merge.
