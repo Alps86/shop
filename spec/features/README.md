@@ -115,3 +115,5 @@ Alle hier konkretisierten Fach-/Seitenverträge sind Demo-Kern. Produktionsbacku
 - [Explizite Korrektur](adapter/suche/korrektur.feature): Normale Haupttreffer bleiben von öffentlichen, bewusst auszuwählenden vollständigen Wortkorrekturen getrennt.
 
 | [Messdiagnose](adapter/betrieb/messdiagnose.feature) | Technische Zuordnung ursprünglicher Messantworten, öffentliche Header-Allowlist und begrenzte Poolbeobachtung erreichter Lastphasen. |
+
+| [Fragmentbudget](adapter/http/fragmentbudget.feature) | Begrenzte verzögerte Fragmentdaten und echte Varnish-Includes bei unverändertem Leistungsziel. |

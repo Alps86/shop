@@ -1,7 +1,6 @@
 package opensearch_test
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/Alps86/shop/internal/adapter/opensearch"
@@ -24,10 +23,15 @@ func (current *world) msearchSteps(ctx *godog.ScenarioContext) {
 	ctx.Step(`^der Suchdrahtvertrag entspricht$`, current.protocolObserved)
 	ctx.Step(`^das vollständige Protokollsuchergebnis entspricht$`, current.protocolResult)
 	ctx.Step(`^die NDJSON-Teilabfragen entsprechen$`, current.protocolParts)
+	ctx.Step(`^die ursprüngliche Transportdiagnose ausschließlich sichere Felder enthält$`, current.transportDiagnostic)
 }
 
 func (current *world) prepareMsearch(table *godog.Table) error {
 	data := read(table)[0]
+	if data["CaptureDiagnostics"] == "true" {
+		current.startTransportLog()
+	}
+
 	probe := &msearchProbe{status: 200}
 	if err := probe.configure(data); err != nil {
 		return err
@@ -35,7 +39,7 @@ func (current *world) prepareMsearch(table *godog.Table) error {
 
 	current.msearch = probe
 	probe.server = httptest.NewServer(http.HandlerFunc(probe.serve))
-	current.config = opensearch.Config{Endpoint: probe.server.URL, Index: "protocol", Context: value.RequestContext{Locale: "de-DE", Currency: "EUR", Market: "DE"}}
+	current.config = opensearch.Config{Endpoint: probe.server.URL + data["EndpointSuffix"], Index: "protocol", Context: value.RequestContext{Locale: "de-DE", Currency: "EUR", Market: "DE"}}
 	current.adapter = opensearch.New(current.config)
 
 	return nil
@@ -100,11 +104,23 @@ func (probe *msearchProbe) respond(writer http.ResponseWriter, request *http.Req
 	_, _ = writer.Write(probe.response)
 }
 
-func (current *world) protocolSearch(table *godog.Table) {
+func (current *world) protocolSearch(table *godog.Table) error {
+	ctx, cancel, err := protocolParent(read(table)[0])
+	if err != nil {
+		return err
+	}
+
+	defer cancel()
+	if read(table)[0]["CloseOrigin"] == "true" {
+		current.msearch.server.Close()
+	}
+
 	current.query = application.SearchQuery{Text: read(table)[0]["Text"], Page: 1, Sort: "relevance", Context: current.config.Context}
 	start := time.Now()
-	current.result, current.err = current.adapter.Search(context.Background(), current.query)
+	current.result, current.err = current.adapter.Search(ctx, current.query)
 	current.elapsed = time.Since(start)
+
+	return nil
 }
 
 func (current *world) protocolObserved(table *godog.Table) error {

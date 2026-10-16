@@ -5,10 +5,15 @@ import (
 	"errors"
 	"fmt"
 	"github.com/cucumber/godog"
+	"log/slog"
 	"net/http"
 )
 
 func (current *world) cleanup(ctx context.Context, scenario *godog.Scenario, err error) (context.Context, error) {
+	if current.previousLogger != nil {
+		slog.SetDefault(current.previousLogger)
+	}
+
 	if current.pool != nil {
 		current.pool.close()
 		return ctx, nil

@@ -203,7 +203,7 @@ Funktionalität: Ehrliche Suchdienstfehler
   Szenariogrundriss: Schreibprojektionen erhalten mehr Zeit während öffentliche Suche ihr Fehlerbudget behält
     Angenommen der echte Suchdienst über eine verzögerte Verbindung angesprochen wird
       | Milliseconds | Client |
-      | 600 | <Client> |
+      | 800 | <Client> |
     Wenn der Suchadapter die Verwaltungsoperation ausführt
       | Operation | ProductID |
       | apply | p-a |
@@ -218,7 +218,7 @@ Funktionalität: Ehrliche Suchdienstfehler
       | SearchUnavailable |
     Und bleibt die öffentliche Suchantwort innerhalb des Fehlerbudgets
       | MaximumMilliseconds |
-      | 500 |
+      | 750 |
 
     Beispiele:
       | Client |

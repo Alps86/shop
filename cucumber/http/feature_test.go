@@ -29,6 +29,7 @@ func (current *world) register(ctx *godog.ScenarioContext) {
 	ctx.Step(`^der HTTPadapter wird initialisiert$`, current.construct)
 	ctx.Step(`^die Adapterinitialisierung meldet$`, current.initializationResult)
 	current.registerComposition(ctx)
+	current.registerBudget(ctx)
 	ctx.Step(`^der Shop liefert eine HTTPansicht$`, current.request)
 	ctx.Step(`^die HTTPantwort enthält die sichtbaren Vertragswerte$`, current.expect)
 	ctx.Step(`^der verwendete Applicationport erhält$`, current.expectPort)

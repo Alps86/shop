@@ -28,6 +28,7 @@ func (adapter Adapter) request(ctx context.Context, method, path string, body []
 	request.Header.Set("Content-Type", requestContentType(path))
 	response, err := adapter.config.HTTP.Do(request)
 	if err != nil {
+		logTransportFailure(ctx, err)
 		return Reply{}, value.NewError("SearchUnavailable", "OpenSearch")
 	}
 

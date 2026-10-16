@@ -84,5 +84,5 @@ sub vcl_deliver {
 }
 
 sub vcl_backend_fetch {
-    if (bereq.url ~ "^/fragments/") { set bereq.first_byte_timeout = 150ms; }
+    if (bereq.url ~ "^/fragments/") { set bereq.first_byte_timeout = 1s; }
 }

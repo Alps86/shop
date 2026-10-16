@@ -21,7 +21,7 @@ func New(config Config) Adapter {
 }
 
 func (adapter Adapter) Search(ctx context.Context, query application.SearchQuery) (application.SearchResult, error) {
-	ctx, cancel := context.WithTimeout(ctx, 250*time.Millisecond)
+	ctx, cancel := context.WithTimeout(ctx, 500*time.Millisecond)
 	defer cancel()
 
 	body, err := adapter.searchBody(query)

@@ -14,7 +14,7 @@ func (handler *Handler) fragment(writer http.ResponseWriter, request *http.Reque
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(request.Context(), 150*time.Millisecond)
+	ctx, cancel := context.WithTimeout(request.Context(), 750*time.Millisecond)
 	defer cancel()
 	clone := request.Clone(ctx)
 	clone.URL.Path = strings.TrimPrefix(request.URL.Path, "/fragments")

@@ -15,6 +15,7 @@ import (
 )
 
 type world struct {
+	responseElapsed    time.Duration
 	fragmentFault      atomic.Bool
 	engineClients      map[string]*http.Client
 	sharedFrame        string

@@ -51,7 +51,7 @@ go test -p 1 -race ./... -count=1
 
 Das [Standardwerkzeug](https://github.com/vladopajic/go-test-coverage) verlangt durch `.testcoverage.yml` je Datei, Package und insgesamt 100 %. Keine Excludes, Overrides oder `coverage-ignore`-Annotationen verwenden. Fachliche Tests bleiben Cucumber-Blackbox-Verträge. Nicht implementierte Spezifikation bleibt als `@spec-only` sichtbar; aktive Implementierungsslices müssen angebunden und aktiviert werden.
 
-Die vollständigen nativen Dienstläufe führen Packages mit dem Standardparameter `-p 1` nacheinander aus. Damit konkurrieren mehrere unabhängig startende Integrationssuites auf dem begrenzten Runner nicht gleichzeitig um dieselbe Suchinstanz; die echten konkurrierenden Transaktions- und Workflowfälle innerhalb der Suites bleiben aktiv. Das öffentliche Suchbudget bleibt unverändert 250 ms.
+Die vollständigen nativen Dienstläufe führen Packages mit dem Standardparameter `-p 1` nacheinander aus. Damit konkurrieren mehrere unabhängig startende Integrationssuites auf dem begrenzten Runner nicht gleichzeitig um dieselbe Suchinstanz; die echten konkurrierenden Transaktions- und Workflowfälle innerhalb der Suites bleiben aktiv. Das öffentliche Suchbudget beträgt 500 ms.
 
 Die aktiven Adapterfälle benötigen echte PostgreSQL-, Temporal- und OpenSearchdienste. `SHOP_TEST_POSTGRES_DSN`, `SHOP_TEST_TEMPORAL_ADDRESS`, `TEMPORAL_ADDRESS` und `SHOP_TEST_OPENSEARCH_URL` benennen deren Testverbindungen. `SHOP_PROCESS_COVERDIR` sammelt zusätzlich die native Coverage der tatsächlich gebauten und gestarteten Shopdatei; das Testframework überschreibt seine eigene Variable `GOCOVERDIR`, deshalb wird die Prozessgrenze ausdrücklich verdrahtet. Die Standardbefehle `covdata merge -pcombine` und `textfmt` führen beide nativen Messungen zusammen. Das Coveragegate enthält dadurch auch `cmd/shop`; keine Ausschlüsse und kein eigener Coveragechecker.
 
@@ -83,7 +83,7 @@ docker compose down --volumes
 docker compose up --detach --build --wait --wait-timeout 180
 ```
 
-Gepinnt sind PostgreSQL16.15, TemporalCLI1.9.1, OpenSearch3.9.0, Go1.26.9 sowie Hugo0.168.0, Nginx1.30.6 und Varnish9.1.0 (die drei Webengines mit überprüftem Image-Digest). Temporal speichert History in seinem eigenen SQLitevolume; Fachzustand liegt in PostgreSQL. Alle veröffentlichten Ports binden Loopback. Das lokale Demopasswort und die ausgeschriebenen Demokeywerte sind keine produktive Zugangskonfiguration. OpenSearch verwendet einen festen Java-Heap von 1 GiB. Das öffentliche Suchbudget bleibt 250 ms.
+Gepinnt sind PostgreSQL16.15, TemporalCLI1.9.1, OpenSearch3.9.0, Go1.26.9 sowie Hugo0.168.0, Nginx1.30.6 und Varnish9.1.0 (die drei Webengines mit überprüftem Image-Digest). Temporal speichert History in seinem eigenen SQLitevolume; Fachzustand liegt in PostgreSQL. Alle veröffentlichten Ports binden Loopback. Das lokale Demopasswort und die ausgeschriebenen Demokeywerte sind keine produktive Zugangskonfiguration. OpenSearch verwendet einen festen Java-Heap von 1 GiB. Das öffentliche Suchbudget beträgt 500 ms.
 
 ## Reproduzierbare Messlaufzeit
 

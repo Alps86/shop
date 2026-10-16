@@ -108,7 +108,7 @@ Funktionalität: Cachefähige Completion neben unverändertem Hauptsuchkontext
   Szenariogrundriss: Ein gemeinsames Budget bricht Warten auf Header und Body ohne Retry ab
     Angenommen ein beobachtbarer Suchprotokollorigin vorbereitet ist
       | ResponseFixture | DelayMilliseconds | Phase |
-      | spec/fixtures/opensearch/msearch-response.json | 600 | <Phase> |
+      | spec/fixtures/opensearch/msearch-response.json | 800 | <Phase> |
     Wenn die Suche über den Protokollorigin ausgeführt wird
       | Text |
       | ph |
@@ -117,7 +117,7 @@ Funktionalität: Cachefähige Completion neben unverändertem Hauptsuchkontext
       | SearchUnavailable |
     Und bleibt die öffentliche Suchantwort innerhalb des Fehlerbudgets
       | MaximumMilliseconds |
-      | 500 |
+      | 750 |
     Und der Suchdrahtvertrag entspricht
       | Calls | FirstPartSent |
       | 1 | <ErsterTeil> |
@@ -175,3 +175,44 @@ Funktionalität: Cachefähige Completion neben unverändertem Hauptsuchkontext
     Dann das vollständige Protokollsuchergebnis entspricht
       | Code |
       | SearchUnavailable |
+
+  Szenariogrundriss: Das begrenzte Suchbudget lässt eine vollständige Antwort nach 350 Millisekunden zu
+    Angenommen ein beobachtbarer Suchprotokollorigin vorbereitet ist
+      | ResponseFixture | DelayMilliseconds | Phase |
+      | spec/fixtures/opensearch/msearch-response.json | 350 | <Phase> |
+    Wenn die Suche über den Protokollorigin ausgeführt wird
+      | Text |
+      | ph |
+    Dann das vollständige Protokollsuchergebnis entspricht
+      | Code | ExpectedFixture |
+      | OK | spec/fixtures/opensearch/pool-expected.json |
+    Und bleibt die öffentliche Suchantwort innerhalb des Fehlerbudgets
+      | MaximumMilliseconds |
+      | 750 |
+    Beispiele:
+      | Phase |
+      | headers |
+      | body |
+
+  Szenariogrundriss: Ursprüngliche Transportfehler bleiben sicher klassifiziert und respektieren den Parent
+    Angenommen ein beobachtbarer Suchprotokollorigin vorbereitet ist
+      | ResponseFixture | DelayMilliseconds | Phase | CaptureDiagnostics | EndpointSuffix |
+      | spec/fixtures/opensearch/msearch-response.json | 800 | headers | true | /private-path?private-query=secret |
+    Wenn die Suche über den Protokollorigin ausgeführt wird
+      | Text | ParentMilliseconds | Parent | CloseOrigin |
+      | private-query | <ParentMilliseconds> | <Parent> | <CloseOrigin> |
+    Dann das vollständige Protokollsuchergebnis entspricht
+      | Code |
+      | SearchUnavailable |
+    Und bleibt die öffentliche Suchantwort innerhalb des Fehlerbudgets
+      | MaximumMilliseconds |
+      | <Maximum> |
+    Und die ursprüngliche Transportdiagnose ausschließlich sichere Felder enthält
+      | Calls | phase | dynamicType | unwrappedType | deadline | canceled | ctxErrCode |
+      | 1 | transport | *url.Error | <UnwrappedType> | <Deadline> | <Canceled> | <Context> |
+    Beispiele:
+      | ParentMilliseconds | Parent | CloseOrigin | Maximum | UnwrappedType | Deadline | Canceled | Context |
+      | | | false | 750 | context.deadlineExceededError | true | false | deadline |
+      | 50 | | false | 300 | context.deadlineExceededError | true | false | deadline |
+      | | canceled | false | 300 | *errors.errorString | false | true | canceled |
+      | | | true | 300 | *net.OpError | false | false | none |

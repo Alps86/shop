@@ -1,6 +1,7 @@
 package opensearch_test
 
 import (
+	"bytes"
 	"encoding/json"
 	"github.com/Alps86/shop/internal/adapter/event"
 	"github.com/Alps86/shop/internal/adapter/opensearch"
@@ -8,6 +9,7 @@ import (
 	"github.com/Alps86/shop/internal/domain/catalog"
 	"github.com/Alps86/shop/internal/domain/sale"
 	"github.com/Alps86/shop/internal/domain/value"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"sync"
@@ -39,31 +41,33 @@ type cacheStatistics struct {
 }
 
 type world struct {
-	codec         *cardCodecProbe
-	msearch       *msearchProbe
-	pool          *poolProbe
-	cacheBefore   int64
-	capture       *captureTransport
-	requestedText string
-	adapter       opensearch.Adapter
-	config        opensearch.Config
-	result        application.SearchResult
-	query         application.SearchQuery
-	interests     []sale.CategoryInterest
-	products      map[value.ProductID]catalog.Product
-	inventory     map[value.ProductID][]sale.Inventory
-	template      catalog.Product
-	now           time.Time
-	err           error
-	writerErr     error
-	sourceFault   string
-	sourceCode    string
-	abortCount    int
-	snapshot      event.ReindexSnapshot
-	lateEvents    []application.ProjectionEvent
-	faultServer   *httptest.Server
-	cleanupConfig opensearch.Config
-	elapsed       time.Duration
+	transportLog   *transportLog
+	previousLogger *slog.Logger
+	codec          *cardCodecProbe
+	msearch        *msearchProbe
+	pool           *poolProbe
+	cacheBefore    int64
+	capture        *captureTransport
+	requestedText  string
+	adapter        opensearch.Adapter
+	config         opensearch.Config
+	result         application.SearchResult
+	query          application.SearchQuery
+	interests      []sale.CategoryInterest
+	products       map[value.ProductID]catalog.Product
+	inventory      map[value.ProductID][]sale.Inventory
+	template       catalog.Product
+	now            time.Time
+	err            error
+	writerErr      error
+	sourceFault    string
+	sourceCode     string
+	abortCount     int
+	snapshot       event.ReindexSnapshot
+	lateEvents     []application.ProjectionEvent
+	faultServer    *httptest.Server
+	cleanupConfig  opensearch.Config
+	elapsed        time.Duration
 }
 
 type sourceResponse struct {
@@ -139,4 +143,9 @@ type cardCodecDocument struct {
 type cardCodecVariant struct {
 	Card        application.ProductCard `json:"card"`
 	CardPayload []byte                  `json:"card_payload"`
+}
+
+type transportLog struct {
+	mutex  sync.Mutex
+	buffer bytes.Buffer
 }
