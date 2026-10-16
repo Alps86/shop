@@ -69,3 +69,5 @@ Kein Ladezustand zeigt ungeprüfte Pflichtdaten als aktuell/kaufbar. Fehlgeschla
 6. Vor Ablauf Browser erneut öffnen → eigener Cart wiederaufgenommen; nach168h Hinweis/neuen Cart wählen. Profilwechsel verändert Empfehlungen, nicht Besitz/Rabatt.
 
 Diese Pfade werden über HTTP-/Renderer-/Templateverträge und echte Dienstintegration abgenommen; höchstens ein kurzer Browser-Smoke zur HTMX-/Historyverdrahtung. Keine Screenshot-/Visualmatrix. Fachregeln bleiben in Domain-/Applicationverträgen, UI prüft deren sichtbare Nutzung.
+
+Die automatische Aktualisierung der Listingfilter wird in [Bug #18](https://github.com/Alps86/shop/issues/18) ergänzt und gezielt im Browser abgenommen; die bisherige HTTP-Abnahme belegt deren Eventauslösung nicht.
