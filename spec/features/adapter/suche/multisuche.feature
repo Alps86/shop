@@ -25,6 +25,7 @@ Funktionalität: Cachefähige Completion neben unverändertem Hauptsuchkontext
       | 1 | size | 12 |
       | 1 | suggest | null |
       | 3 | _source | false |
+      | 3 | stored_fields | ["_none_"] |
       | 3 | size | 0 |
       | 3 | query | {"match_all":{}} |
       | 1 | query.bool.filter | [{"term":{"deleted":false}},{"term":{"published":true}}] |

@@ -14,7 +14,7 @@ func (adapter Adapter) searchRequest(body JSON) searchRequest {
 	}
 
 	delete(body, "suggest")
-	completion := JSON{"size": 0, "_source": false, "query": JSON{"match_all": JSON{}}, "suggest": suggest}
+	completion := JSON{"size": 0, "_source": false, "stored_fields": []string{"_none_"}, "query": JSON{"match_all": JSON{}}, "suggest": suggest}
 	lines := multiSearchLines{{"request_cache": true}, body, {"request_cache": true}, completion}
 
 	return searchRequest{Path: "/" + adapter.config.Index + "/_msearch", Payload: lines, Multi: true}
