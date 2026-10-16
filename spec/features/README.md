@@ -41,7 +41,7 @@ Jede Zeile benennt einen öffentlichen Blackbox-Vertrag, seine maßgebliche Arch
 | [Sortierung Vorschläge und Ausfallgrenzen](application/suche/reihenfolge.feature) | [05-bausteine/search.md](../architecture/05-bausteine/search.md) | `application` |
 | [Häufig zusammen gekauft aus Demostatistik](application/empfehlung/zubehoer.feature) | [05-bausteine/recommendation.md](../architecture/05-bausteine/recommendation.md) | `application` |
 | [Validierter versionierter Demoimport](adapter/persistenz/import.feature) | [08-querschnitt/import.md](../architecture/08-querschnitt/import.md) | echte PG-Publikation einschließlich Herkunft und Versionskonflikten |
-| [SQL- und Transaktionsfehler](adapter/persistenz/fehler.feature) | [06-laufzeit/checkout.md](../architecture/06-laufzeit/checkout.md) | begrenzte Fehler an echten PG-Verbindungen |
+| [SQL- und Transaktionsfehler](adapter/persistenz/fehler.feature) | [06-laufzeit/checkout.md](../architecture/06-laufzeit/checkout.md) | begrenzte Fehler und technische Pooldiagnose an echten PG-Verbindungen |
 | [Reservierungen mehrerer Lieferpositionen](adapter/persistenz/lieferung.feature) | [06-laufzeit/temporal.md](../architecture/06-laufzeit/temporal.md) | gemeinsamer 2-SKU-Kauf und wiederholte Lieferung ohne Doppelwirkung |
 | [Persistenz Projektion und Prozess zusammen](adapter/prozess/commerce.feature) | [07-verteilung.md](../architecture/07-verteilung.md) | tatsächlicher Gastkauf bei ausgefallener Suche |
 | [WAL-Projektion und Indexwechsel](adapter/suche/projektion.feature) | [06-laufzeit/projection.md](../architecture/06-laufzeit/projection.md) | echter PG-WAL-Nachlauf bis zum OpenSearch-Alias |
@@ -113,3 +113,5 @@ Alle hier konkretisierten Fach-/Seitenverträge sind Demo-Kern. Produktionsbacku
 - [Multisuche](adapter/suche/multisuche.feature) hält Hauptkarten und Facetten zusammen, trennt cachefähige Completion und verwirft fehlerhafte Teilantworten vollständig.
 - [Gespeicherte Karten](adapter/suche/gespeicherte-karte.feature): Sourcefreier Storedfields-Transport erhält vollständige öffentliche Karten und verwirft fehlende, defekte oder inkonsistente Identitäten und Payloads.
 - [Explizite Korrektur](adapter/suche/korrektur.feature): Normale Haupttreffer bleiben von öffentlichen, bewusst auszuwählenden vollständigen Wortkorrekturen getrennt.
+
+| [Messdiagnose](adapter/betrieb/messdiagnose.feature) | Technische Zuordnung ursprünglicher paralleler Messantworten und öffentliche Header-Allowlist. |

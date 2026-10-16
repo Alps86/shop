@@ -1,14 +1,19 @@
 package performance_test
 
 import (
+	"context"
+	"encoding/json"
 	"github.com/Alps86/shop/internal/adapter/postgres"
 	"github.com/Alps86/shop/internal/application"
+	"github.com/Alps86/shop/internal/domain/catalog"
 	"github.com/Alps86/shop/internal/domain/value"
 	"go.temporal.io/sdk/client"
 	"net/http"
+	"time"
 )
 
 type world struct {
+	originalCaptured bool
 	store            *postgres.Store
 	temporal         client.Client
 	service          application.Service
@@ -70,6 +75,9 @@ type curlResult struct {
 	TimeTotal   float64 `json:"time_total"`
 	HTTPCode    int     `json:"http_code"`
 	NumConnects int     `json:"num_connects"`
+	FileName    string  `json:"filename_effective"`
+	URLNum      int     `json:"urlnum"`
+	URL         string  `json:"url_effective"`
 }
 
 type fixtureState struct {
@@ -89,9 +97,11 @@ type measurementProfile struct {
 }
 
 type probeResponse struct {
-	status int
-	header http.Header
-	body   string
+	started time.Time
+	ended   time.Time
+	status  int
+	header  http.Header
+	body    string
 }
 
 type directRequest struct {
@@ -114,4 +124,111 @@ type failureProbe struct {
 	CacheControl   string
 	ContentType    string
 	RetryAfter     string
+}
+
+type probeRequest struct {
+	route    string
+	origin   string
+	path     string
+	cookie   string
+	contains string
+}
+
+type originalFailure struct {
+	HeaderCaptureError   string
+	CurlTimeTotalSeconds float64
+	Route                string
+	Boundary             string
+	Source               string
+	StartedUTC           time.Time
+	EndedUTC             time.Time
+	UTCNote              string
+	Status               int
+	URL                  string
+	Host                 string
+	URLNum               int
+	FileName             string
+	Headers              http.Header
+	BodyBytes            int
+	BodySHA256           string
+	Error                string
+}
+
+type coldTransfer struct {
+	host     string
+	url      string
+	fileName string
+}
+
+type coldBatch struct {
+	route     string
+	path      string
+	cookie    string
+	directory string
+	count     int
+	started   time.Time
+	ended     time.Time
+	transfers map[int]coldTransfer
+}
+
+type failureSnapshot struct {
+	Note            string
+	StartedUTC      time.Time
+	EndedUTC        time.Time
+	Alias           snapshotHTTP
+	Document        snapshotHTTP
+	Product         snapshotProduct
+	PostgreSQLError string
+	Pool            snapshotPool
+}
+
+type snapshotHTTP struct {
+	Status int
+	Body   json.RawMessage
+	Error  string
+}
+
+type snapshotProduct struct {
+	ID                    value.ProductID
+	Revision              uint64
+	Published             bool
+	Name                  catalog.LocalizedText
+	PrimaryCategoryID     value.CategoryID
+	AdditionalCategoryIDs []value.CategoryID
+	Context               catalog.ComplianceContext
+	ApplicableRules       []catalog.RuleReference
+	Variants              []snapshotVariant
+	Inventory             []snapshotInventory
+}
+
+type snapshotVariant struct {
+	SKU        value.SKU
+	Compliance value.Optional[snapshotValidity]
+}
+
+type snapshotValidity struct {
+	Context         catalog.ComplianceContext
+	ApplicableRules []catalog.RuleReference
+}
+
+type snapshotInventory struct {
+	SKU              value.SKU
+	Revision         uint64
+	Price            value.Money
+	StockQuantity    int64
+	ReservedQuantity int64
+}
+
+type snapshotPool struct {
+	StartedUTC time.Time
+	EndedUTC   time.Time
+	Status     int
+	Values     map[string]uint64
+	Error      string
+	Note       string
+}
+
+type snapshotRequest struct {
+	ctx context.Context
+	url string
 }

@@ -129,6 +129,9 @@ jobs:
           echo "$!" > /tmp/shop-benchmark-events.pid
           setsid timeout 1500s pidstat -H -h -r -u -p ALL 1 > /tmp/shop-benchmark-results/resources/host-processes.txt 2> /tmp/shop-benchmark-results/resources/host-processes.stderr &
           echo "$!" > /tmp/shop-host-processes.pid
+          setsid timeout 1500s docker compose -p shop-benchmark -f compose.yml -f compose.benchmark.yml exec -T varnish timeout 1440s varnishlog -g request -i Begin,Link,End,Timestamp,ReqURL,BereqURL,BerespStatus,RespStatus,FetchError,VCL_Error -q 'ReqURL ~ "^(/de-DE/(suche|kategorie/)|/fragments/de-DE/(suche|kategorie/))"' > /tmp/shop-benchmark-results/resources/benchmark-varnish.log 2> /tmp/shop-benchmark-results/resources/benchmark-varnish.stderr &
+          echo "$!" > /tmp/shop-varnish-log.pid
+          printf 'Einmalige beobachtende VSL-Diagnose: nur Kategorie/Suche und technische Tags; bestehende Header-Maske unverändert. Keine Hostkorrelation, keine eindeutige Zuordnung zur kalten Bodydatei. URL/UTC/VSL-IDs erlauben nur begrenzte Zuordnung. Fehlender Collector ist kein Nullfehlerbeleg; Ausgabe verursacht Aufwand. Containerseitiger timeout begrenzt auf 1440s; fehlendes timeout/varnishlog steht in stderr. Hostclient wird zusätzlich begrenzt, Compose-down beendet verbleibende Containerprozesse.\n' > /tmp/shop-benchmark-results/resources/varnish-boundary.txt
           ps -eo pid,ppid,comm > /tmp/shop-benchmark-results/resources/process-tree-before.txt
           printf 'pidstat -H: UTC Unixzeit; CPU100 entspricht einem Kern. Nur Prozessnamen, keine Argumente. PPID-Zuordnung aus separaten Snapshots; kurze Prozesse und Samplinglücken bleiben unbelegt. Beobachtung läuft in beiden Phasen und verursacht Aufwand.\n' > /tmp/shop-benchmark-results/resources/host-process-boundary.txt
           printf 'Mitlaufende Standard-Dockerbeobachtung verursacht zusätzlichen Diagnoseaufwand. UTC je Statszeile ist Empfangszeit, kein exakter CPU-Intervallbeginn. Snapshots vor/nach der gesamten Suite erlauben keine isolierte Routenzuordnung. Fehlende Dateien/Fehler sind fehlende Diagnosen, keine Nullwerte.\n' > /tmp/shop-benchmark-results/resources/measurement-boundary.txt
@@ -222,7 +225,7 @@ jobs:
       - name: Eigene beobachtende Collectorprozesse auch nach Testfehlern beenden
         if: always()
         run: |
-          for file in /tmp/shop-stats.pid /tmp/shop-demo-events.pid /tmp/shop-benchmark-events.pid /tmp/shop-host-processes.pid; do
+          for file in /tmp/shop-stats.pid /tmp/shop-demo-events.pid /tmp/shop-benchmark-events.pid /tmp/shop-host-processes.pid /tmp/shop-varnish-log.pid; do
             if [ -f "$file" ]; then
               process=$(cat "$file")
               if kill -0 -- "-$process" 2>/dev/null; then
@@ -306,6 +309,9 @@ jobs:
           echo "$!" > /tmp/shop-benchmark-events.pid
           setsid timeout 1500s pidstat -H -h -r -u -p ALL 1 > /tmp/shop-benchmark-results/resources/host-processes.txt 2> /tmp/shop-benchmark-results/resources/host-processes.stderr &
           echo "$!" > /tmp/shop-host-processes.pid
+          setsid timeout 1500s docker compose -p shop-benchmark -f compose.yml -f compose.benchmark.yml exec -T varnish timeout 1440s varnishlog -g request -i Begin,Link,End,Timestamp,ReqURL,BereqURL,BerespStatus,RespStatus,FetchError,VCL_Error -q 'ReqURL ~ "^(/de-DE/(suche|kategorie/)|/fragments/de-DE/(suche|kategorie/))"' > /tmp/shop-benchmark-results/resources/benchmark-varnish.log 2> /tmp/shop-benchmark-results/resources/benchmark-varnish.stderr &
+          echo "$!" > /tmp/shop-varnish-log.pid
+          printf 'Einmalige beobachtende VSL-Diagnose: nur Kategorie/Suche und technische Tags; bestehende Header-Maske unverändert. Keine Hostkorrelation, keine eindeutige Zuordnung zur kalten Bodydatei. URL/UTC/VSL-IDs erlauben nur begrenzte Zuordnung. Fehlender Collector ist kein Nullfehlerbeleg; Ausgabe verursacht Aufwand. Containerseitiger timeout begrenzt auf 1440s; fehlendes timeout/varnishlog steht in stderr. Hostclient wird zusätzlich begrenzt, Compose-down beendet verbleibende Containerprozesse.\n' > /tmp/shop-benchmark-results/resources/varnish-boundary.txt
           ps -eo pid,ppid,comm > /tmp/shop-benchmark-results/resources/process-tree-before.txt
           printf 'pidstat -H: UTC Unixzeit; CPU100 entspricht einem Kern. Nur Prozessnamen, keine Argumente. PPID-Zuordnung aus separaten Snapshots; kurze Prozesse und Samplinglücken bleiben unbelegt. Beobachtung läuft in beiden Phasen und verursacht Aufwand.\n' > /tmp/shop-benchmark-results/resources/host-process-boundary.txt
           printf 'Mitlaufende Standard-Dockerbeobachtung verursacht zusätzlichen Diagnoseaufwand. UTC je Statszeile ist Empfangszeit, kein exakter CPU-Intervallbeginn. Snapshots vor/nach der gesamten Suite erlauben keine isolierte Routenzuordnung. Fehlende Dateien/Fehler sind fehlende Diagnosen, keine Nullwerte.\n' > /tmp/shop-benchmark-results/resources/measurement-boundary.txt
@@ -381,7 +387,7 @@ jobs:
       - name: Eigene beobachtende Collectorprozesse auch nach Testfehlern beenden
         if: always()
         run: |
-          for file in /tmp/shop-stats.pid /tmp/shop-demo-events.pid /tmp/shop-benchmark-events.pid /tmp/shop-host-processes.pid; do
+          for file in /tmp/shop-stats.pid /tmp/shop-demo-events.pid /tmp/shop-benchmark-events.pid /tmp/shop-host-processes.pid /tmp/shop-varnish-log.pid; do
             if [ -f "$file" ]; then
               process=$(cat "$file")
               if kill -0 -- "-$process" 2>/dev/null; then

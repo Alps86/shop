@@ -37,7 +37,7 @@ func (current *world) measureRoute(route string, data map[string]string) error {
 		return fmt.Errorf("unbekannte Messroute %s", route)
 	}
 
-	if err := current.probe(current.public, endpoint, cookie, contains); err != nil {
+	if err := current.probe(probeRequest{route: route, origin: current.public, path: endpoint, cookie: cookie, contains: contains}); err != nil {
 		return fmt.Errorf("Inhaltsprobe %s: %w", route, err)
 	}
 

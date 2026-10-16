@@ -1,16 +1,13 @@
 package performance_test
 
 import (
-	"crypto/rand"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"os"
 	"os/exec"
-	"path/filepath"
-	"strconv"
 	"strings"
+	"time"
 )
 
 func (current *world) cold(route, path, cookie string, data map[string]string) error {
@@ -43,35 +40,23 @@ func (current *world) curlSamples(route, path, cookie string, data map[string]st
 	defer func() {
 		err = errors.Join(err, os.RemoveAll(directory))
 	}()
-	config := current.curlConfig(path, cookie, directory, count)
+
+	return current.executeCold(coldBatch{route: route, path: path, cookie: cookie, directory: directory, count: count})
+}
+
+func (current *world) executeCold(batch coldBatch) ([]sample, error) {
+	config := batch.config(current.public)
 	command := current.curlCommand(config)
-	output, err := command.Output()
-	if err != nil {
-		return nil, require(err, "Standardwerkzeug curl")
-	}
+	batch.started = time.Now()
+	output, commandError := command.Output()
+	batch.ended = time.Now()
+	samples, readError := current.readCold(batch, output)
 
-	return current.readCold(route, directory, count, output)
+	return samples, errors.Join(require(commandError, "Standardwerkzeug curl"), readError)
 }
 
-func (current *world) curlConfig(path, cookie, directory string, count int) string {
-	var config strings.Builder
-	run := strings.ToLower(rand.Text())
-	for index := range count {
-		fmt.Fprintf(&config, "url = %q\nheader = %q\noutput = %q\nwrite-out = \"%%{json}\\n\"\nmax-time = 15\n", current.public+path, "Host: cold-"+run+"-"+strconv.Itoa(index)+".localhost", filepath.Join(directory, strconv.Itoa(index)))
-		if cookie != "" {
-			fmt.Fprintf(&config, "header = %q\n", "Cookie: "+cookie)
-		}
-
-		if index+1 < count {
-			config.WriteString("next\n")
-		}
-	}
-
-	return config.String()
-}
-
-func (current *world) readCold(route, directory string, count int, output []byte) ([]sample, error) {
-	if err := os.WriteFile(current.reportPath(route, "cold", ".jsonl"), output, 0600); err != nil {
+func (current *world) readCold(batch coldBatch, output []byte) ([]sample, error) {
+	if err := current.saveColdMetrics(batch.route, output); err != nil {
 		return nil, err
 	}
 
@@ -80,18 +65,19 @@ func (current *world) readCold(route, directory string, count int, output []byte
 		return nil, err
 	}
 
-	return samples, current.verifyColdBodies(route, directory, count)
+	return samples, current.verifyColdBodies(batch, output)
 }
 
-func (current *world) verifyColdBodies(route, directory string, count int) error {
-	_, _, contains := current.route(route)
-	for index := range count {
-		body, err := readBody(directory, strconv.Itoa(index))
-		if err != nil {
+func (current *world) verifyColdBodies(batch coldBatch, output []byte) error {
+	decoder := json.NewDecoder(strings.NewReader(string(output)))
+	_, _, contains := current.route(batch.route)
+	for decoder.More() {
+		var observed curlResult
+		if err := decoder.Decode(&observed); err != nil {
 			return err
 		}
 
-		if err := validHTML(200, string(body), contains); err != nil {
+		if err := current.checkColdTransfer(batch, observed, contains); err != nil {
 			return err
 		}
 	}

@@ -9,13 +9,17 @@ import (
 	"time"
 )
 
-func (current *world) probe(origin, path, cookie, contains string) error {
-	response, err := readResponse(origin, path, cookie)
-	if err != nil {
-		return err
+func (current *world) probe(input probeRequest) error {
+	response, err := readResponse(input.origin, input.path, input.cookie)
+	if err == nil {
+		err = validHTML(response.status, response.body, input.contains)
 	}
 
-	return validHTML(response.status, response.body, contains)
+	if err != nil {
+		return errors.Join(err, current.captureProbe(input, response, err))
+	}
+
+	return nil
 }
 
 func readResponse(origin, path, cookie string) (probeResponse, error) {
@@ -25,14 +29,17 @@ func readResponse(origin, path, cookie string) (probeResponse, error) {
 	}
 
 	request.Header.Set("Cookie", cookie)
+	started := time.Now()
 	response, err := (&http.Client{Timeout: 10 * time.Second}).Do(request)
 	if err != nil {
-		return probeResponse{}, err
+		return probeResponse{started: started, ended: time.Now()}, err
 	}
 
 	body, readError := io.ReadAll(response.Body)
 
-	return probeResponse{status: response.StatusCode, header: response.Header, body: string(body)}, errors.Join(readError, response.Body.Close())
+	closeError := response.Body.Close()
+
+	return probeResponse{status: response.StatusCode, header: response.Header, body: string(body), started: started, ended: time.Now()}, errors.Join(readError, closeError)
 }
 
 func validHTML(status int, body, contains string) error {

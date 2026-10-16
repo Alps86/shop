@@ -3,7 +3,6 @@ package postgres
 import "context"
 
 func (store *Store) Diagnostics(ctx context.Context) (map[string]string, error) {
-	result := map[string]string{}
 	var ready, processes, projections, checkpoints, slots string
 	query := `SELECT 'ready',
  (SELECT count(*)::text FROM process_outbox WHERE NOT acknowledged),
@@ -15,6 +14,7 @@ func (store *Store) Diagnostics(ctx context.Context) (map[string]string, error) 
 		return nil, databaseError(err)
 	}
 
+	result := store.poolDiagnostics()
 	result["PostgreSQL"] = ready
 	result["PendingProcesses"] = processes
 	result["ProjectionEvents"] = projections
