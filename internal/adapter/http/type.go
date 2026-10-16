@@ -182,3 +182,16 @@ type queryInput struct {
 type inventoryInput struct {
 	values url.Values
 }
+
+type cardView struct {
+	application.ProductCard
+	ImageAlt   string
+	Price      string
+	BasePrice  string
+	Attributes []cardAttributeView
+}
+
+type cardAttributeView struct {
+	Code value.AttributeCode
+	Text string
+}

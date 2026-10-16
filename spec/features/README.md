@@ -117,3 +117,5 @@ Alle hier konkretisierten Fach-/Seitenverträge sind Demo-Kern. Produktionsbacku
 | [Messdiagnose](adapter/betrieb/messdiagnose.feature) | Technische Zuordnung ursprünglicher Messantworten, öffentliche Header-Allowlist und begrenzte Poolbeobachtung erreichter Lastphasen. |
 
 | [Fragmentbudget](adapter/http/fragmentbudget.feature) | Begrenzte verzögerte Fragmentdaten und echte Varnish-Includes bei unverändertem Leistungsziel. |
+
+- [Vollständige Kartenanzeige](adapter/http/kartendarstellung.feature): Derselbe öffentliche Renderer erhält Karten- und Attributreihenfolge, sichere Formatierung und Grundpreisfehler ohne Teilausgabe für SSR und HX.
