@@ -124,7 +124,7 @@ Die warme anonyme Suchmessung belegt tatsächliche gemeinsame Hits, Misses und C
 
 HTTPzeiten sind kein Browser-LCP-Beleg. Abweichungen vom p95-Ziel unter100ms und ungemessener Browseraufbau bleiben ausdrücklich sichtbar. Der kurze Browser-Smoke ersetzt keine Lastmessung und keine Browsermatrix. Mutierende Kauf-/Zahlungs-/Liefercommands zählen nicht zur Anzeigelatenz.
 
-Das noch offene HTTP-p95-Ziel wird im [Performanceissue #16](https://github.com/Alps86/shop/issues/16) weitergeführt.
+Auftrag und Nachweise zum HTTP-p95-Ziel stehen im [Performanceissue #16](https://github.com/Alps86/shop/issues/16).
 
 **Aussagegrenze:** Native Packageermittlung und Standard-Coverageprüfung erfassen den aktuellen buildfähigen Go-Umfang. Sie sind kein unabhängiger AST-Blockvergleich aller Repositoryquellen oder aller Plattform-/Build-Tag-Kombinationen und kein automatischer Beweis vollständiger Slicezuordnung. Solche zusätzliche Härtung ist offen. Review prüft deshalb insbesondere neue Quellen, Build-Tags, zusätzliche Module und unzulässige `spec-only`-Markierungen. Es gibt keine frei konfigurierbare Bootstrap-Abschaltung.
 
