@@ -9,6 +9,7 @@ import (
 	"github.com/Alps86/shop/internal/domain/sale"
 	"github.com/Alps86/shop/internal/domain/value"
 	"github.com/cucumber/godog"
+	"go.temporal.io/sdk/worker"
 	"time"
 )
 
@@ -86,7 +87,7 @@ func (current *world) restart(table *godog.Table) error {
 		return err
 	}
 
-	current.runner.Stop()
+	current.stopColdWorker()
 	current.runner = current.adapter.Worker()
 	if err := current.runner.Start(); err != nil {
 		return err
@@ -97,6 +98,12 @@ func (current *world) restart(table *godog.Table) error {
 	}
 
 	return current.resumeCart()
+}
+
+func (current *world) stopColdWorker() {
+	current.runner.Stop()
+	// This serial fixture has no other live worker; a process restart loses this cache.
+	worker.PurgeStickyWorkflowCache()
 }
 
 func (current *world) awaitCartWorker(table *godog.Table) error {
@@ -189,7 +196,7 @@ func (current *world) statusObserved(table *godog.Table, status temporal.Status)
 
 func (current *world) registerRuntime(ctx *godog.ScenarioContext) {
 	ctx.Step(`^ein Worker den gespeicherten Cart übernimmt$`, current.prepare)
-	ctx.Step(`^der Worker vollständig neu startet und seine History wieder bereitsteht$`, current.restart)
+	ctx.Step(`^der Worker mit geleertem lokalen SDK-Cache neu startet und seine History wieder bereitsteht$`, current.restart)
 	ctx.Step(`^ein echtes Workflowupdate gesendet wird$`, current.update)
 	ctx.Step(`^antwortet der weitergeführte Prozess$`, current.observed)
 }

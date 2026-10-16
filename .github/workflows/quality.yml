@@ -114,6 +114,47 @@ jobs:
           docker compose -p shop-benchmark -f compose.yml -f compose.benchmark.yml up --detach --build --wait --wait-timeout 180
           elapsed=$((SECONDS - started))
           printf '{"boundary":"compose-command-start-to-all-services-healthy","seconds":%s,"resolutionSeconds":1,"includes":"image pull, build, content generation, seed import, health waits","freshProjectVolumes":true,"dataset":"30 synthetische Modelle / 90 Varianten","ordersAtStartup":0,"buildCache":"shared image build cache from demo","fullPageRequestMeasurement":false}\n' "$elapsed" > /tmp/shop-benchmark-results/benchmark-cold-start.json
+      - name: Beobachtende Ressourcenzeitreihen für beide eigenen Projekte starten
+        run: |
+          mkdir -p /tmp/shop-benchmark-results/resources
+          docker compose ps -aq > /tmp/shop-diagnostic-containers
+          docker compose -p shop-benchmark -f compose.yml -f compose.benchmark.yml ps -aq >> /tmp/shop-diagnostic-containers
+          sort -u /tmp/shop-diagnostic-containers -o /tmp/shop-diagnostic-containers
+          mapfile -t containers < /tmp/shop-diagnostic-containers
+          setsid bash -c 'docker stats --format "{{json .}}" "$@" | while IFS= read -r sample; do printf "{\"utc\":\"%s\",\"sample\":%s}\n" "$(date --utc --iso-8601=ns)" "$sample"; done' collector "${containers[@]}" > /tmp/shop-benchmark-results/resources/container-stats.jsonl 2> /tmp/shop-benchmark-results/resources/container-stats.stderr &
+          echo "$!" > /tmp/shop-stats.pid
+          setsid docker events --filter type=container --filter label=com.docker.compose.project=shop --format '{{json .}}' > /tmp/shop-benchmark-results/resources/demo-events.jsonl 2> /tmp/shop-benchmark-results/resources/demo-events.stderr &
+          echo "$!" > /tmp/shop-demo-events.pid
+          setsid docker events --filter type=container --filter label=com.docker.compose.project=shop-benchmark --format '{{json .}}' > /tmp/shop-benchmark-results/resources/benchmark-events.jsonl 2> /tmp/shop-benchmark-results/resources/benchmark-events.stderr &
+          echo "$!" > /tmp/shop-benchmark-events.pid
+          printf 'Mitlaufende Standard-Dockerbeobachtung verursacht zusätzlichen Diagnoseaufwand. UTC je Statszeile ist Empfangszeit, kein exakter CPU-Intervallbeginn. Snapshots vor/nach der gesamten Suite erlauben keine isolierte Routenzuordnung. Fehlende Dateien/Fehler sind fehlende Diagnosen, keine Nullwerte.\n' > /tmp/shop-benchmark-results/resources/measurement-boundary.txt
+      - name: Vor Tests echte Ressourcen- und Dienstzustände sichern
+        if: always()
+        run: |
+          directory=/tmp/shop-benchmark-results/resources/vor
+          mkdir -p "$directory"
+          date --utc --iso-8601=ns > "$directory/utc.txt"
+          docker info --format '{"cpu":{{.NCPU}},"memoryBytes":{{.MemTotal}},"kernel":{{json .KernelVersion}},"os":{{json .OperatingSystem}}}' > "$directory/docker-host.json"
+          free --bytes > "$directory/host-memory.txt"
+          for pressure in cpu memory io; do
+            cat "/proc/pressure/$pressure" > "$directory/host-$pressure-pressure.txt" 2>&1 || printf 'Nicht verfügbare Hostdiagnose: %s\n' "$pressure" >> "$directory/unavailable.txt"
+          done
+          docker compose ps -aq > /tmp/shop-diagnostic-current
+          docker compose -p shop-benchmark -f compose.yml -f compose.benchmark.yml ps -aq >> /tmp/shop-diagnostic-current
+          sort -u /tmp/shop-diagnostic-current -o /tmp/shop-diagnostic-current
+          while read -r container; do
+            docker inspect --format '{"id":{{json .Id}},"name":{{json .Name}},"status":{{json .State.Status}},"oomKilled":{{.State.OOMKilled}},"restarts":{{.RestartCount}},"exitCode":{{.State.ExitCode}},"health":{{json .State.Health}},"started":{{json .State.StartedAt}},"finished":{{json .State.FinishedAt}},"nanoCPUs":{{.HostConfig.NanoCpus}},"cpuQuota":{{.HostConfig.CpuQuota}},"cpuPeriod":{{.HostConfig.CpuPeriod}},"memoryLimit":{{.HostConfig.Memory}}}' "$container" > "$directory/$container-state.json"
+            process=$(docker inspect --format '{{.State.Pid}}' "$container")
+            if [ "$process" -gt 0 ]; then
+              for metric in cpu.stat memory.events memory.current memory.peak cpu.pressure memory.pressure; do
+                sudo cat "/proc/$process/root/sys/fs/cgroup/$metric" > "$directory/$container-$metric.txt" 2>&1 || printf 'Nicht verfügbare Containerdiagnose: %s/%s\n' "$container" "$metric" >> "$directory/unavailable.txt"
+              done
+            fi
+          done < /tmp/shop-diagnostic-current
+          for port in 19200 29200; do
+            curl --fail --silent --show-error --max-time 5 "http://127.0.0.1:$port/_nodes/stats/indices,jvm,process,os,thread_pool" > "$directory/opensearch-$port-nodes.json" 2> "$directory/opensearch-$port-nodes.stderr" || printf 'OSnodes %s nicht verfügbar\n' "$port" >> "$directory/unavailable.txt"
+            curl --fail --silent --show-error --max-time 5 "http://127.0.0.1:$port/_stats/request_cache,search" > "$directory/opensearch-$port-search.json" 2> "$directory/opensearch-$port-search.stderr" || printf 'OSindexstats %s nicht verfügbar\n' "$port" >> "$directory/unavailable.txt"
+          done
       - name: Tatsächlichen Dienstrestart prüfen
         run: |
           docker compose restart shop
@@ -141,6 +182,44 @@ jobs:
           go tool covdata merge -i="$SHOP_PROCESS_COVERDIR" -o=/tmp/shop-merged-coverage -pcombine
           go tool covdata textfmt -i=/tmp/shop-merged-coverage -o=cover.out
           go run github.com/vladopajic/go-test-coverage/v2@v2.19.0 --config=.testcoverage.yml
+      - name: Nach Tests echte Ressourcen- und Dienstzustände sichern
+        if: always()
+        run: |
+          directory=/tmp/shop-benchmark-results/resources/nach
+          mkdir -p "$directory"
+          date --utc --iso-8601=ns > "$directory/utc.txt"
+          docker info --format '{"cpu":{{.NCPU}},"memoryBytes":{{.MemTotal}},"kernel":{{json .KernelVersion}},"os":{{json .OperatingSystem}}}' > "$directory/docker-host.json"
+          free --bytes > "$directory/host-memory.txt"
+          for pressure in cpu memory io; do
+            cat "/proc/pressure/$pressure" > "$directory/host-$pressure-pressure.txt" 2>&1 || printf 'Nicht verfügbare Hostdiagnose: %s\n' "$pressure" >> "$directory/unavailable.txt"
+          done
+          docker compose ps -aq > /tmp/shop-diagnostic-current
+          docker compose -p shop-benchmark -f compose.yml -f compose.benchmark.yml ps -aq >> /tmp/shop-diagnostic-current
+          sort -u /tmp/shop-diagnostic-current -o /tmp/shop-diagnostic-current
+          while read -r container; do
+            docker inspect --format '{"id":{{json .Id}},"name":{{json .Name}},"status":{{json .State.Status}},"oomKilled":{{.State.OOMKilled}},"restarts":{{.RestartCount}},"exitCode":{{.State.ExitCode}},"health":{{json .State.Health}},"started":{{json .State.StartedAt}},"finished":{{json .State.FinishedAt}},"nanoCPUs":{{.HostConfig.NanoCpus}},"cpuQuota":{{.HostConfig.CpuQuota}},"cpuPeriod":{{.HostConfig.CpuPeriod}},"memoryLimit":{{.HostConfig.Memory}}}' "$container" > "$directory/$container-state.json"
+            process=$(docker inspect --format '{{.State.Pid}}' "$container")
+            if [ "$process" -gt 0 ]; then
+              for metric in cpu.stat memory.events memory.current memory.peak cpu.pressure memory.pressure; do
+                sudo cat "/proc/$process/root/sys/fs/cgroup/$metric" > "$directory/$container-$metric.txt" 2>&1 || printf 'Nicht verfügbare Containerdiagnose: %s/%s\n' "$container" "$metric" >> "$directory/unavailable.txt"
+              done
+            fi
+          done < /tmp/shop-diagnostic-current
+          for port in 19200 29200; do
+            curl --fail --silent --show-error --max-time 5 "http://127.0.0.1:$port/_nodes/stats/indices,jvm,process,os,thread_pool" > "$directory/opensearch-$port-nodes.json" 2> "$directory/opensearch-$port-nodes.stderr" || printf 'OSnodes %s nicht verfügbar\n' "$port" >> "$directory/unavailable.txt"
+            curl --fail --silent --show-error --max-time 5 "http://127.0.0.1:$port/_stats/request_cache,search" > "$directory/opensearch-$port-search.json" 2> "$directory/opensearch-$port-search.stderr" || printf 'OSindexstats %s nicht verfügbar\n' "$port" >> "$directory/unavailable.txt"
+          done
+      - name: Eigene beobachtende Collectorprozesse auch nach Testfehlern beenden
+        if: always()
+        run: |
+          for file in /tmp/shop-stats.pid /tmp/shop-demo-events.pid /tmp/shop-benchmark-events.pid; do
+            if [ -f "$file" ]; then
+              process=$(cat "$file")
+              if kill -0 -- "-$process" 2>/dev/null; then
+                kill -- "-$process"
+              fi
+            fi
+          done
       - name: Tatsächliche vollständige Lastwerte und Aussagegrenzen ausgeben
         if: always()
         run: |
@@ -202,6 +281,47 @@ jobs:
           docker compose -p shop-benchmark -f compose.yml -f compose.benchmark.yml up --detach --build --wait --wait-timeout 180
           elapsed=$((SECONDS - started))
           printf '{"boundary":"compose-command-start-to-all-services-healthy","seconds":%s,"resolutionSeconds":1,"includes":"image pull, build, content generation, seed import, health waits","freshProjectVolumes":true,"dataset":"30 synthetische Modelle / 90 Varianten","ordersAtStartup":0,"buildCache":"shared image build cache from demo","fullPageRequestMeasurement":false}\n' "$elapsed" > /tmp/shop-benchmark-results/benchmark-cold-start.json
+      - name: Beobachtende Ressourcenzeitreihen für beide eigenen Projekte starten
+        run: |
+          mkdir -p /tmp/shop-benchmark-results/resources
+          docker compose ps -aq > /tmp/shop-diagnostic-containers
+          docker compose -p shop-benchmark -f compose.yml -f compose.benchmark.yml ps -aq >> /tmp/shop-diagnostic-containers
+          sort -u /tmp/shop-diagnostic-containers -o /tmp/shop-diagnostic-containers
+          mapfile -t containers < /tmp/shop-diagnostic-containers
+          setsid bash -c 'docker stats --format "{{json .}}" "$@" | while IFS= read -r sample; do printf "{\"utc\":\"%s\",\"sample\":%s}\n" "$(date --utc --iso-8601=ns)" "$sample"; done' collector "${containers[@]}" > /tmp/shop-benchmark-results/resources/container-stats.jsonl 2> /tmp/shop-benchmark-results/resources/container-stats.stderr &
+          echo "$!" > /tmp/shop-stats.pid
+          setsid docker events --filter type=container --filter label=com.docker.compose.project=shop --format '{{json .}}' > /tmp/shop-benchmark-results/resources/demo-events.jsonl 2> /tmp/shop-benchmark-results/resources/demo-events.stderr &
+          echo "$!" > /tmp/shop-demo-events.pid
+          setsid docker events --filter type=container --filter label=com.docker.compose.project=shop-benchmark --format '{{json .}}' > /tmp/shop-benchmark-results/resources/benchmark-events.jsonl 2> /tmp/shop-benchmark-results/resources/benchmark-events.stderr &
+          echo "$!" > /tmp/shop-benchmark-events.pid
+          printf 'Mitlaufende Standard-Dockerbeobachtung verursacht zusätzlichen Diagnoseaufwand. UTC je Statszeile ist Empfangszeit, kein exakter CPU-Intervallbeginn. Snapshots vor/nach der gesamten Suite erlauben keine isolierte Routenzuordnung. Fehlende Dateien/Fehler sind fehlende Diagnosen, keine Nullwerte.\n' > /tmp/shop-benchmark-results/resources/measurement-boundary.txt
+      - name: Vor Tests echte Ressourcen- und Dienstzustände sichern
+        if: always()
+        run: |
+          directory=/tmp/shop-benchmark-results/resources/vor
+          mkdir -p "$directory"
+          date --utc --iso-8601=ns > "$directory/utc.txt"
+          docker info --format '{"cpu":{{.NCPU}},"memoryBytes":{{.MemTotal}},"kernel":{{json .KernelVersion}},"os":{{json .OperatingSystem}}}' > "$directory/docker-host.json"
+          free --bytes > "$directory/host-memory.txt"
+          for pressure in cpu memory io; do
+            cat "/proc/pressure/$pressure" > "$directory/host-$pressure-pressure.txt" 2>&1 || printf 'Nicht verfügbare Hostdiagnose: %s\n' "$pressure" >> "$directory/unavailable.txt"
+          done
+          docker compose ps -aq > /tmp/shop-diagnostic-current
+          docker compose -p shop-benchmark -f compose.yml -f compose.benchmark.yml ps -aq >> /tmp/shop-diagnostic-current
+          sort -u /tmp/shop-diagnostic-current -o /tmp/shop-diagnostic-current
+          while read -r container; do
+            docker inspect --format '{"id":{{json .Id}},"name":{{json .Name}},"status":{{json .State.Status}},"oomKilled":{{.State.OOMKilled}},"restarts":{{.RestartCount}},"exitCode":{{.State.ExitCode}},"health":{{json .State.Health}},"started":{{json .State.StartedAt}},"finished":{{json .State.FinishedAt}},"nanoCPUs":{{.HostConfig.NanoCpus}},"cpuQuota":{{.HostConfig.CpuQuota}},"cpuPeriod":{{.HostConfig.CpuPeriod}},"memoryLimit":{{.HostConfig.Memory}}}' "$container" > "$directory/$container-state.json"
+            process=$(docker inspect --format '{{.State.Pid}}' "$container")
+            if [ "$process" -gt 0 ]; then
+              for metric in cpu.stat memory.events memory.current memory.peak cpu.pressure memory.pressure; do
+                sudo cat "/proc/$process/root/sys/fs/cgroup/$metric" > "$directory/$container-$metric.txt" 2>&1 || printf 'Nicht verfügbare Containerdiagnose: %s/%s\n' "$container" "$metric" >> "$directory/unavailable.txt"
+              done
+            fi
+          done < /tmp/shop-diagnostic-current
+          for port in 19200 29200; do
+            curl --fail --silent --show-error --max-time 5 "http://127.0.0.1:$port/_nodes/stats/indices,jvm,process,os,thread_pool" > "$directory/opensearch-$port-nodes.json" 2> "$directory/opensearch-$port-nodes.stderr" || printf 'OSnodes %s nicht verfügbar\n' "$port" >> "$directory/unavailable.txt"
+            curl --fail --silent --show-error --max-time 5 "http://127.0.0.1:$port/_stats/request_cache,search" > "$directory/opensearch-$port-search.json" 2> "$directory/opensearch-$port-search.stderr" || printf 'OSindexstats %s nicht verfügbar\n' "$port" >> "$directory/unavailable.txt"
+          done
       - name: Echte Standardtestanbindung mit Race-Erkennung
         run: |
           packages="$(go list -f '{{if or .GoFiles .CgoFiles}}{{.ImportPath}}{{end}}' ./... | sed '/^$/d')"
@@ -211,6 +331,44 @@ jobs:
             exit 0
           fi
           go test -p 1 -race ./... -count=1
+      - name: Nach Tests echte Ressourcen- und Dienstzustände sichern
+        if: always()
+        run: |
+          directory=/tmp/shop-benchmark-results/resources/nach
+          mkdir -p "$directory"
+          date --utc --iso-8601=ns > "$directory/utc.txt"
+          docker info --format '{"cpu":{{.NCPU}},"memoryBytes":{{.MemTotal}},"kernel":{{json .KernelVersion}},"os":{{json .OperatingSystem}}}' > "$directory/docker-host.json"
+          free --bytes > "$directory/host-memory.txt"
+          for pressure in cpu memory io; do
+            cat "/proc/pressure/$pressure" > "$directory/host-$pressure-pressure.txt" 2>&1 || printf 'Nicht verfügbare Hostdiagnose: %s\n' "$pressure" >> "$directory/unavailable.txt"
+          done
+          docker compose ps -aq > /tmp/shop-diagnostic-current
+          docker compose -p shop-benchmark -f compose.yml -f compose.benchmark.yml ps -aq >> /tmp/shop-diagnostic-current
+          sort -u /tmp/shop-diagnostic-current -o /tmp/shop-diagnostic-current
+          while read -r container; do
+            docker inspect --format '{"id":{{json .Id}},"name":{{json .Name}},"status":{{json .State.Status}},"oomKilled":{{.State.OOMKilled}},"restarts":{{.RestartCount}},"exitCode":{{.State.ExitCode}},"health":{{json .State.Health}},"started":{{json .State.StartedAt}},"finished":{{json .State.FinishedAt}},"nanoCPUs":{{.HostConfig.NanoCpus}},"cpuQuota":{{.HostConfig.CpuQuota}},"cpuPeriod":{{.HostConfig.CpuPeriod}},"memoryLimit":{{.HostConfig.Memory}}}' "$container" > "$directory/$container-state.json"
+            process=$(docker inspect --format '{{.State.Pid}}' "$container")
+            if [ "$process" -gt 0 ]; then
+              for metric in cpu.stat memory.events memory.current memory.peak cpu.pressure memory.pressure; do
+                sudo cat "/proc/$process/root/sys/fs/cgroup/$metric" > "$directory/$container-$metric.txt" 2>&1 || printf 'Nicht verfügbare Containerdiagnose: %s/%s\n' "$container" "$metric" >> "$directory/unavailable.txt"
+              done
+            fi
+          done < /tmp/shop-diagnostic-current
+          for port in 19200 29200; do
+            curl --fail --silent --show-error --max-time 5 "http://127.0.0.1:$port/_nodes/stats/indices,jvm,process,os,thread_pool" > "$directory/opensearch-$port-nodes.json" 2> "$directory/opensearch-$port-nodes.stderr" || printf 'OSnodes %s nicht verfügbar\n' "$port" >> "$directory/unavailable.txt"
+            curl --fail --silent --show-error --max-time 5 "http://127.0.0.1:$port/_stats/request_cache,search" > "$directory/opensearch-$port-search.json" 2> "$directory/opensearch-$port-search.stderr" || printf 'OSindexstats %s nicht verfügbar\n' "$port" >> "$directory/unavailable.txt"
+          done
+      - name: Eigene beobachtende Collectorprozesse auch nach Testfehlern beenden
+        if: always()
+        run: |
+          for file in /tmp/shop-stats.pid /tmp/shop-demo-events.pid /tmp/shop-benchmark-events.pid; do
+            if [ -f "$file" ]; then
+              process=$(cat "$file")
+              if kill -0 -- "-$process" 2>/dev/null; then
+                kill -- "-$process"
+              fi
+            fi
+          done
       - name: Tatsächliche vollständige Lastwerte und Aussagegrenzen ausgeben
         if: always()
         run: |

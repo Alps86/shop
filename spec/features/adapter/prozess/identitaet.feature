@@ -20,7 +20,7 @@ Funktionalität: Dauerhafte Temporalidentität
     Wenn der Cartprozess wird wiederholt gestartet
       | DefinitionVersion | RuleSetVersion | Attempts |
       | cart-v1 | demo-v1 | 2 |
-    Und der Worker vollständig neu startet und seine History wieder bereitsteht
+    Und der Worker mit geleertem lokalen SDK-Cache neu startet und seine History wieder bereitsteht
       | ReadinessTimeout |
       | 10s |
     Und ein echtes Workflowupdate gesendet wird
