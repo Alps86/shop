@@ -31,7 +31,7 @@ func (adapter Adapter) baseQuery(query application.SearchQuery) JSON {
 
 	text := JSON{"match_all": JSON{}}
 	if strings.TrimSpace(query.Text) != "" {
-		text = JSON{"multi_match": JSON{"query": query.Text, "fields": []string{"name^3", "brand.text^2", "description"}, "fuzziness": "AUTO", "prefix_length": 2}}
+		text = JSON{"multi_match": JSON{"query": query.Text, "fields": []string{"name^3", "brand.text^2", "description"}}}
 	}
 
 	return JSON{"must": []JSON{text}, "filter": filters}

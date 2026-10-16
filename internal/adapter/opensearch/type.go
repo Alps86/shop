@@ -107,6 +107,7 @@ type Document struct {
 	CategoryIDs []value.CategoryID `json:"category_ids"`
 	Variants    []Variant          `json:"variants"`
 	Suggest     []string           `json:"suggest"`
+	Words       []string           `json:"words"`
 	Visibility  string             `json:"visibility"`
 }
 

@@ -13,19 +13,19 @@ func (adapter Adapter) suggestBody(body JSON, query application.SearchQuery) {
 		return
 	}
 
-	fuzziness := 1
-	if utf8.RuneCountInString(text) >= 8 {
-		fuzziness = 2
-	}
-
-	completion := JSON{"field": "suggest", "size": 25, "skip_duplicates": true, "contexts": JSON{"visibility": []string{"public"}}, "fuzzy": JSON{"fuzziness": fuzziness, "min_length": 4, "prefix_length": 2, "transpositions": true}}
-	body["suggest"] = JSON{"catalog": JSON{"prefix": text, "completion": completion}}
+	groups := JSON{"catalog": completionGroup("suggest", text)}
+	addWordGroups(groups, text)
+	body["suggest"] = groups
 }
 
 func (response SearchResponse) suggestions(query application.SearchQuery) []application.Suggestion {
 	set := SuggestionSet{Values: []application.Suggestion{}, Seen: map[string]bool{}}
 	for _, group := range response.Suggest["catalog"] {
 		set.appendGroup(group, query.Text)
+	}
+
+	if len(set.Values) == 0 {
+		return response.wordCorrection(query.Text)
 	}
 
 	slices.SortFunc(set.Values, response.compareSuggestions)

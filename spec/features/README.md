@@ -69,6 +69,7 @@ Jede Zeile benennt einen öffentlichen Blackbox-Vertrag, seine maßgebliche Arch
 | [Sichtbare HTML und HTMXzustände](ui/seite/http.feature) | [08-querschnitt/pages.md](../architecture/08-querschnitt/pages.md) | `frontend`, aktiv |
 | [Private Zustands und Fehleransichten](ui/seite/zustand.feature) | [08-querschnitt/pages.md](../architecture/08-querschnitt/pages.md) | `frontend`, aktiv |
 | [Reale Demo und ehrliche Performanceabnahme](adapter/betrieb/demo.feature) | [10-qualitaet.md](../architecture/10-qualitaet.md) | `integration` |
+| [Bewusste Suchkorrektur](adapter/betrieb/suchkorrektur.feature) | [05-bausteine/search.md](../architecture/05-bausteine/search.md) | Echte HTTPgäste behalten ihre Originalsuche und folgen erst dem sichtbaren Korrekturlink mit erhaltenem Filterkontext zu neuen Ergebnissen. |
 
 ## Datenkonventionen und Zuordnung
 
@@ -111,3 +112,4 @@ Alle hier konkretisierten Fach-/Seitenverträge sind Demo-Kern. Produktionsbacku
 
 - [Multisuche](adapter/suche/multisuche.feature) hält Hauptkarten und Facetten zusammen, trennt cachefähige Completion und verwirft fehlerhafte Teilantworten vollständig.
 - [Gespeicherte Karten](adapter/suche/gespeicherte-karte.feature): Sourcefreier Storedfields-Transport erhält vollständige öffentliche Karten und verwirft fehlende, defekte oder inkonsistente Identitäten und Payloads.
+- [Explizite Korrektur](adapter/suche/korrektur.feature): Normale Haupttreffer bleiben von öffentlichen, bewusst auszuwählenden vollständigen Wortkorrekturen getrennt.

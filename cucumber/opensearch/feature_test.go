@@ -30,6 +30,7 @@ func (current *world) register(ctx *godog.ScenarioContext) {
 	current.projectionSteps(ctx)
 	current.searchSteps(ctx)
 	current.rankingSteps(ctx)
+	current.correctionSteps(ctx)
 	current.reindexSteps(ctx)
 	current.failureSteps(ctx)
 	current.budgetSteps(ctx)

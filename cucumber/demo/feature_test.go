@@ -32,6 +32,7 @@ func (current *world) register(ctx *godog.ScenarioContext) {
 	ctx.Step(`^die Bestellung ist über echte Kaufports beobachtbar$`, current.orderObserved)
 	ctx.Step(`^der persistierte Gastwarenkorb lautet$`, current.cartObserved)
 	current.registerOperations(ctx)
+	current.registerSearchCorrection(ctx)
 }
 
 func (current *world) before(ctx context.Context, _ *godog.Scenario) (context.Context, error) {

@@ -390,3 +390,17 @@ Funktionalität: Suchseite ohne doppelte Parentfragmentabfrage
       | Status | 503 |
       | Header:Cache-Control | private,no-store |
       | Absent | Kurzes Suchangebot |
+
+  Szenario: Ein sichtbarer Korrekturlink erhält den Suchkontext und setzt die Seite zurück
+    Angenommen HTTPportdaten werden ersetzt
+      | JSON |
+      | {"Search":{"Suggestions":[{"Text":"Entkalker","Correction":true}]}} |
+    Wenn der Shop liefert eine HTTPansicht
+      | Method | URL |
+      | GET | /de-DE/suche?q=Entkalkre&sort=nameAsc&view=list&priceMax=1000000&page=2 |
+    Dann die HTTPantwort enthält die sichtbaren Vertragswerte
+      | Field | Value |
+      | Status | 200 |
+      | Body | href="/de-DE/suche?priceMax=1000000&amp;q=Entkalker&amp;sort=nameAsc&amp;view=list" |
+      | Body | name="q" value="Entkalkre" |
+      | Body | Meintest du Entkalker |
