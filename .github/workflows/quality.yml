@@ -40,7 +40,7 @@ jobs:
         run: |
           export PATH="$HOME/.qlty/bin:$PATH"
           qlty config validate
-          qlty check --all --no-cache --no-fix --summary
+          qlty check --all --no-cache --no-fix
       - name: Smells und Metrics als vollständige Qualitätsnachweise
         run: |
           export PATH="$HOME/.qlty/bin:$PATH"
@@ -121,7 +121,7 @@ jobs:
           docker compose -p shop-benchmark -f compose.yml -f compose.benchmark.yml ps -aq >> /tmp/shop-diagnostic-containers
           sort -u /tmp/shop-diagnostic-containers -o /tmp/shop-diagnostic-containers
           mapfile -t containers < /tmp/shop-diagnostic-containers
-          setsid bash -c 'docker stats --format "{{json .}}" "$@" | while IFS= read -r sample; do printf "{\"utc\":\"%s\",\"sample\":%s}\n" "$(date --utc --iso-8601=ns)" "$sample"; done' collector "${containers[@]}" > /tmp/shop-benchmark-results/resources/container-stats.jsonl 2> /tmp/shop-benchmark-results/resources/container-stats.stderr &
+          setsid bash -c "docker stats --format '{{json .}}' \"\$@\" | while IFS= read -r sample; do printf '{\"utc\":\"%s\",\"sample\":%s}\\n' \"\$(date --utc --iso-8601=ns)\" \"\$sample\"; done" collector "${containers[@]}" > /tmp/shop-benchmark-results/resources/container-stats.jsonl 2> /tmp/shop-benchmark-results/resources/container-stats.stderr &
           echo "$!" > /tmp/shop-stats.pid
           setsid docker events --filter type=container --filter label=com.docker.compose.project=shop --format '{{json .}}' > /tmp/shop-benchmark-results/resources/demo-events.jsonl 2> /tmp/shop-benchmark-results/resources/demo-events.stderr &
           echo "$!" > /tmp/shop-demo-events.pid
@@ -143,11 +143,14 @@ jobs:
           docker compose -p shop-benchmark -f compose.yml -f compose.benchmark.yml ps -aq >> /tmp/shop-diagnostic-current
           sort -u /tmp/shop-diagnostic-current -o /tmp/shop-diagnostic-current
           while read -r container; do
-            docker inspect --format '{"id":{{json .Id}},"name":{{json .Name}},"status":{{json .State.Status}},"oomKilled":{{.State.OOMKilled}},"restarts":{{.RestartCount}},"exitCode":{{.State.ExitCode}},"health":{{json .State.Health}},"started":{{json .State.StartedAt}},"finished":{{json .State.FinishedAt}},"nanoCPUs":{{.HostConfig.NanoCpus}},"cpuQuota":{{.HostConfig.CpuQuota}},"cpuPeriod":{{.HostConfig.CpuPeriod}},"memoryLimit":{{.HostConfig.Memory}}}' "$container" > "$directory/$container-state.json"
+            docker inspect --format '{"id":{{json .Id}},"name":{{json .Name}},"status":{{json .State.Status}},"oomKilled":{{.State.OOMKilled}},"restarts":{{.RestartCount}},"exitCode":{{.State.ExitCode}},"health":{{json (index .State "Health")}},"started":{{json .State.StartedAt}},"finished":{{json .State.FinishedAt}},"nanoCPUs":{{.HostConfig.NanoCpus}},"cpuQuota":{{.HostConfig.CpuQuota}},"cpuPeriod":{{.HostConfig.CpuPeriod}},"memoryLimit":{{.HostConfig.Memory}}}' "$container" > "$directory/$container-state.json"
             process=$(docker inspect --format '{{.State.Pid}}' "$container")
             if [ "$process" -gt 0 ]; then
               for metric in cpu.stat memory.events memory.current memory.peak cpu.pressure memory.pressure; do
-                sudo cat "/proc/$process/root/sys/fs/cgroup/$metric" > "$directory/$container-$metric.txt" 2>&1 || printf 'Nicht verfügbare Containerdiagnose: %s/%s\n' "$container" "$metric" >> "$directory/unavailable.txt"
+                if ! captured=$(sudo cat "/proc/$process/root/sys/fs/cgroup/$metric" 2>&1); then
+                  printf 'Nicht verfügbare Containerdiagnose: %s/%s\n' "$container" "$metric" >> "$directory/unavailable.txt"
+                fi
+                printf '%s\n' "$captured" > "$directory/$container-$metric.txt"
               done
             fi
           done < /tmp/shop-diagnostic-current
@@ -197,11 +200,14 @@ jobs:
           docker compose -p shop-benchmark -f compose.yml -f compose.benchmark.yml ps -aq >> /tmp/shop-diagnostic-current
           sort -u /tmp/shop-diagnostic-current -o /tmp/shop-diagnostic-current
           while read -r container; do
-            docker inspect --format '{"id":{{json .Id}},"name":{{json .Name}},"status":{{json .State.Status}},"oomKilled":{{.State.OOMKilled}},"restarts":{{.RestartCount}},"exitCode":{{.State.ExitCode}},"health":{{json .State.Health}},"started":{{json .State.StartedAt}},"finished":{{json .State.FinishedAt}},"nanoCPUs":{{.HostConfig.NanoCpus}},"cpuQuota":{{.HostConfig.CpuQuota}},"cpuPeriod":{{.HostConfig.CpuPeriod}},"memoryLimit":{{.HostConfig.Memory}}}' "$container" > "$directory/$container-state.json"
+            docker inspect --format '{"id":{{json .Id}},"name":{{json .Name}},"status":{{json .State.Status}},"oomKilled":{{.State.OOMKilled}},"restarts":{{.RestartCount}},"exitCode":{{.State.ExitCode}},"health":{{json (index .State "Health")}},"started":{{json .State.StartedAt}},"finished":{{json .State.FinishedAt}},"nanoCPUs":{{.HostConfig.NanoCpus}},"cpuQuota":{{.HostConfig.CpuQuota}},"cpuPeriod":{{.HostConfig.CpuPeriod}},"memoryLimit":{{.HostConfig.Memory}}}' "$container" > "$directory/$container-state.json"
             process=$(docker inspect --format '{{.State.Pid}}' "$container")
             if [ "$process" -gt 0 ]; then
               for metric in cpu.stat memory.events memory.current memory.peak cpu.pressure memory.pressure; do
-                sudo cat "/proc/$process/root/sys/fs/cgroup/$metric" > "$directory/$container-$metric.txt" 2>&1 || printf 'Nicht verfügbare Containerdiagnose: %s/%s\n' "$container" "$metric" >> "$directory/unavailable.txt"
+                if ! captured=$(sudo cat "/proc/$process/root/sys/fs/cgroup/$metric" 2>&1); then
+                  printf 'Nicht verfügbare Containerdiagnose: %s/%s\n' "$container" "$metric" >> "$directory/unavailable.txt"
+                fi
+                printf '%s\n' "$captured" > "$directory/$container-$metric.txt"
               done
             fi
           done < /tmp/shop-diagnostic-current
@@ -288,7 +294,7 @@ jobs:
           docker compose -p shop-benchmark -f compose.yml -f compose.benchmark.yml ps -aq >> /tmp/shop-diagnostic-containers
           sort -u /tmp/shop-diagnostic-containers -o /tmp/shop-diagnostic-containers
           mapfile -t containers < /tmp/shop-diagnostic-containers
-          setsid bash -c 'docker stats --format "{{json .}}" "$@" | while IFS= read -r sample; do printf "{\"utc\":\"%s\",\"sample\":%s}\n" "$(date --utc --iso-8601=ns)" "$sample"; done' collector "${containers[@]}" > /tmp/shop-benchmark-results/resources/container-stats.jsonl 2> /tmp/shop-benchmark-results/resources/container-stats.stderr &
+          setsid bash -c "docker stats --format '{{json .}}' \"\$@\" | while IFS= read -r sample; do printf '{\"utc\":\"%s\",\"sample\":%s}\\n' \"\$(date --utc --iso-8601=ns)\" \"\$sample\"; done" collector "${containers[@]}" > /tmp/shop-benchmark-results/resources/container-stats.jsonl 2> /tmp/shop-benchmark-results/resources/container-stats.stderr &
           echo "$!" > /tmp/shop-stats.pid
           setsid docker events --filter type=container --filter label=com.docker.compose.project=shop --format '{{json .}}' > /tmp/shop-benchmark-results/resources/demo-events.jsonl 2> /tmp/shop-benchmark-results/resources/demo-events.stderr &
           echo "$!" > /tmp/shop-demo-events.pid
@@ -310,11 +316,14 @@ jobs:
           docker compose -p shop-benchmark -f compose.yml -f compose.benchmark.yml ps -aq >> /tmp/shop-diagnostic-current
           sort -u /tmp/shop-diagnostic-current -o /tmp/shop-diagnostic-current
           while read -r container; do
-            docker inspect --format '{"id":{{json .Id}},"name":{{json .Name}},"status":{{json .State.Status}},"oomKilled":{{.State.OOMKilled}},"restarts":{{.RestartCount}},"exitCode":{{.State.ExitCode}},"health":{{json .State.Health}},"started":{{json .State.StartedAt}},"finished":{{json .State.FinishedAt}},"nanoCPUs":{{.HostConfig.NanoCpus}},"cpuQuota":{{.HostConfig.CpuQuota}},"cpuPeriod":{{.HostConfig.CpuPeriod}},"memoryLimit":{{.HostConfig.Memory}}}' "$container" > "$directory/$container-state.json"
+            docker inspect --format '{"id":{{json .Id}},"name":{{json .Name}},"status":{{json .State.Status}},"oomKilled":{{.State.OOMKilled}},"restarts":{{.RestartCount}},"exitCode":{{.State.ExitCode}},"health":{{json (index .State "Health")}},"started":{{json .State.StartedAt}},"finished":{{json .State.FinishedAt}},"nanoCPUs":{{.HostConfig.NanoCpus}},"cpuQuota":{{.HostConfig.CpuQuota}},"cpuPeriod":{{.HostConfig.CpuPeriod}},"memoryLimit":{{.HostConfig.Memory}}}' "$container" > "$directory/$container-state.json"
             process=$(docker inspect --format '{{.State.Pid}}' "$container")
             if [ "$process" -gt 0 ]; then
               for metric in cpu.stat memory.events memory.current memory.peak cpu.pressure memory.pressure; do
-                sudo cat "/proc/$process/root/sys/fs/cgroup/$metric" > "$directory/$container-$metric.txt" 2>&1 || printf 'Nicht verfügbare Containerdiagnose: %s/%s\n' "$container" "$metric" >> "$directory/unavailable.txt"
+                if ! captured=$(sudo cat "/proc/$process/root/sys/fs/cgroup/$metric" 2>&1); then
+                  printf 'Nicht verfügbare Containerdiagnose: %s/%s\n' "$container" "$metric" >> "$directory/unavailable.txt"
+                fi
+                printf '%s\n' "$captured" > "$directory/$container-$metric.txt"
               done
             fi
           done < /tmp/shop-diagnostic-current
@@ -346,11 +355,14 @@ jobs:
           docker compose -p shop-benchmark -f compose.yml -f compose.benchmark.yml ps -aq >> /tmp/shop-diagnostic-current
           sort -u /tmp/shop-diagnostic-current -o /tmp/shop-diagnostic-current
           while read -r container; do
-            docker inspect --format '{"id":{{json .Id}},"name":{{json .Name}},"status":{{json .State.Status}},"oomKilled":{{.State.OOMKilled}},"restarts":{{.RestartCount}},"exitCode":{{.State.ExitCode}},"health":{{json .State.Health}},"started":{{json .State.StartedAt}},"finished":{{json .State.FinishedAt}},"nanoCPUs":{{.HostConfig.NanoCpus}},"cpuQuota":{{.HostConfig.CpuQuota}},"cpuPeriod":{{.HostConfig.CpuPeriod}},"memoryLimit":{{.HostConfig.Memory}}}' "$container" > "$directory/$container-state.json"
+            docker inspect --format '{"id":{{json .Id}},"name":{{json .Name}},"status":{{json .State.Status}},"oomKilled":{{.State.OOMKilled}},"restarts":{{.RestartCount}},"exitCode":{{.State.ExitCode}},"health":{{json (index .State "Health")}},"started":{{json .State.StartedAt}},"finished":{{json .State.FinishedAt}},"nanoCPUs":{{.HostConfig.NanoCpus}},"cpuQuota":{{.HostConfig.CpuQuota}},"cpuPeriod":{{.HostConfig.CpuPeriod}},"memoryLimit":{{.HostConfig.Memory}}}' "$container" > "$directory/$container-state.json"
             process=$(docker inspect --format '{{.State.Pid}}' "$container")
             if [ "$process" -gt 0 ]; then
               for metric in cpu.stat memory.events memory.current memory.peak cpu.pressure memory.pressure; do
-                sudo cat "/proc/$process/root/sys/fs/cgroup/$metric" > "$directory/$container-$metric.txt" 2>&1 || printf 'Nicht verfügbare Containerdiagnose: %s/%s\n' "$container" "$metric" >> "$directory/unavailable.txt"
+                if ! captured=$(sudo cat "/proc/$process/root/sys/fs/cgroup/$metric" 2>&1); then
+                  printf 'Nicht verfügbare Containerdiagnose: %s/%s\n' "$container" "$metric" >> "$directory/unavailable.txt"
+                fi
+                printf '%s\n' "$captured" > "$directory/$container-$metric.txt"
               done
             fi
           done < /tmp/shop-diagnostic-current
