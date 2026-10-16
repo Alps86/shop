@@ -23,6 +23,7 @@ func (current *world) register(ctx *godog.ScenarioContext) {
 	ctx.After(current.close)
 	ctx.Step(`^der dokumentierte Messdatensatz ist geladen$`, current.open)
 	ctx.Step(`^die vereinbarten Anzeigerouten gemessen werden$`, current.measure)
+	ctx.Step(`^die direkten Go-Grenzen getrennt gemessen werden$`, current.direct)
 	ctx.Step(`^muss der Messbericht die Aussagegrenze enthalten$`, current.observe)
 }
 

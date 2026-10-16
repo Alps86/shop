@@ -71,26 +71,32 @@ func (current *world) curlConfig(path, cookie, directory string, count int) stri
 }
 
 func (current *world) readCold(route, directory string, count int, output []byte) ([]sample, error) {
-	_, _, contains := current.route(route)
+	if err := os.WriteFile(current.reportPath(route, "cold", ".jsonl"), output, 0600); err != nil {
+		return nil, err
+	}
+
 	samples, err := curlSamples(output)
 	if err != nil {
 		return nil, err
 	}
 
+	return samples, current.verifyColdBodies(route, directory, count)
+}
+
+func (current *world) verifyColdBodies(route, directory string, count int) error {
+	_, _, contains := current.route(route)
 	for index := range count {
 		body, err := readBody(directory, strconv.Itoa(index))
 		if err != nil {
-			return nil, err
+			return err
 		}
 
 		if err := validHTML(200, string(body), contains); err != nil {
-			return nil, err
+			return err
 		}
 	}
 
-	err = os.WriteFile(current.reportPath(route, "cold", ".jsonl"), output, 0600)
-
-	return samples, err
+	return nil
 }
 
 func curlSamples(output []byte) ([]sample, error) {

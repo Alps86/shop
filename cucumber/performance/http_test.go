@@ -9,21 +9,30 @@ import (
 	"time"
 )
 
-func (current *world) probe(path, cookie, contains string) error {
-	request, err := http.NewRequest(http.MethodGet, current.public+path, nil)
+func (current *world) probe(origin, path, cookie, contains string) error {
+	response, err := readResponse(origin, path, cookie)
 	if err != nil {
 		return err
+	}
+
+	return validHTML(response.status, response.body, contains)
+}
+
+func readResponse(origin, path, cookie string) (probeResponse, error) {
+	request, err := http.NewRequest(http.MethodGet, origin+path, nil)
+	if err != nil {
+		return probeResponse{}, err
 	}
 
 	request.Header.Set("Cookie", cookie)
 	response, err := (&http.Client{Timeout: 10 * time.Second}).Do(request)
 	if err != nil {
-		return err
+		return probeResponse{}, err
 	}
 
 	body, readError := io.ReadAll(response.Body)
 
-	return errors.Join(readError, response.Body.Close(), validHTML(response.StatusCode, string(body), contains))
+	return probeResponse{status: response.StatusCode, header: response.Header, body: string(body)}, errors.Join(readError, response.Body.Close())
 }
 
 func validHTML(status int, body, contains string) error {

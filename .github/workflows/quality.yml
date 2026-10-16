@@ -10,6 +10,7 @@ env:
   SHOP_BASE_SHA: ${{ github.event.pull_request.base.sha || 'origin/main' }}
   SHOP_PERFORMANCE_PUBLIC_URL: http://127.0.0.1:28080
   SHOP_PERFORMANCE_BACKEND_URL: http://127.0.0.1:28081
+  SHOP_PERFORMANCE_INTERNAL_URL: http://127.0.0.1:28090
   SHOP_PERFORMANCE_POSTGRES_DSN: postgres://shop:local-demo-only@127.0.0.1:25432/shop?sslmode=disable
   SHOP_PERFORMANCE_SCHEMA: demo_benchmark
   SHOP_PERFORMANCE_TEMPORAL_ADDRESS: 127.0.0.1:27233
@@ -100,9 +101,19 @@ jobs:
       - name: Standardlastwerkzeug installieren
         run: GOBIN=/tmp/shop-standard-tools go install github.com/rakyll/hey@v0.1.5
       - name: Tatsächliche Compose-Laufzeit starten
-        run: docker compose up --detach --build --wait --wait-timeout 180
+        run: |
+          mkdir -p /tmp/shop-benchmark-results
+          started=$SECONDS
+          docker compose up --detach --build --wait --wait-timeout 180
+          elapsed=$((SECONDS - started))
+          printf '{"boundary":"compose-command-start-to-all-services-healthy","seconds":%s,"resolutionSeconds":1,"includes":"image pull, build, content generation, seed import, health waits","freshProjectVolumes":true,"dataset":"4 Modelle / 8 Varianten","ordersAtStartup":0,"buildCache":"first build","fullPageRequestMeasurement":false}\n' "$elapsed" > /tmp/shop-benchmark-results/demo-cold-start.json
       - name: Isoliertes synthetisches Referenzprofil mit gleichem Build starten
-        run: docker compose -p shop-benchmark -f compose.yml -f compose.benchmark.yml up --detach --build --wait --wait-timeout 180
+        run: |
+          mkdir -p /tmp/shop-benchmark-results
+          started=$SECONDS
+          docker compose -p shop-benchmark -f compose.yml -f compose.benchmark.yml up --detach --build --wait --wait-timeout 180
+          elapsed=$((SECONDS - started))
+          printf '{"boundary":"compose-command-start-to-all-services-healthy","seconds":%s,"resolutionSeconds":1,"includes":"image pull, build, content generation, seed import, health waits","freshProjectVolumes":true,"dataset":"30 synthetische Modelle / 90 Varianten","ordersAtStartup":0,"buildCache":"shared image build cache from demo","fullPageRequestMeasurement":false}\n' "$elapsed" > /tmp/shop-benchmark-results/benchmark-cold-start.json
       - name: Tatsächlichen Dienstrestart prüfen
         run: |
           docker compose restart shop
@@ -132,7 +143,10 @@ jobs:
           go run github.com/vladopajic/go-test-coverage/v2@v2.19.0 --config=.testcoverage.yml
       - name: Tatsächliche vollständige Lastwerte und Aussagegrenzen ausgeben
         if: always()
-        run: cat /tmp/shop-benchmark-results/measurement.json
+        run: |
+          cat /tmp/shop-benchmark-results/demo-cold-start.json
+          cat /tmp/shop-benchmark-results/benchmark-cold-start.json
+          cat /tmp/shop-benchmark-results/measurement.json
       - name: Compose-Ausgabe sichern
         if: always()
         run: docker compose logs --no-color
@@ -175,9 +189,19 @@ jobs:
       - name: Standardlastwerkzeug installieren
         run: GOBIN=/tmp/shop-standard-tools go install github.com/rakyll/hey@v0.1.5
       - name: Tatsächliche Compose-Laufzeit starten
-        run: docker compose up --detach --build --wait --wait-timeout 180
+        run: |
+          mkdir -p /tmp/shop-benchmark-results
+          started=$SECONDS
+          docker compose up --detach --build --wait --wait-timeout 180
+          elapsed=$((SECONDS - started))
+          printf '{"boundary":"compose-command-start-to-all-services-healthy","seconds":%s,"resolutionSeconds":1,"includes":"image pull, build, content generation, seed import, health waits","freshProjectVolumes":true,"dataset":"4 Modelle / 8 Varianten","ordersAtStartup":0,"buildCache":"first build","fullPageRequestMeasurement":false}\n' "$elapsed" > /tmp/shop-benchmark-results/demo-cold-start.json
       - name: Isoliertes synthetisches Referenzprofil mit gleichem Build starten
-        run: docker compose -p shop-benchmark -f compose.yml -f compose.benchmark.yml up --detach --build --wait --wait-timeout 180
+        run: |
+          mkdir -p /tmp/shop-benchmark-results
+          started=$SECONDS
+          docker compose -p shop-benchmark -f compose.yml -f compose.benchmark.yml up --detach --build --wait --wait-timeout 180
+          elapsed=$((SECONDS - started))
+          printf '{"boundary":"compose-command-start-to-all-services-healthy","seconds":%s,"resolutionSeconds":1,"includes":"image pull, build, content generation, seed import, health waits","freshProjectVolumes":true,"dataset":"30 synthetische Modelle / 90 Varianten","ordersAtStartup":0,"buildCache":"shared image build cache from demo","fullPageRequestMeasurement":false}\n' "$elapsed" > /tmp/shop-benchmark-results/benchmark-cold-start.json
       - name: Echte Standardtestanbindung mit Race-Erkennung
         run: |
           packages="$(go list -f '{{if or .GoFiles .CgoFiles}}{{.ImportPath}}{{end}}' ./... | sed '/^$/d')"
@@ -189,7 +213,10 @@ jobs:
           go test -p 1 -race ./... -count=1
       - name: Tatsächliche vollständige Lastwerte und Aussagegrenzen ausgeben
         if: always()
-        run: cat /tmp/shop-benchmark-results/measurement.json
+        run: |
+          cat /tmp/shop-benchmark-results/demo-cold-start.json
+          cat /tmp/shop-benchmark-results/benchmark-cold-start.json
+          cat /tmp/shop-benchmark-results/measurement.json
       - name: Compose-Ausgabe sichern
         if: always()
         run: docker compose logs --no-color

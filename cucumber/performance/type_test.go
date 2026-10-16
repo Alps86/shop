@@ -5,6 +5,7 @@ import (
 	"github.com/Alps86/shop/internal/application"
 	"github.com/Alps86/shop/internal/domain/value"
 	"go.temporal.io/sdk/client"
+	"net/http"
 )
 
 type world struct {
@@ -15,11 +16,16 @@ type world struct {
 	order            value.OrderID
 	cookie           string
 	public           string
+	internal         string
+	backendReports   []measurement
+	fragmentReports  []measurement
 	directory        string
 	data             map[string]string
 	reports          []measurement
 	expectedRequests int
 	profile          measurementProfile
+	failure          string
+	diagnostics      []failureProbe
 }
 
 type measurement struct {
@@ -31,6 +37,7 @@ type measurement struct {
 	P95Milliseconds       float64
 	P99Milliseconds       float64
 	ErrorRate             float64
+	StatusCounts          map[int]int
 	NewConnections        int
 	CacheHits             uint64
 	CacheMisses           uint64
@@ -39,6 +46,8 @@ type measurement struct {
 	BrowserLCPMeasured    bool
 	TargetP95Milliseconds float64
 	Goal                  string
+	Representation        string
+	ComposedHTMLMeasured  bool
 }
 
 type sample struct {
@@ -77,4 +86,32 @@ type measurementProfile struct {
 	WarmupPerRoute           int
 	Concurrency              int
 	MutatingCommandsIncluded bool
+}
+
+type probeResponse struct {
+	status int
+	header http.Header
+	body   string
+}
+
+type directRequest struct {
+	cookie         string
+	data           map[string]string
+	representation string
+}
+
+type failureProbe struct {
+	Route          string
+	Boundary       string
+	Note           string
+	Status         int
+	BodyBytes      int
+	BodySHA256     string
+	DegradedHTML   bool
+	RemainingESI   bool
+	RemainingSSI   bool
+	TransportError string
+	CacheControl   string
+	ContentType    string
+	RetryAfter     string
 }

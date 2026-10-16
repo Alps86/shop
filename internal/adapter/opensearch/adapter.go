@@ -38,7 +38,7 @@ func (adapter Adapter) Search(ctx context.Context, query application.SearchQuery
 }
 
 func (adapter Adapter) performSearch(ctx context.Context, query application.SearchQuery, body JSON) (application.SearchResult, error) {
-	reply, err := adapter.send(ctx, http.MethodPost, "/"+adapter.config.Index+"/_search", body)
+	reply, err := adapter.send(ctx, http.MethodPost, "/"+adapter.config.Index+"/_search?request_cache=true", body)
 	if err != nil {
 		return application.SearchResult{}, err
 	}

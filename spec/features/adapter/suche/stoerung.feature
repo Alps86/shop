@@ -224,3 +224,27 @@ Funktionalität: Ehrliche Suchdienstfehler
       | Client |
       | default |
       | custom |
+
+  Szenario: Wiederholte vollständige Suchanfragen nutzen den echten Indexrequestcache
+    Angenommen der echte Suchantwortkörper zur Transportprüfung beobachtet wird
+      | CaptureResponse |
+      | true |
+    Wenn die echte öffentliche Suche abgefragt wird
+      | Text | Page | Sort |
+      | Alpha | 1 | relevance |
+    Dann liefert die Suchverbindung
+      | Code | TotalProducts |
+      | OK | 1 |
+    Angenommen der echte Suchindex seinen Requestcachezähler vormerkt
+    Wenn die identische öffentliche Suche mehrfach ausgeführt wird
+      | Attempts |
+      | 3 |
+    Dann der Suchindex echte Requestcachetreffer meldet
+      | MinimumHitDelta |
+      | 2 |
+    Und liefert die Suchverbindung
+      | Code | TotalProducts |
+      | OK | 1 |
+    Und die echte Suchantwort nur benötigte Rootdaten und die vollständige Variantkarte enthält
+      | RootFields | ProductID |
+      | 1 | p-a |

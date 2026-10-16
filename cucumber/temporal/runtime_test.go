@@ -81,7 +81,7 @@ func (store *cartStore) Expire(_ context.Context, _ value.CartID, now time.Time)
 	return store.cart, nil
 }
 
-func (current *world) restart() error {
+func (current *world) restart(table *godog.Table) error {
 	if err := current.resumeCart(); err != nil {
 		return err
 	}
@@ -92,7 +92,28 @@ func (current *world) restart() error {
 		return err
 	}
 
+	if err := current.awaitCartWorker(table); err != nil {
+		return err
+	}
+
 	return current.resumeCart()
+}
+
+func (current *world) awaitCartWorker(table *godog.Table) error {
+	timeout, err := time.ParseDuration(current.rows(table)[0]["ReadinessTimeout"])
+	if err != nil {
+		return err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	// Start spawns pollers; only a successful query proves cold history replay.
+	encoded, err := current.connection.QueryWorkflow(ctx, "cart/"+current.id, current.runID, "ProcessStatus")
+	if err != nil {
+		return err
+	}
+
+	return encoded.Get(&current.processStatus)
 }
 
 func (current *world) resumeCart() error {
@@ -168,7 +189,7 @@ func (current *world) statusObserved(table *godog.Table, status temporal.Status)
 
 func (current *world) registerRuntime(ctx *godog.ScenarioContext) {
 	ctx.Step(`^ein Worker den gespeicherten Cart übernimmt$`, current.prepare)
-	ctx.Step(`^der Worker vollständig neu startet$`, current.restart)
+	ctx.Step(`^der Worker vollständig neu startet und seine History wieder bereitsteht$`, current.restart)
 	ctx.Step(`^ein echtes Workflowupdate gesendet wird$`, current.update)
 	ctx.Step(`^antwortet der weitergeführte Prozess$`, current.observed)
 }

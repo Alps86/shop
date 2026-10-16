@@ -9,7 +9,7 @@ import (
 )
 
 func (current *world) warm(route, path, cookie string, data map[string]string) error {
-	if _, err := current.hey(path, cookie, data["WarmupPerRoute"]); err != nil {
+	if _, err := current.hey(current.public, path, cookie, data["WarmupPerRoute"]); err != nil {
 		return err
 	}
 
@@ -22,7 +22,7 @@ func (current *world) warmSamples(route, path, cookie string) error {
 		return err
 	}
 
-	samples, err := current.heyResult(route, path, cookie)
+	samples, err := current.heyResult(current.public, route, path, cookie)
 	if err != nil {
 		return err
 	}
@@ -35,8 +35,8 @@ func (current *world) warmSamples(route, path, cookie string) error {
 	return current.record(route, "warm", samples, after.subtract(before))
 }
 
-func (current *world) heyResult(route, path, cookie string) ([]sample, error) {
-	output, err := current.hey(path, cookie, strconv.Itoa(current.expectedRequests))
+func (current *world) heyResult(origin, route, path, cookie string) ([]sample, error) {
+	output, err := current.hey(origin, path, cookie, strconv.Itoa(current.expectedRequests))
 	if err != nil {
 		return nil, err
 	}
@@ -48,13 +48,13 @@ func (current *world) heyResult(route, path, cookie string) ([]sample, error) {
 	return heySamples(string(output))
 }
 
-func (current *world) hey(path, cookie, count string) ([]byte, error) {
+func (current *world) hey(origin, path, cookie, count string) ([]byte, error) {
 	arguments := []string{"-n", count, "-c", current.data["Concurrency"], "-o", "csv", "-disable-redirects", "-disable-compression", "-t", "15"}
 	if cookie != "" {
 		arguments = append(arguments, "-H", "Cookie: "+cookie)
 	}
 
-	arguments = append(arguments, current.public+path)
+	arguments = append(arguments, origin+path)
 	command := exec.Command("hey")
 	configureTool(command, "SHOP_HEY")
 	command.Args = append(command.Args, arguments...)

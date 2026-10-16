@@ -93,13 +93,14 @@ Der kleine quellengeprüfte Vorführkatalog und das ausdrücklich synthetische R
 docker compose -p shop-benchmark -f compose.yml -f compose.benchmark.yml up --detach --build --wait --wait-timeout 180
 ```
 
-Seine öffentlichen Ports sind 28080/28081, PostgreSQL25432, Temporal27233/UI28233 und OpenSearch29200. Für den unabhängigen Messlauf:
+Seine öffentlichen Ports sind 28080/28081; der direkte Go-Origin für getrennte Diagnosemessungen liegt auf Loopback-Port28090. Weitere Ports sind PostgreSQL25432, Temporal27233/UI28233 und OpenSearch29200. Für den unabhängigen Messlauf:
 
 ```sh
 GOBIN=/tmp/shop-standard-tools go install github.com/rakyll/hey@v0.1.5
 export SHOP_HEY=/tmp/shop-standard-tools/hey
 export SHOP_PERFORMANCE_PUBLIC_URL=http://127.0.0.1:28080
 export SHOP_PERFORMANCE_BACKEND_URL=http://127.0.0.1:28081
+export SHOP_PERFORMANCE_INTERNAL_URL=http://127.0.0.1:28090
 export SHOP_PERFORMANCE_POSTGRES_DSN='postgres://shop:local-demo-only@127.0.0.1:25432/shop?sslmode=disable'
 export SHOP_PERFORMANCE_SCHEMA=demo_benchmark
 export SHOP_PERFORMANCE_TEMPORAL_ADDRESS=127.0.0.1:27233
@@ -115,8 +116,10 @@ go test ./cucumber/performance -count=1
 
 Die private Zustandsdatei gehört genau zu diesem Stack; nach einem Volume-Reset auch diese Datei entfernen. Die beiden Compose-Parameterdateien und derselbe Projektname gelten ebenfalls für Stop/Reset des Benchmarkstacks.
 
- Die Performance-Cucumber-Suite benötigt zusätzlich `hey` v0.1.5 und `curl` mit Parallelunterstützung. Sie misst das vollständige zusammengesetzte HTML mit Parallelität10, 100 Warmup/1000 warme und 100 kalte Anfragen pro Route. Frische Host-Cachepartitionen pro kalter Anfrage sowie echte Hit-/Miss-/Coalescing-Zähler unterscheiden kalte Fragmente von bloßer Batchleerung; private no-store-Seiten haben keinen gemeinsamen Kaltcache. Ein privater Fixturezustand mit Modus0600 hält die Testgast-Capabilities außerhalb der Messberichte. Vollständige Testumgebung und tatsächliche Berichte werden in der Integrationsabnahme ausgewiesen.
+Die Performance-Cucumber-Suite benötigt zusätzlich `hey` v0.1.5 und `curl` mit Parallelunterstützung. Sie misst das vollständige zusammengesetzte HTML mit Parallelität10, 100 Warmup/1000 warme und 100 kalte Anfragen pro Route. Frische Host-Cachepartitionen pro kalter Anfrage sowie echte Hit-/Miss-/Coalescing-Zähler unterscheiden kalte Fragmente von bloßer Batchleerung; private no-store-Seiten haben keinen gemeinsamen Kaltcache. Das kalte Profil leert ausschließlich den Proxycache pro Anfrage; Dienste, Index und OpenSearch-Requestcache bleiben bereit. Der Suchadapter nutzt den nach Indexrefresh invalidierten Standardrequestcache ausdrücklich auch für vollständige Trefferseiten. Ein privater Fixturezustand mit Modus0600 hält die Testgast-Capabilities außerhalb der Messberichte. Vollständige Testumgebung und tatsächliche Berichte werden in der Integrationsabnahme ausgewiesen.
 
 HTTPzeiten sind kein Browser-LCP-Beleg. Abweichungen vom p95-Ziel unter100ms und ungemessener Browseraufbau bleiben ausdrücklich sichtbar. Der kurze Browser-Smoke ersetzt keine Lastmessung und keine Browsermatrix. Mutierende Kauf-/Zahlungs-/Liefercommands zählen nicht zur Anzeigelatenz.
 
 **Aussagegrenze:** Native Packageermittlung und Standard-Coverageprüfung erfassen den aktuellen buildfähigen Go-Umfang. Sie sind kein unabhängiger AST-Blockvergleich aller Repositoryquellen oder aller Plattform-/Build-Tag-Kombinationen und kein automatischer Beweis vollständiger Slicezuordnung. Solche zusätzliche Härtung ist offen. Review prüft deshalb insbesondere neue Quellen, Build-Tags, zusätzliche Module und unzulässige `spec-only`-Markierungen. Es gibt keine frei konfigurierbare Bootstrap-Abschaltung.
+
+Die acht direkten Go-Antwortzeiten und vier echten Fragmentzeiten werden zusätzlich getrennt erfasst. Neutrale Kategorie- und Produktantworten am Go-Origin delegieren mit leerem Body und `X-Accel-Redirect`; deren Antwortzeit ist keine HTML-Seitenzeit. Diese Diagnosewerte ersetzen keine der 16 vollständigen HTML-Messungen. Die CI protokolliert außerdem den frischen Start beider Compose-Projekte bis zu gesunden Diensten in eigenen JSON-Berichten, einschließlich Imageabruf, Build, Inhaltsgenerierung und Seedimport. Der zweite Stack nutzt dabei den Buildcache des ersten. Bereits laufende native Infrastruktur belegt keinen vollständigen kalten Dienststart. Browser-LCP und eine durchgängig erreichte Vollseitenzeit unter100ms bleiben damit gesondert zu bewerten.

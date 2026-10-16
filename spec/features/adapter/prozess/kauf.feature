@@ -16,7 +16,9 @@ Funktionalität: Echter Gastkauf mit PostgreSQL und Temporal
       | add-a | add | PHONE | 1 | | | | | | | |
       | address-a | address | | 0 | Demo Gast | Testweg 1 | 12345 | Teststadt | DE | | |
       | payment-a | payment | | 0 | | | | | | | <Payment> |
-    Und der Worker vollständig neu startet
+    Und der Worker vollständig neu startet und seine History wieder bereitsteht
+      | ReadinessTimeout |
+      | 10s |
     Und der Kauf über den Workflow verbindlich abgeschlossen wird
       | ConfirmCommandID | PlaceCommandID |
       | confirm-a | place-a |
@@ -135,7 +137,9 @@ Funktionalität: Echter Gastkauf mit PostgreSQL und Temporal
     Wenn ein neuer Regelstand nur für neue Carts veröffentlicht wird
       | Fixture | PublishedRules | CommandID |
       | spec/fixtures/runtime/katalog.json | demo-v2 | start-new |
-    Und der Worker vollständig neu startet
+    Und der Worker vollständig neu startet und seine History wieder bereitsteht
+      | ReadinessTimeout |
+      | 10s |
     Dann bestehende und neue Prozesse ihre jeweiligen Versionen behalten
       | ExistingRules | NewRules |
       | demo-v1 | demo-v2 |

@@ -468,12 +468,16 @@ Funktionalität: Reale Demo und ehrliche Performanceabnahme
   @demo-performance
   Szenario: Tatsächliche HTTPlast hält Messumfang und Browsergrenze getrennt
     Angenommen der dokumentierte Messdatensatz ist geladen
-      | Dataset | Products | Variants | Categories | Profiles | ProfileCodes | Orders | Concurrency | CounterFlushMilliseconds | Network | MinimumCPU | MinimumRAMGiB | Namespace | SKU | Recipient | Street | PostalCode | City | Country | Shipping | Payment | CategoryPath | ListingContains | SearchPath | ProductPath |
-      | benchmark-synthetic-v1 | 30 | 90 | 5 | 4 | neutral,mobile,home,coffee | 100 | 10 | 1500 | loopback | 4 | 8 | default | BENCH-01-A | Synthetischer Messgast | Messweg 1 | 10115 | Berlin | DE | standard | invoice | /de-DE/kategorie/benchmark-mobile--mobile | bench-product-01 | /de-DE/suche?q=Synthetischer | /de-DE/produkt/synthetischer-messartikel-01--bench-product-01?sku=BENCH-01-A |
+      | Dataset | Products | Variants | Categories | Profiles | ProfileCodes | Orders | Concurrency | CounterFlushMilliseconds | Network | MinimumCPU | MinimumRAMGiB | Namespace | SKU | Recipient | Street | PostalCode | City | Country | Shipping | Payment | CategoryPath | ListingContains | SearchPath | ProductPath | CategoryDelegation | ProductDelegation |
+      | benchmark-synthetic-v1 | 30 | 90 | 5 | 4 | neutral,mobile,home,coffee | 100 | 10 | 1500 | loopback | 4 | 8 | default | BENCH-01-A | Synthetischer Messgast | Messweg 1 | 10115 | Berlin | DE | standard | invoice | /de-DE/kategorie/benchmark-mobile--mobile | bench-product-01 | /de-DE/suche?q=Synthetischer | /de-DE/produkt/synthetischer-messartikel-01--bench-product-01?sku=BENCH-01-A | /_frame/category/mobile/1/index.html? | /_frame/product/bench-product-01/1/index.html?sku=BENCH-01-A |
     Wenn die vereinbarten Anzeigerouten gemessen werden
       | Boundary | Cache | WarmupPerRoute | RequestsPerRoute | Routes |
       | requestStart-to-last-composed-HTML-byte | warm | 100 | 1000 | home,category,search,personalized-search,product,cart,checkout,order |
       | requestStart-to-last-composed-HTML-byte | cold-cache-services-ready | 0 | 100 | home,category,search,personalized-search,product,cart,checkout,order |
+    Und die direkten Go-Grenzen getrennt gemessen werden
+      | Boundary | Cache | WarmupPerRoute | RequestsPerRoute | Routes | ExpectedMeasurements |
+      | requestStart-to-last-Go-response-byte | direct-services-ready | 100 | 1000 | home,category,search,personalized-search,product,cart,checkout,order | 8 |
+      | requestStart-to-last-Go-fragment-byte | direct-services-ready | 100 | 1000 | home,category,search,product | 4 |
     Dann muss der Messbericht die Aussagegrenze enthalten
-      | TargetP95Milliseconds | RequiredStatistics | RequiredEnvironment | ProvesBrowserLCP | MutatingCommandsIncluded | Measurements |
-      | 100 | p50,p95,p99,errorRate | CPU,RAM,OS,images,dataset,TCP,compression | false | false | 16 |
+      | TargetP95Milliseconds | RequiredStatistics | RequiredEnvironment | ProvesBrowserLCP | MutatingCommandsIncluded | Measurements | BackendMeasurements | FragmentMeasurements |
+      | 100 | p50,p95,p99,errorRate | CPU,RAM,OS,images,dataset,TCP,compression | false | false | 16 | 8 | 4 |

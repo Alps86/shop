@@ -1,6 +1,7 @@
 package opensearch_test
 
 import (
+	"encoding/json"
 	"github.com/Alps86/shop/internal/adapter/event"
 	"github.com/Alps86/shop/internal/adapter/opensearch"
 	"github.com/Alps86/shop/internal/application"
@@ -20,10 +21,23 @@ type delayedProxy struct {
 }
 
 type captureTransport struct {
-	payload []byte
+	observeResponse bool
+	payload         []byte
+	response        []byte
+}
+
+type cacheStatistics struct {
+	All struct {
+		Primaries struct {
+			RequestCache struct {
+				Hits int64 `json:"hit_count"`
+			} `json:"request_cache"`
+		} `json:"primaries"`
+	} `json:"_all"`
 }
 
 type world struct {
+	cacheBefore   int64
 	capture       *captureTransport
 	requestedText string
 	adapter       opensearch.Adapter
@@ -45,4 +59,10 @@ type world struct {
 	faultServer   *httptest.Server
 	cleanupConfig opensearch.Config
 	elapsed       time.Duration
+}
+
+type sourceResponse struct {
+	Hits struct {
+		Hits []map[string]json.RawMessage `json:"hits"`
+	} `json:"hits"`
 }

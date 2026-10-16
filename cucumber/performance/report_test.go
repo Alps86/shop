@@ -2,6 +2,7 @@ package performance_test
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/cucumber/godog"
 	"math"
@@ -25,13 +26,10 @@ func (current *world) record(route, cache string, samples []sample, delta counte
 
 func summarize(samples []sample) measurement {
 	times := []float64{}
-	report := measurement{Requests: len(samples), CacheApplicability: "public-fragments", BrowserLCPMeasured: false, TargetP95Milliseconds: 100, Goal: "unmet"}
+	report := measurement{Requests: len(samples), CacheApplicability: "public-fragments", BrowserLCPMeasured: false, TargetP95Milliseconds: 100, Goal: "unmet", StatusCounts: map[int]int{}}
 	for _, sample := range samples {
 		times = append(times, sample.seconds*1000)
-		report.NewConnections += sample.connections
-		if sample.status != 200 {
-			report.ErrorRate++
-		}
+		report.observeSample(sample)
 	}
 
 	sort.Float64s(times)
@@ -39,7 +37,17 @@ func summarize(samples []sample) measurement {
 	report.P50Milliseconds = percentile(times, 0.50)
 	report.P95Milliseconds = percentile(times, 0.95)
 	report.P99Milliseconds = percentile(times, 0.99)
-	if report.P95Milliseconds < 100 {
+
+	return report.withGoal()
+}
+
+func (report measurement) withGoal() measurement {
+	if report.ErrorRate != 0 {
+		report.Goal = "ineligible; measured HTTP errors"
+		return report
+	}
+
+	if report.P95Milliseconds < report.TargetP95Milliseconds {
 		report.Goal = "met-in-measured-profile"
 	}
 
@@ -103,7 +111,7 @@ func (current *world) writeReport() error {
 }
 
 func (current *world) environmentReport() (map[string]any, error) {
-	environment := map[string]any{"CPU": runtime.NumCPU(), "OS": runtime.GOOS, "images": os.Getenv("SHOP_PERFORMANCE_IMAGES"), "dataset": current.datasetFacts(), "TCP": "hey keepalive enabled; NewConnections=-1 is unmeasured; actual curl cold num_connects per route", "compression": "disabled explicitly for hey; curl sends no Accept-Encoding", "BrowserLCPMeasured": false, "CompletePageSLAAchieved": false, "measurements": current.reports}
+	environment := map[string]any{"CPU": runtime.NumCPU(), "OS": runtime.GOOS, "images": os.Getenv("SHOP_PERFORMANCE_IMAGES"), "dataset": current.datasetFacts(), "TCP": "hey keepalive enabled; NewConnections=-1 is unmeasured; actual curl cold num_connects per route", "compression": "disabled explicitly for hey; curl sends no Accept-Encoding", "ColdBoundary": "Only Varnish frame/fragment objects are cold; PostgreSQL/OpenSearch/Temporal services stay ready; OpenSearch request cache is not reset", "BrowserLCPMeasured": false, "CompletePageSLAAchieved": false, "measurements": current.reports, "BackendMeasurements": current.backendReports, "FragmentMeasurements": current.fragmentReports, "Failure": current.failure, "PostFailureProbes": current.diagnostics}
 	memory, err := memoryKiB()
 	if err != nil {
 		return nil, err
@@ -130,7 +138,7 @@ func (current *world) observe(table *godog.Table) error {
 		return fmt.Errorf("unverändertes Messziel benötigt 100 ms")
 	}
 
-	expected := map[string]string{"RequiredStatistics": "p50,p95,p99,errorRate", "RequiredEnvironment": "CPU,RAM,OS,images,dataset,TCP,compression", "Measurements": fmt.Sprint(len(current.reports))}
+	expected := map[string]string{"RequiredStatistics": "p50,p95,p99,errorRate", "RequiredEnvironment": "CPU,RAM,OS,images,dataset,TCP,compression", "Measurements": fmt.Sprint(len(current.reports)), "BackendMeasurements": fmt.Sprint(len(current.backendReports)), "FragmentMeasurements": fmt.Sprint(len(current.fragmentReports))}
 	for key, actual := range expected {
 		if data[key] != actual {
 			return fmt.Errorf("Messbericht %s=%s statt %s", key, actual, data[key])
@@ -159,6 +167,7 @@ func (current *world) datasetFacts() map[string]string {
 
 func (current *world) decorate(report measurement, route, cache string, delta counters) measurement {
 	report.measurementProfile = current.profile
+	report.ComposedHTMLMeasured = true
 	report.Route = route
 	report.Cache = cache
 	report.CacheHits = delta["MAIN.cache_hit"]
@@ -185,4 +194,20 @@ func (current *world) verifyWarm(report measurement) error {
 	}
 
 	return nil
+}
+
+func (report *measurement) observeSample(sample sample) {
+	report.NewConnections += sample.connections
+	report.StatusCounts[sample.status]++
+	if sample.status != 200 {
+		report.ErrorRate++
+	}
+}
+
+func (current *world) finishReport(cause error) error {
+	if cause != nil {
+		current.failure = cause.Error()
+	}
+
+	return errors.Join(cause, current.writeReport())
 }

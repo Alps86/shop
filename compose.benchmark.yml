@@ -17,7 +17,7 @@ services:
       - ./spec/fixtures/demo/benchmark.json:/demo/katalog.json:ro
   shop:
     environment: *benchmark-environment
-    ports: !override ["127.0.0.1:28081:8081"]
+    ports: !override ["127.0.0.1:28081:8081", "127.0.0.1:28090:8080"]
     volumes:
       - ./spec/fixtures/demo/benchmark.json:/demo/katalog.json:ro
   varnish:

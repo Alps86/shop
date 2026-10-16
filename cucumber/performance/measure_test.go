@@ -9,10 +9,14 @@ import (
 	"strings"
 )
 
-func (current *world) measure(table *godog.Table) error {
+func (current *world) measure(table *godog.Table) (err error) {
 	if err := os.MkdirAll(current.directory, 0750); err != nil {
 		return err
 	}
+
+	defer func() {
+		err = current.finishReport(err)
+	}()
 
 	for _, data := range read(table) {
 		if err := current.loadProfile(data); err != nil {
@@ -24,7 +28,7 @@ func (current *world) measure(table *godog.Table) error {
 		}
 	}
 
-	return current.writeReport()
+	return nil
 }
 
 func (current *world) measureRoute(route string, data map[string]string) error {
@@ -33,7 +37,7 @@ func (current *world) measureRoute(route string, data map[string]string) error {
 		return fmt.Errorf("unbekannte Messroute %s", route)
 	}
 
-	if err := current.probe(endpoint, cookie, contains); err != nil {
+	if err := current.probe(current.public, endpoint, cookie, contains); err != nil {
 		return fmt.Errorf("Inhaltsprobe %s: %w", route, err)
 	}
 
@@ -59,6 +63,7 @@ func (current *world) reportPath(route, cache, suffix string) string {
 func (current *world) measureRoutes(data map[string]string) error {
 	for _, route := range strings.Split(data["Routes"], ",") {
 		if err := current.measureRoute(route, data); err != nil {
+			current.diagnoseFailure(route, data["Boundary"])
 			return fmt.Errorf("Messroute %s/%s: %w", route, data["Cache"], err)
 		}
 	}
@@ -67,11 +72,11 @@ func (current *world) measureRoutes(data map[string]string) error {
 }
 
 func (current *world) loadProfile(data map[string]string) error {
-	if data["Boundary"] != "requestStart-to-last-composed-HTML-byte" {
+	if !map[string]bool{"requestStart-to-last-composed-HTML-byte": true, "requestStart-to-last-Go-response-byte": true, "requestStart-to-last-Go-fragment-byte": true}[data["Boundary"]] {
 		return fmt.Errorf("unbekannte Messgrenze %s", data["Boundary"])
 	}
 
-	if !map[string]bool{"warm": true, "cold-cache-services-ready": true}[data["Cache"]] {
+	if !map[string]bool{"warm": true, "cold-cache-services-ready": true, "direct-services-ready": true}[data["Cache"]] {
 		return fmt.Errorf("unbekanntes Cacheprofil %s", data["Cache"])
 	}
 
