@@ -2,7 +2,6 @@ package opensearch
 
 import (
 	"context"
-	"encoding/json"
 	"github.com/Alps86/shop/internal/application"
 	"github.com/Alps86/shop/internal/domain/value"
 	"net/http"
@@ -38,25 +37,26 @@ func (adapter Adapter) Search(ctx context.Context, query application.SearchQuery
 }
 
 func (adapter Adapter) performSearch(ctx context.Context, query application.SearchQuery, body JSON) (application.SearchResult, error) {
-	reply, err := adapter.send(ctx, http.MethodPost, "/"+adapter.config.Index+"/_search?request_cache=true", body)
+	request := adapter.searchRequest(body)
+	reply, err := adapter.send(ctx, http.MethodPost, request.Path, request.Payload)
 	if err != nil {
 		return application.SearchResult{}, err
 	}
 
-	return adapter.searchResult(reply, query)
+	return adapter.searchResult(reply, query, request.Multi)
 }
 
-func (adapter Adapter) searchResult(reply Reply, query application.SearchQuery) (application.SearchResult, error) {
+func (adapter Adapter) searchResult(reply Reply, query application.SearchQuery, multi bool) (application.SearchResult, error) {
 	if reply.Status != http.StatusOK {
 		return application.SearchResult{}, value.NewError("SearchUnavailable", "Search")
 	}
 
-	var response SearchResponse
-	if err := json.Unmarshal(reply.Body, &response); err != nil {
+	response, err := decodeSearchResponse(reply.Body, multi)
+	if err != nil {
 		return application.SearchResult{}, value.NewError("SearchUnavailable", "Response")
 	}
 
-	return response.result(query)
+	return response.searchResult(query, multi)
 }
 
 func (clock Clock) Now() time.Time {

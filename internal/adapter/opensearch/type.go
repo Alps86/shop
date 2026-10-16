@@ -164,3 +164,27 @@ type ProductCount struct {
 type Ranking struct {
 	Interests []sale.CategoryInterest
 }
+
+type multiSearchLines []JSON
+
+type searchRequest struct {
+	Path    string
+	Payload any
+	Multi   bool
+}
+
+type multiSearchResponse struct {
+	Responses []multiSearchPart `json:"responses"`
+}
+
+type multiSearchPart struct {
+	SearchResponse
+	Status   int             `json:"status"`
+	Error    json.RawMessage `json:"error"`
+	TimedOut bool            `json:"timed_out"`
+	Shards   searchShards    `json:"_shards"`
+}
+
+type searchShards struct {
+	Failed int `json:"failed"`
+}

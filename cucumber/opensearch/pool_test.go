@@ -38,7 +38,7 @@ func (current *world) preparePool(table *godog.Table) error {
 	}
 
 	current.adapter = opensearch.New(current.config)
-	current.query = application.SearchQuery{Text: "ph", Page: 1, Sort: "relevance", Context: current.config.Context}
+	current.query = application.SearchQuery{Text: data["Text"], Page: 1, Sort: "relevance", Context: current.config.Context}
 
 	return nil
 }

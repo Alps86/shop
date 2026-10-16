@@ -108,3 +108,5 @@ Alle hier konkretisierten Fach-/Seitenverträge sind Demo-Kern. Produktionsbacku
 - [Suchkomposition](adapter/http/suchkomposition.feature): Die Suchseite rendert einmal serverseitig mit SSI-Rahmen und erhält sofortige Fehlerstatus-, Gast-, HTMX-, SEO- und TTL-Verträge.
 
 - [Verbindungspool](adapter/suche/verbindungspool.feature): Zwei parallele Suchbatches vergleichen vollständige Antworten und echte Verbindungswiederverwendung unter Standard-, explizitem und fremdem Clienttransport.
+
+- [Multisuche](adapter/suche/multisuche.feature) hält Hauptkarten und Facetten zusammen, trennt cachefähige Completion und verwirft fehlerhafte Teilantworten vollständig.

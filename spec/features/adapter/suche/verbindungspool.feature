@@ -5,8 +5,8 @@ Funktionalität: Wiederverwendbare HTTPverbindungen bei paralleler Suche
 
   Szenariogrundriss: Zwei abgeschlossene Batches erhalten vollständige Antworten und den vorgesehenen Pool
     Angenommen ein frischer Suchorigin mit synchronisierten Antworten bereitsteht
-      | Client | Parallel | ResponseFixture | ExpectedFixture |
-      | <client> | 10 | spec/fixtures/opensearch/pool-response.json | spec/fixtures/opensearch/pool-expected.json |
+      | Text | Client | Parallel | ResponseFixture | ExpectedFixture |
+      | p | <client> | 10 | spec/fixtures/opensearch/pool-response-single.json | spec/fixtures/opensearch/pool-expected-single.json |
     Wenn zwei getrennte parallele Suchbatches ausgeführt werden
     Dann die vollständigen Suchantworten und Verbindungswiederverwendung entsprechen
       | Results | Reused | SentinelCalls |

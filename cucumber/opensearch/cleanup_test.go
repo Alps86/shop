@@ -14,6 +14,11 @@ func (current *world) cleanup(ctx context.Context, scenario *godog.Scenario, err
 		return ctx, nil
 	}
 
+	if current.msearch != nil {
+		current.msearch.server.Close()
+		return ctx, nil
+	}
+
 	return current.cleanupIndex(ctx, scenario, err)
 }
 

@@ -36,6 +36,7 @@ func (current *world) register(ctx *godog.ScenarioContext) {
 	current.cacheSteps(ctx)
 	current.attributeSteps(ctx)
 	current.poolSteps(ctx)
+	current.msearchSteps(ctx)
 	ctx.Step(`^der veröffentlichte Kategorienbaum steht bereit$`, current.categories)
 	ctx.Step(`^der Suchindex als leere echte Fixture angelegt wird$`, current.emptyIndex)
 	ctx.Step(`^die echte öffentliche Suche abgefragt wird$`, current.search)

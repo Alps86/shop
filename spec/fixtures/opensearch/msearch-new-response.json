@@ -1,0 +1,118 @@
+{
+  "responses": [
+    {
+      "hits": {
+        "total": {
+          "value": 1
+        },
+        "hits": [
+          {
+            "_source": {
+              "product_id": "p-pool"
+            },
+            "inner_hits": {
+              "chosen": {
+                "hits": {
+                  "hits": [
+                    {
+                      "_source": {
+                        "sku": "POOL",
+                        "card": {
+                          "ProductID": "p-pool",
+                          "URL": "/de-DE/produkt/testmodell--p-phone?sku=RED-256",
+                          "Name": "Model new",
+                          "SKU": "POOL",
+                          "Image": {
+                            "URL": "/assets/product.svg",
+                            "AltText": {
+                              "de-DE": "Galerie RED-256"
+                            }
+                          },
+                          "UnitPrice": {
+                            "MinorUnits": 12000,
+                            "Currency": "EUR"
+                          },
+                          "AvailableQuantity": 7,
+                          "VariantCount": 3,
+                          "TopAttributes": {
+                            "storageCapacity": {
+                              "Type": "number",
+                              "Number": {
+                                "Present": true,
+                                "Value": "256"
+                              }
+                            }
+                          },
+                          "Compliance": {
+                            "Context": {
+                              "Market": "DE",
+                              "Locale": "de-DE",
+                              "VerificationStatus": "verified"
+                            },
+                            "Notices": [
+                              {
+                                "Code": "notice",
+                                "Text": {
+                                  "de-DE": "verified-blue"
+                                },
+                                "Placement": [
+                                  "detail",
+                                  "listing"
+                                ]
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        ]
+      },
+      "aggregations": {
+        "facet_brand": {
+          "values": {
+            "buckets": [
+              {
+                "key": "Alpha",
+                "doc_count": 1
+              }
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "timed_out": false,
+      "_shards": {
+        "failed": 0
+      }
+    },
+    {
+      "status": 200,
+      "timed_out": false,
+      "_shards": {
+        "failed": 0
+      },
+      "hits": {
+        "total": {
+          "value": 999
+        },
+        "hits": []
+      },
+      "suggest": {
+        "catalog": [
+          {
+            "options": [
+              {
+                "text": "Phone old"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

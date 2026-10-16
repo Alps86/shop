@@ -80,10 +80,20 @@ func (current *world) cacheObserved(table *godog.Table) error {
 }
 
 func (current *world) sourceObserved(table *godog.Table) error {
-	var response sourceResponse
-	if err := json.Unmarshal(current.capture.response, &response); err != nil {
+	var envelope sourceEnvelope
+	if err := json.Unmarshal(current.capture.response, &envelope); err != nil {
 		return err
 	}
+
+	if len(envelope.Responses) != 2 {
+		return fmt.Errorf("zwei echte Teilantworten benötigt")
+	}
+
+	if len(envelope.Responses[1].Hits.Hits) != 0 {
+		return fmt.Errorf("Completion darf keine Roottreffer laden")
+	}
+
+	response := envelope.Responses[0]
 
 	fmt.Printf("Echte Suchantwort: %d Bytes\n", len(current.capture.response))
 

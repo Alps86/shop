@@ -12,7 +12,7 @@ import (
 )
 
 func (transport *captureTransport) RoundTrip(request *http.Request) (*http.Response, error) {
-	if strings.HasSuffix(request.URL.Path, "/_search") {
+	if strings.HasSuffix(request.URL.Path, "search") {
 		payload, err := io.ReadAll(request.Body)
 		if err != nil {
 			return nil, err
@@ -66,7 +66,7 @@ func (transport *captureTransport) forward(request *http.Request) (*http.Respons
 	payload, readError := io.ReadAll(response.Body)
 	closeError := response.Body.Close()
 	response.Body = io.NopCloser(bytes.NewReader(payload))
-	if strings.HasSuffix(request.URL.Path, "/_search") {
+	if strings.HasSuffix(request.URL.Path, "search") {
 		transport.response = payload
 	}
 

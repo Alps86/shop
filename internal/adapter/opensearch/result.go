@@ -40,3 +40,16 @@ func (hit Hit) card() (application.ProductCard, error) {
 
 	return card, nil
 }
+
+func (response SearchResponse) searchResult(query application.SearchQuery, multi bool) (application.SearchResult, error) {
+	if !multi {
+		return response.result(query)
+	}
+
+	result, err := response.result(query)
+	if err != nil {
+		return application.SearchResult{}, err
+	}
+
+	return result, nil
+}

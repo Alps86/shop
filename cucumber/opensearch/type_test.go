@@ -39,6 +39,7 @@ type cacheStatistics struct {
 }
 
 type world struct {
+	msearch       *msearchProbe
 	pool          *poolProbe
 	cacheBefore   int64
 	capture       *captureTransport
@@ -100,4 +101,27 @@ type poolBatch struct {
 	adapter opensearch.Adapter
 	query   application.SearchQuery
 	wait    sync.WaitGroup
+}
+
+type msearchProbe struct {
+	mutex         sync.Mutex
+	server        *httptest.Server
+	response      []byte
+	request       []byte
+	path          string
+	mediaType     string
+	calls         int
+	status        int
+	delay         time.Duration
+	phase         string
+	prefix        []byte
+	firstPartSent bool
+}
+
+type sourceEnvelope struct {
+	Responses []sourceResponse `json:"responses"`
+}
+
+type protocolEnvelope struct {
+	Responses []json.RawMessage `json:"responses"`
 }

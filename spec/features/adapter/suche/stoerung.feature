@@ -17,7 +17,7 @@ Funktionalität: Ehrliche Suchdienstfehler
       | <Verbindung> | <Status> | <Antwort> | controlled |
     Wenn die echte öffentliche Suche abgefragt wird
       | Text | Page | Sort |
-      | Alpha | 1 | relevance |
+      | A | 1 | relevance |
     Dann liefert die Suchverbindung
       | Code | TotalProducts |
       | <Fehler> | 0 |
@@ -136,7 +136,7 @@ Funktionalität: Ehrliche Suchdienstfehler
   Szenario: Wiederholte Vorschläge verschiedener Gruppen werden stabil dedupliziert
     Angenommen die Suchdienstverbindung eine explizite Protokollstörung liefert
       | Connection | Status | Body | Clock |
-      | open | 200 | {"hits":{"total":{"value":0},"hits":[]},"suggest":{"catalog":[{"options":[{"text":"Alpha Z"},{"text":"Beta"},{"text":"Zeta"},{"text":"Alpha A"},{"text":"Alpha A"}]},{"options":[{"text":"Gamma"},{"text":"Alpha B"},{"text":"Alpha C"}]}]}} | controlled |
+      | open | 200 | {"responses":[{"status":200,"hits":{"total":{"value":0},"hits":[]}},{"status":200,"suggest":{"catalog":[{"options":[{"text":"Alpha Z"},{"text":"Beta"},{"text":"Zeta"},{"text":"Alpha A"},{"text":"Alpha A"}]},{"options":[{"text":"Gamma"},{"text":"Alpha B"},{"text":"Alpha C"}]}]}}]} | controlled |
     Wenn Vorschläge angefragt werden
       | Query | Page | Sort |
       | Alpha | 1 | relevance |
@@ -241,7 +241,7 @@ Funktionalität: Ehrliche Suchdienstfehler
       | 3 |
     Dann der Suchindex echte Requestcachetreffer meldet
       | MinimumHitDelta |
-      | 2 |
+      | 6 |
     Und liefert die Suchverbindung
       | Code | TotalProducts |
       | OK | 1 |
