@@ -1,9 +1,9 @@
 # language: de
 @http
-Funktionalität: Authentifizierte SKUcacheinvalidierung
-  Als Laufzeitadapter invalidiere ich nur gültige SKUkeys über den internen Cachevertrag.
+Funktionalität: Authentifizierte öffentliche Such- und SKUcacheinvalidierung
+  Als Laufzeitadapter invalidiere ich öffentliche Suchantworten auch ohne SKU und danach echte gültige SKUkeys.
 
-  Szenariogrundriss: Jede SKU erhält einen authentifizierten PURGErequest
+  Szenariogrundriss: Jeder Aufruf invalidiert die Suche und danach jede echte SKU
     Angenommen die Cacheinvalidierung wird eingerichtet
       | Endpoint | Key | Status |
       | test-server | 00000000000000000000000000000000 | 200 |
@@ -11,12 +11,12 @@ Funktionalität: Authentifizierte SKUcacheinvalidierung
       | SKUs |
       | <skus> |
     Dann die Cachegrenze beobachtet
-      | Outcome | Calls | Methods | SKUs | Keys |
-      | success | <anzahl> | <methoden> | <skus> | <schluessel> |
+      | Outcome | Calls | Methods | SKUs | Keys | PublicSearch |
+      | success | <anzahl> | <methoden> | <gesendete-skus> | <schluessel> | <global> |
     Beispiele:
-      | skus | anzahl | methoden | schluessel |
-      | RED-256,BLUE-128 | 2 | PURGE,PURGE | 00000000000000000000000000000000,00000000000000000000000000000000 |
-      | | 0 | | |
+      | skus | anzahl | methoden | gesendete-skus | schluessel | global |
+      | RED-256,BLUE-128 | 3 | PURGE,PURGE,PURGE | ,RED-256,BLUE-128 | 00000000000000000000000000000000,00000000000000000000000000000000,00000000000000000000000000000000 | 1,, |
+      | | 1 | PURGE | | 00000000000000000000000000000000 | 1 |
 
   Szenariogrundriss: Ungültige Cachekonfiguration startet keine Kommunikation
     Angenommen die Cacheinvalidierung wird eingerichtet
@@ -57,3 +57,28 @@ Funktionalität: Authentifizierte SKUcacheinvalidierung
     Dann die Cachegrenze beobachtet
       | Outcome | Calls |
       | context canceled | 0 |
+
+  Szenario: Ein nachfolgender SKUfehler wird nach erfolgreichem globalem Ban nicht verschluckt
+    Angenommen die Cacheinvalidierung wird eingerichtet
+      | Endpoint | Key | Status | GlobalStatus |
+      | test-server | 00000000000000000000000000000000 | 503 | 200 |
+    Wenn die SKUcacheinvalidierung ausgeführt wird
+      | SKUs |
+      | RED-256 |
+    Dann die Cachegrenze beobachtet
+      | Calls | PublicSearch | SKUs | Outcome |
+      | 2 | 1, | ,RED-256 | cacheinvalidierung: HTTP 503 |
+
+  Szenario: Auch eine ungültige spätere SKU verhindert sämtliche Kommunikation
+    Angenommen die Cacheinvalidierung wird eingerichtet
+      | Endpoint | Key | Status |
+      | test-server | 00000000000000000000000000000000 | 200 |
+    Wenn die SKUcacheinvalidierung ausgeführt wird
+      | SKUs |
+      | RED-256,bad sku |
+    Dann die Cachegrenze beobachtet
+      | Calls |
+      | 0 |
+    Und die Adapterinitialisierung meldet
+      | Error |
+      | InvalidInput |

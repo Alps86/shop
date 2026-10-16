@@ -14,6 +14,10 @@ sub vcl_recv {
     if (req.method == "PURGE") {
         if (client.ip !~ invalidators) { return (synth(403)); }
         if (req.http.X-Cache-Key != "SHOP_CACHE_KEY") { return (synth(403)); }
+        if (req.http.X-Cache-Public-Search == "1") {
+            ban("obj.http.Surrogate-Key ~ (^|[[:space:]])shop:public-search([[:space:]]|$)");
+            return (synth(200));
+        }
         if (req.http.X-Cache-SKU !~ "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$") { return (synth(422)); }
         ban("obj.http.Surrogate-Key ~ " + req.http.X-Cache-SKU);
         return (synth(200));
@@ -29,12 +33,23 @@ sub vcl_recv {
         set req.http.X-Shop-Fragment = "1";
     }
     if (req.method != "GET" && req.method != "HEAD") { return (pass); }
+    if (req.url ~ "^/de-DE/suche($|[?])" && req.method != "GET") { return (pass); }
     if (req.http.Cookie || req.http.Authorization) { return (pass); }
     if (req.url ~ "^/de-DE/(warenkorb|kasse|bestellung|profil|gast)") { return (pass); }
-    if (req.url ~ "^/de-DE/(suche|produkt/|kategorie/)") { return (pass); }
+    if (req.url ~ "^/de-DE/(produkt/|kategorie/)") { return (pass); }
 }
 
 sub vcl_backend_response {
+    if (bereq.url ~ "^/de-DE/suche($|[?])") {
+        set beresp.grace = 0s;
+        set beresp.keep = 0s;
+        if (beresp.status != 200 || beresp.http.Cache-Control !~ "public" || beresp.ttl <= 0s) {
+            set beresp.uncacheable = true;
+            set beresp.ttl = 0s;
+            return (deliver);
+        }
+        if (beresp.ttl > 5s) { set beresp.ttl = 5s; }
+    }
     if (bereq.url ~ "^/fragments/") {
         if (beresp.ttl > 5s) { set beresp.ttl = 5s; }
         set beresp.grace = 0s;

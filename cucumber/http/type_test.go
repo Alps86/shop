@@ -21,6 +21,7 @@ type world struct {
 	lastCSRF           string
 	cache              shophttp.CacheInvalidator
 	cacheServer        *httptest.Server
+	cacheGlobalStatus  int
 	cacheStatus        int
 	cacheRequests      []cacheRequest
 	mutex              sync.Mutex
@@ -132,7 +133,8 @@ type cacheOrigin struct {
 }
 
 type cacheRequest struct {
-	Method string
-	SKU    string
-	Key    string
+	PublicSearch string
+	Method       string
+	SKU          string
+	Key          string
 }

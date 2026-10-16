@@ -3,6 +3,7 @@ package demo_test
 import (
 	"bytes"
 	"context"
+	"github.com/Alps86/shop/internal/adapter/opensearch"
 	"github.com/Alps86/shop/internal/adapter/postgres"
 	"github.com/Alps86/shop/internal/application"
 	"github.com/Alps86/shop/internal/domain/value"
@@ -13,23 +14,25 @@ import (
 	"net/url"
 	"os/exec"
 	"sync"
+	"time"
 )
 
 type world struct {
-	deployment *deployment
-	clients    map[string]*http.Client
-	client     *http.Client
-	response   response
-	forms      []form
-	saved      url.Values
-	order      application.OrderView
-	orderPath  string
-	cartID     string
-	runs       map[string]string
-	snapshot   string
-	prepared   map[string]url.Values
-	attempts   []purchaseAttempt
-	orders     []value.OrderID
+	deployment  *deployment
+	clients     map[string]*http.Client
+	client      *http.Client
+	response    response
+	forms       []form
+	saved       url.Values
+	order       application.OrderView
+	orderPath   string
+	cartID      string
+	runs        map[string]string
+	snapshot    string
+	prepared    map[string]url.Values
+	attempts    []purchaseAttempt
+	orders      []value.OrderID
+	searchCache searchCacheProof
 }
 
 type purchaseAttempt struct {
@@ -72,4 +75,25 @@ type form struct {
 type engineLog struct {
 	mutex  sync.Mutex
 	buffer bytes.Buffer
+}
+
+type searchCacheProof struct {
+	host       string
+	entries    []searchCacheEntry
+	baseline   application.AdminCatalogSnapshot
+	seed       runtime.Seed
+	product    value.ProductID
+	slot       string
+	checkpoint uint64
+	bans       int64
+}
+
+type searchCacheEntry struct {
+	path   string
+	stored time.Time
+	ttl    time.Duration
+}
+
+type searchProjectionReply struct {
+	Source opensearch.Document `json:"_source"`
 }

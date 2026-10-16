@@ -465,10 +465,76 @@ Funktionalität: Reale Demo und ehrliche Performanceabnahme
       | 200 | 419,00 EUR |
       | 200 | Gesamt 423,90 EUR |
 
+  @demo-http
+  Szenario: Bestätigte WALprojektion bannt bereits gespeicherte leere und nichtleere Suchen vor Ablauf
+    Bereits gespeicherte Objekte werden nach erfolgreichem Apply und Ban geprüft.
+    Eine vor dem Ban gestartete Originantwort kann den Ban verpassen und höchstens bis zu ihrer kurzen TTL bestehen bleiben.
+
+    Angenommen die echte öffentliche Demolaufzeit ist bereit
+      | PostgresEnv | TemporalEnv | SearchEnv | Namespace | SeedFile | CacheKey | CSRFKey |
+      | SHOP_TEST_POSTGRES_DSN | SHOP_TEST_TEMPORAL_ADDRESS | SHOP_TEST_OPENSEARCH_URL | default | spec/fixtures/demo/katalog.json | demo-cache-key-0123456789abcdef0123456789 | demo-csrf-key-0123456789abcdef0123456789 |
+    Und ein eigener HTTPgast wird verwendet
+      | Jar |
+      | suchcache |
+    Und die öffentlichen Suchantworten sind tatsächlich gespeichert
+      | Path | Status | Contains | Excludes | HostPrefix | TTLSeconds | MinimumHits | TimeoutSeconds | Tag | TagCount |
+      | /de-DE/suche | 200 | 4 Modelle | CACHE-NEW | cache-projection | 5 | 2 | 2 | shop:public-search | |
+      | /de-DE/suche?q=Cachebeleg | 200 | 0 Modelle | CACHE-NEW | cache-projection | 5 | 2 | 2 | shop:public-search | 1 |
+    Wenn ein neues Produkt wird über den echten Importport veröffentlicht
+      | SeedFile | TemplateProductID | ProductID | SKU | Name | Locale | Slug | DatasetVersion | ComposeSlot | Code |
+      | spec/fixtures/demo/katalog.json | p-fairphone5-case | p-cache-new | CACHE-NEW | Cachebeleg Huelle | de-DE | cachebeleg-huelle | cache-proof | shop_demo | OK |
+    Dann die bestätigte Projektion invalidiert die gespeicherten Suchen vor Ablauf
+      | Path | ProductID | Deleted | Status | Contains | Excludes | MinimumBans | TimeoutSeconds |
+      | /de-DE/suche | p-cache-new | false | 200 | 5 Modelle | | 1 | 2 |
+      | /de-DE/suche?q=Cachebeleg | p-cache-new | false | 200 | CACHE-NEW | 0 Modelle | 1 | 2 |
+    Und die öffentlichen Suchantworten sind tatsächlich gespeichert
+      | Path | Status | Contains | Excludes | HostPrefix | TTLSeconds | MinimumHits | TimeoutSeconds | Tag | TagCount |
+      | /de-DE/suche | 200 | 5 Modelle | | cache-projection | 5 | 2 | 2 | shop:public-search | |
+      | /de-DE/suche?q=Cachebeleg | 200 | CACHE-NEW | 0 Modelle | cache-projection | 5 | 2 | 2 | shop:public-search | |
+    Wenn das hinzugefügte Produkt wird über den echten Katalogport gelöscht
+      | ProductID |
+      | p-cache-new |
+    Dann die bestätigte Projektion invalidiert die gespeicherten Suchen vor Ablauf
+      | Path | ProductID | Deleted | Status | Contains | Excludes | MinimumBans | TimeoutSeconds |
+      | /de-DE/suche | p-cache-new | true | 200 | 4 Modelle | CACHE-NEW | 1 | 2 |
+      | /de-DE/suche?q=Cachebeleg | p-cache-new | true | 200 | 0 Modelle | CACHE-NEW | 1 | 2 |
+    Und die bisherigen Lagerwerte bleiben unverändert
+      | ProductID |
+      | p-cache-new |
+
+    Und der Lagerdatensatz ist nach der Produktlöschung weiterhin vorhanden
+      | SKU |
+      | CACHE-NEW |
+    Und die öffentlichen Suchantworten sind tatsächlich gespeichert
+      | Path | Status | Contains | Excludes | HostPrefix | TTLSeconds | MinimumHits | TimeoutSeconds | Tag | TagCount |
+      | /de-DE/suche | 200 | 4 Modelle | CACHE-NEW | cache-projection | 5 | 2 | 2 | shop:public-search | |
+      | /de-DE/suche?q=Cachebeleg | 200 | 0 Modelle | CACHE-NEW | cache-projection | 5 | 2 | 2 | shop:public-search | 1 |
+    Wenn ein neues Produkt wird über den echten Importport veröffentlicht
+      | SeedFile | TemplateProductID | ProductID | SKU | Name | Locale | Slug | DatasetVersion | ComposeSlot | Code |
+      | spec/fixtures/demo/katalog.json | p-fairphone5-case | p-cache-new | CACHE-NEW | Cachebeleg Huelle | de-DE | cachebeleg-huelle | cache-proof | shop_demo | OK |
+    Dann die bestätigte Projektion invalidiert die gespeicherten Suchen vor Ablauf
+      | Path | ProductID | Deleted | Status | Contains | Excludes | MinimumBans | TimeoutSeconds |
+      | /de-DE/suche | p-cache-new | false | 200 | 5 Modelle | | 1 | 2 |
+      | /de-DE/suche?q=Cachebeleg | p-cache-new | false | 200 | CACHE-NEW | 0 Modelle | 1 | 2 |
+    Und die öffentlichen Suchantworten sind tatsächlich gespeichert
+      | Path | Status | Contains | Excludes | HostPrefix | TTLSeconds | MinimumHits | TimeoutSeconds | Tag | TagCount |
+      | /de-DE/suche | 200 | 5 Modelle | | cache-projection | 5 | 2 | 2 | shop:public-search | |
+      | /de-DE/suche?q=Cachebeleg | 200 | CACHE-NEW | 0 Modelle | cache-projection | 5 | 2 | 2 | shop:public-search | |
+    Wenn das hinzugefügte Produkt wird über den echten Katalogport gelöscht
+      | ProductID |
+      | p-cache-new |
+    Dann die bestätigte Projektion invalidiert die gespeicherten Suchen vor Ablauf
+      | Path | ProductID | Deleted | Status | Contains | Excludes | MinimumBans | TimeoutSeconds |
+      | /de-DE/suche | p-cache-new | true | 200 | 4 Modelle | CACHE-NEW | 1 | 2 |
+      | /de-DE/suche?q=Cachebeleg | p-cache-new | true | 200 | 0 Modelle | CACHE-NEW | 1 | 2 |
+    Und die bisherigen Lagerwerte bleiben unverändert
+      | ProductID |
+      | p-cache-new |
+
   @demo-performance
   Szenario: Tatsächliche HTTPlast hält Messumfang und Browsergrenze getrennt
-    Die neutrale Suche bleibt vollständig gerendert im Proxy-PASS; ihr gemeinsamer Proxycache ist nicht anwendbar.
-    Die privaten Routen umgehen ebenfalls den gemeinsamen Cache, während die übrigen öffentlichen Fragmente echte Cachewerte belegen.
+    Die neutrale SSR-Suche wird höchstens fünf Sekunden und nur innerhalb ihrer Pflichtdatengültigkeit gemeinsam gecacht; warme echte Hits und hundert kalte eindeutige Hostpartitionen mit hundert SSR-Misses werden beobachtet.
+    Private Routen bleiben PASS mit nicht anwendbarem gemeinsamem Cache; die übrigen öffentlichen Fragmente behalten ihre echten Cachewerte.
 
     Angenommen der dokumentierte Messdatensatz ist geladen
       | Dataset | Products | Variants | Categories | Profiles | ProfileCodes | Orders | Concurrency | CounterFlushMilliseconds | Network | MinimumCPU | MinimumRAMGiB | Namespace | SKU | Recipient | Street | PostalCode | City | Country | Shipping | Payment | CategoryPath | ListingContains | SearchPath | ProductPath | CategoryDelegation | ProductDelegation |

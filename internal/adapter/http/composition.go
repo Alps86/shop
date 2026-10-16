@@ -88,6 +88,10 @@ func (handler *Handler) fragmentFailure(writer http.ResponseWriter) {
 
 func (page Page) surrogateKeys() string {
 	keys := []string{}
+	if page.Path == "/de-DE/suche" {
+		keys = append(keys, "shop:public-search")
+	}
+
 	for _, card := range page.Search.Cards {
 		keys = append(keys, string(card.SKU))
 	}

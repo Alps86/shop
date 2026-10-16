@@ -22,6 +22,7 @@ func (current *world) registerOperations(ctx *godog.ScenarioContext) {
 	ctx.Step(`^die echten konkurrierenden Käufe ergeben$`, current.concurrentObserved)
 	ctx.Step(`^ein vorbereitetes Abschlussformular wird gesendet$`, current.submitPrepared)
 	ctx.Step(`^der öffentliche Produktcache wird tatsächlich wiederverwendet$`, current.cacheHit)
+	current.registerSearchCache(ctx)
 }
 
 func (current *world) rememberOrder(table *godog.Table) error {

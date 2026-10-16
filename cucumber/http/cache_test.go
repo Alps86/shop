@@ -18,6 +18,7 @@ func (current *world) prepareCache(table *godog.Table) error {
 	endpoint := fields["Endpoint"]
 	if endpoint == "test-server" {
 		current.cacheStatus = readCount(fields["Status"])
+		current.cacheGlobalStatus = readCount(fields["GlobalStatus"])
 		current.cacheServer = httptest.NewServer(cacheOrigin{current})
 		endpoint = current.cacheServer.URL
 	}
@@ -46,21 +47,23 @@ func (current *world) invalidateCache(table *godog.Table) error {
 func (origin cacheOrigin) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	origin.current.mutex.Lock()
 	defer origin.current.mutex.Unlock()
-	origin.current.cacheRequests = append(origin.current.cacheRequests, cacheRequest{Method: request.Method, SKU: request.Header.Get("X-Cache-SKU"), Key: request.Header.Get("X-Cache-Key")})
-	writer.WriteHeader(origin.current.cacheStatus)
+	origin.current.cacheRequests = append(origin.current.cacheRequests, cacheRequest{PublicSearch: request.Header.Get("X-Cache-Public-Search"), Method: request.Method, SKU: request.Header.Get("X-Cache-SKU"), Key: request.Header.Get("X-Cache-Key")})
+	writer.WriteHeader(origin.responseStatus(request))
 }
 
 func (current *world) cacheResult(table *godog.Table) error {
 	skus := []string{}
 	methods := []string{}
 	keys := []string{}
+	globals := []string{}
 	for _, request := range current.cacheRequests {
 		skus = append(skus, request.SKU)
 		methods = append(methods, request.Method)
 		keys = append(keys, request.Key)
+		globals = append(globals, request.PublicSearch)
 	}
 
-	actual := map[string]string{"Outcome": current.cacheOutcome(), "Calls": strconv.Itoa(len(current.cacheRequests)), "SKUs": strings.Join(skus, ","), "Methods": strings.Join(methods, ","), "Keys": strings.Join(keys, ",")}
+	actual := map[string]string{"PublicSearch": strings.Join(globals, ","), "Outcome": current.cacheOutcome(), "Calls": strconv.Itoa(len(current.cacheRequests)), "SKUs": strings.Join(skus, ","), "Methods": strings.Join(methods, ","), "Keys": strings.Join(keys, ",")}
 
 	return read(table).matches(actual)
 }
@@ -110,4 +113,14 @@ func (current *world) cacheOutcome() string {
 	}
 
 	return "success"
+}
+
+func (origin cacheOrigin) responseStatus(request *http.Request) int {
+	if request.Header.Get("X-Cache-Public-Search") == "1" {
+		if origin.current.cacheGlobalStatus != 0 {
+			return origin.current.cacheGlobalStatus
+		}
+	}
+
+	return origin.current.cacheStatus
 }

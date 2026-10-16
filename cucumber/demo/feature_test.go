@@ -44,7 +44,9 @@ func (current *world) after(ctx context.Context, _ *godog.Scenario, _ error) (co
 		return ctx, nil
 	}
 
-	return ctx, errors.Join(current.deployment.stopApp(), current.stopWorkflows(), current.deployment.close())
+	cleanup := current.cleanupSearchImport()
+
+	return ctx, errors.Join(cleanup, current.deployment.stopApp(), current.stopWorkflows(), current.deployment.close())
 }
 
 func read(table *godog.Table) []map[string]string {

@@ -105,7 +105,7 @@ Alle hier konkretisierten Fach-/Seitenverträge sind Demo-Kern. Produktionsbacku
 - [Inhaltsaufbau](adapter/betrieb/inhalt.feature): Der Inhaltsbefehl erzeugt versionsgebundene Hugo-Artefakte aus dem tatsächlichen Katalog.
 - [Inhaltsausgabe](adapter/betrieb/inhaltsausgabe.feature): IO-Unterbrechungen beim Frontmatter- und Markdown-Schreiben erhalten den ursprünglichen Fehler.
 
-- [Suchkomposition](adapter/http/suchkomposition.feature): Die Suchseite rendert einmal serverseitig mit SSI-Rahmen und erhält sofortige Fehlerstatus-, Gast-, HTMX-, SEO- und TTL-Verträge.
+- [Suchkomposition](adapter/http/suchkomposition.feature): Die öffentliche Suchseite rendert auf Miss einmal mit SSI-Rahmen, teilt gültige anonyme Antworten und erhält Ablauf-, Invalidierungs-, Gast-, HTMX-, SEO- und TTL-Verträge.
 
 - [Verbindungspool](adapter/suche/verbindungspool.feature): Zwei parallele Suchbatches vergleichen vollständige Antworten und echte Verbindungswiederverwendung unter Standard-, explizitem und fremdem Clienttransport.
 

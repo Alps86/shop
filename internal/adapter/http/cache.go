@@ -30,12 +30,16 @@ func NewCacheInvalidator(endpoint, key string) (CacheInvalidator, error) {
 }
 
 func (cache CacheInvalidator) Invalidate(ctx context.Context, skus []value.SKU) error {
-	for _, sku := range skus {
-		if err := value.IdentifierSyntax(sku).Validate(); err != nil {
-			return err
-		}
+	if err := validateCacheSKUs(skus); err != nil {
+		return err
+	}
 
-		if err := cache.purge(ctx, sku); err != nil {
+	if err := cache.purge(ctx, "X-Cache-Public-Search", "1"); err != nil {
+		return err
+	}
+
+	for _, sku := range skus {
+		if err := cache.purge(ctx, "X-Cache-SKU", string(sku)); err != nil {
 			return err
 		}
 	}
@@ -43,11 +47,21 @@ func (cache CacheInvalidator) Invalidate(ctx context.Context, skus []value.SKU) 
 	return nil
 }
 
-func (cache CacheInvalidator) purge(ctx context.Context, sku value.SKU) error {
+func validateCacheSKUs(skus []value.SKU) error {
+	for _, sku := range skus {
+		if err := value.IdentifierSyntax(sku).Validate(); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (cache CacheInvalidator) purge(ctx context.Context, header, key string) error {
 	request := cache.request.Clone(ctx)
 
 	request.Header.Set("X-Cache-Key", cache.key)
-	request.Header.Set("X-Cache-SKU", string(sku))
+	request.Header.Set(header, key)
 	response, err := cache.client.Do(request)
 	if err != nil {
 		return fmt.Errorf("cacheinvalidierung: %w", err)

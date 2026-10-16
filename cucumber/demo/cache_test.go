@@ -55,11 +55,16 @@ func (current *world) pollHits(before, minimum int64, deadline time.Time) error 
 }
 
 func (deployment *deployment) cacheHits() (int64, error) {
+	return deployment.cacheCounter("MAIN.cache_hit")
+}
+
+func (deployment *deployment) cacheCounter(name string) (int64, error) {
 	varnishstat := filepath.Join(filepath.Dir(binary("SHOP_VARNISH", "/usr/sbin/varnishd")), "../bin/varnishstat")
 	// #nosec G204 -- Eigenes Standardwerkzeug, selbst erzeugte Instanz ohne Shell.
-	command := exec.Command(varnishstat, "-n", deployment.directory+"/varnish", "-1", "-f", "MAIN.cache_hit")
+	command := exec.Command(varnishstat, "-n", deployment.directory+"/varnish", "-1", "-f", name)
 	if deployment.external {
-		command = exec.Command("docker", "compose", "exec", "-T", "varnish", "varnishstat", "-1", "-f", "MAIN.cache_hit")
+		// #nosec G204 -- Festes Composewerkzeug, technischer Zählername ohne Shell.
+		command = exec.Command("docker", "compose", "exec", "-T", "varnish", "varnishstat", "-1", "-f", name)
 		command.Dir = "../.."
 	}
 
@@ -68,17 +73,17 @@ func (deployment *deployment) cacheHits() (int64, error) {
 		return 0, fmt.Errorf("Varnishcachezähler: %w: %s", err, output)
 	}
 
-	return parseHits(string(output))
+	return parseCounter(string(output), name)
 }
 
-func parseHits(output string) (int64, error) {
+func parseCounter(output, name string) (int64, error) {
 	for _, line := range strings.Split(output, "\n") {
 		fields := strings.Fields(line)
 		if len(fields) < 2 {
 			continue
 		}
 
-		if fields[0] == "MAIN.cache_hit" {
+		if fields[0] == name {
 			return strconv.ParseInt(fields[1], 10, 64)
 		}
 	}
