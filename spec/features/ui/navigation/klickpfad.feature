@@ -1,43 +1,112 @@
 # language: de
-@spec-only @integration
-Funktionalität: Durchgängiger eigener Gastpfad
-  Als Gast erreiche ich Abschluss und Status über öffentliche Links und Formulare.
+@http
+Funktionalität: Durchgängiger eigener Gastpfad über HTTP
+  Die expliziten Applicationportdaten isolieren hier Navigation und Formulare.
+  Die reale Transaktion und Prozessintegration bleiben Runtimeverträge.
 
-  Szenariogrundriss: Öffentliche Navigation nutzt die vereinbarten Ports
-    Angenommen für jeden Schritt liefert der zuständige Port eine erfolgreiche Ansichtsantwort
-      | Source | Action | Target |
-      | <quelle> | <aktion> | <ziel> |
-    Wenn die dargestellte Aktion über HTTP ausgeführt wird
-      | Mode |
-      | HTML-form-or-link |
-    Dann ist der nächste Schritt erreichbar
-      | Target | Preserves | MethodSafety |
-      | <ziel> | <erhalt> | GET-read-POST-write |
+  Hintergrund:
+    Angenommen explizite HTTPdaten liegen vor
+      | Fixture | Fault |
+      | spec/fixtures/http/shop.json | |
+
+  Szenario: Veröffentlichte Navigation führt über Kategorie und Modell zur gewählten Variante
+    Wenn der Shop liefert eine HTTPansicht
+      | Method | URL |
+      | GET | /de-DE/ |
+    Dann die HTTPantwort enthält die sichtbaren Vertragswerte
+      | Field | Value |
+      | Body | href="/de-DE/kategorie/smartphones--c-phone" |
+    Wenn der Shop liefert eine HTTPansicht
+      | Method | URL |
+      | GET | /de-DE/kategorie/smartphones--c-phone?brand=Alpha |
+    Dann die HTTPantwort enthält die sichtbaren Vertragswerte
+      | Field | Value |
+      | Body | href="/de-DE/produkt/testmodell--p-phone?sku=RED-256" |
+    Wenn der Shop liefert eine HTTPansicht
+      | Method | URL |
+      | GET | /de-DE/produkt/testmodell--p-phone?sku=RED-256 |
+    Dann die HTTPantwort enthält die sichtbaren Vertragswerte
+      | Field | Value |
+      | BodyAll | data-sku="RED-256",href="/de-DE/warenkorb?add=RED-256" |
+
+  Szenario: Normales Formular leitet nach Cartänderung zur lesenden Ansicht
+    Wenn der Shop liefert eine HTTPansicht
+      | Method | URL | Session | CSRFSource | Form |
+      | POST | /de-DE/warenkorb/aktion | test-session-a | /de-DE/warenkorb | cartID=cart-a&commandID=navigation-add&revision=2&sku=RED-256&quantity=1&action=add |
+    Dann die HTTPantwort enthält die sichtbaren Vertragswerte
+      | Field | Value |
+      | Status | 303 |
+      | Header:Location | /de-DE/warenkorb |
+    Wenn der Shop liefert eine HTTPansicht
+      | Method | URL | Session |
+      | GET | /de-DE/warenkorb | test-session-a |
+    Dann die HTTPantwort enthält die sichtbaren Vertragswerte
+      | Field | Value |
+      | BodyAll | RED-256,href="/de-DE/kasse" |
+
+  Szenario: Teilbare Filteradresse wird nach Historywiederherstellung vollständig gerendert
+    Wenn der Shop liefert eine HTTPansicht
+      | Method | URL | HTMX |
+      | GET | /de-DE/kategorie/smartphones--c-phone?brand=Alpha&brand=Beta | true |
+    Dann der verwendete Applicationport erhält
+      | Brands | Page |
+      | Alpha,Beta | 1 |
+    Wenn der Shop liefert eine HTTPansicht
+      | Method | URL |
+      | GET | /de-DE/kategorie/smartphones--c-phone?brand=Alpha&page=2 |
+    Dann der verwendete Applicationport erhält
+      | Brands | Page |
+      | Alpha | 2 |
+    Und die HTTPantwort enthält die sichtbaren Vertragswerte
+      | Field | Value |
+      | BodyAll | <!doctype html>,historyRestoreAsHxRequest,hx-push-url="true" |
+
+  Szenariogrundriss: Vollständige Variantenlinkziele aus B bleiben unverändert
+    Angenommen HTTPportdaten werden ersetzt
+      | JSON |
+      | {"Recommendations":{"Cards":[{"ProductID":"p-phone","Name":"Empfohlenes Modell","SKU":"RED-256","URL":"/de-DE/produkt/testmodell--p-phone?sku=RED-256"}]}} |
+    Wenn der Shop liefert eine HTTPansicht
+      | Method | URL | Session |
+      | GET | <source> | <session> |
+    Dann die HTTPantwort enthält die sichtbaren Vertragswerte
+      | Field | Value |
+      | Status | 200 |
+      | Body | href="/de-DE/produkt/testmodell--p-phone?sku=RED-256" |
+      | Absent | ?sku=RED-256?sku= |
+    Wenn der Shop liefert eine HTTPansicht
+      | Method | URL |
+      | GET | /de-DE/produkt/testmodell--p-phone?sku=RED-256 |
+    Dann die HTTPantwort enthält die sichtbaren Vertragswerte
+      | Field | Value |
+      | Status | 200 |
+      | Body | data-sku="RED-256" |
     Beispiele:
-      | quelle | aktion | ziel | erhalt |
-      | home | category | category | locale |
-      | category | selectBrand | listing | query |
-      | listing | addBrand | listing | multiSelection |
-      | listing | modelCard | product | chosenSKU |
-      | product | variant | product | activeSKU |
-      | product | addToCart | cart | guestSession |
-      | cart | acceptAccessory | cart | guestSession |
-      | cart | declineAccessory | cart | existingItems |
-      | cart | removeItem | cart | guestSession |
-      | cart | checkout | checkout | cartIdentity |
-      | checkout | confirmTotal | checkout | evaluationIdentity |
-      | checkout | placeDemoOrder | orderStatus | sameOrderOnRetry |
-      | backendOrder | reportPartialShipment | backendOrder | purchaseSnapshot |
-      | orderStatus | refresh | orderStatus | guestOwnership |
+      | source | session |
+      | /de-DE/ | |
+      | /de-DE/suche | |
+      | /de-DE/kategorie/smartphones--c-phone | |
+      | /de-DE/produkt/testmodell--p-phone | |
+      | /de-DE/warenkorb | test-session-a |
 
-  Szenario: Filteränderung und Browserzurück erhalten teilbaren Zustand
-    Angenommen eine Listingansicht ist geöffnet
-      | URL |
-      | /de-DE/kategorie/smartphones--c-phone?brand=Alpha&page=2 |
-    Wenn die Filterauswahl geändert und anschließend zurück navigiert wird
-      | AddedBrand | Navigation |
-      | Beta | history-back |
-    Dann lauten die beobachteten Zustände
-      | Moment | Brands | Page |
-      | afterChange | Alpha,Beta | 1 |
-      | afterBack | Alpha | 2 |
+  Szenario: Aktive Checkoutalternative verwendet das vollständige Linkziel aus dem Kaufresultat
+    Angenommen explizite HTTPdaten liegen vor
+      | Fixture | Fault |
+      | spec/fixtures/http/shop.json | Place:Unavailable |
+    Und HTTPportdaten werden ersetzt
+      | JSON |
+      | {"Purchase":{"UnavailableSKU":{"Present":true,"Value":"BLUE-128"},"Alternatives":[{"ProductID":"p-phone","Name":"Verfügbare rote Variante","SKU":"RED-256","URL":"/de-DE/produkt/testmodell--p-phone?sku=RED-256"}]}} |
+    Wenn der Shop liefert eine HTTPansicht
+      | Method | URL | Session | CSRFSource | Form |
+      | POST | /de-DE/warenkorb/aktion | test-session-a | /de-DE/kasse | cartID=cart-a&commandID=alternative-link&revision=2&evaluationID=evaluation-a&action=place&return=checkout |
+    Dann die HTTPantwort enthält die sichtbaren Vertragswerte
+      | Field | Value |
+      | Status | 409 |
+      | Body | href="/de-DE/produkt/testmodell--p-phone?sku=RED-256" |
+      | Absent | ?sku=RED-256?sku= |
+    Wenn der Shop liefert eine HTTPansicht
+      | Method | URL |
+      | GET | /de-DE/produkt/testmodell--p-phone?sku=RED-256 |
+    Dann die HTTPantwort enthält die sichtbaren Vertragswerte
+      | Field | Value |
+      | Status | 200 |
+      | Body | data-sku="RED-256" |

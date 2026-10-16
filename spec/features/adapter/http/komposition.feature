@@ -1,76 +1,60 @@
 # language: de
-@spec-only @frontend
-Funktionalität: Hugo SSI ESI und sichere Cachegrenzen
-  Als Gast erhalte ich vollständig zusammengesetzte Seiten ohne fremde persönliche Daten.
+@http @frontend
+Funktionalität: Originfallback und klar getrennte Fragmentantworten
+  Als Gast erhalte ich bei Fragmentfehlern keine ungeprüfte Kaufaktion.
 
-  Szenariogrundriss: Standardengines setzen statische und dynamische Teile zusammen
-    Angenommen Hugo hat einen Markdownrahmen erzeugt
-      | BuildVersion | SSI | ESI | Locale | Market | Currency |
-      | build-a | header,footer | detail | de-DE | DE | EUR |
-    Wenn eine Ansicht am öffentlichen Einstieg angefordert wird
-      | Class | Cookie | HX-Request |
-      | <klasse> | <cookie> | <htmx> |
-    Dann lautet der Kompositionsvertrag
-      | EngineOrder | RawIncludeMarkers | Shared | MaxAgeSeconds | ContainsForeignGuestData |
-      | Nginx-SSI,Varnish-ESI | false | <shared> | <ttl> | false |
+  Hintergrund:
+    Angenommen explizite HTTPdaten liegen vor
+      | Fixture | Fault |
+      | spec/fixtures/http/shop.json | |
+
+  Szenariogrundriss: Nur erlaubte öffentliche Fragmente liefern HTML
+    Wenn der Shop liefert eine HTTPansicht
+      | Method | URL |
+      | <methode> | <url> |
+    Dann die HTTPantwort enthält die sichtbaren Vertragswerte
+      | Field | Value |
+      | Status | <status> |
+      | <form> | <!doctype |
     Beispiele:
-      | klasse | cookie | htmx | shared | ttl |
-      | markdownFrame | absent | false | true | 3600 |
-      | categoryNavigation | absent | false | true | 300 |
-      | productDetail | absent | false | true | 5 |
-      | listing | absent | true | true | 5 |
-      | personalizedSearch | guest-a | true | false | 0 |
-      | recommendation | guest-a | true | false | 0 |
-      | cart | guest-a | false | false | 0 |
-      | checkout | guest-a | false | false | 0 |
-      | order | guest-a | false | false | 0 |
+      | methode | url | status | form |
+      | GET | /fragments/de-DE/ | 200 | Absent |
+      | GET | /fragments/de-DE/suche?q=phone | 200 | Absent |
+      | GET | /fragments/de-DE/kategorie/smartphones--c-phone | 200 | Absent |
+      | GET | /fragments/de-DE/produkt/testmodell--p-phone?sku=RED-256&rootVersion=1 | 200 | Absent |
+      | POST | /fragments/de-DE/ | 405 | Body |
+      | GET | /fragments/de-DE/warenkorb | 404 | Body |
 
-  Szenariogrundriss: Sichere Fragmentfehler
-    Wenn ein Detailfragment an einer definierten Grenze ausfällt
-      | Fault |
-      | <stoerung> |
-    Dann lautet die sichtbare Elternantwort
-      | Status | BuyAction | UnverifiedPrice | Message | CacheControl |
-      | <status> | false | false | <hinweis> | no-store |
-    Beispiele:
-      | stoerung | status | hinweis |
-      | knownBeforeParentHeaders | 503 | retry |
-      | originReturnsSafeFallback | 200 | Daten vorübergehend nicht verfügbar |
-      | subrequestFailsAfterParentHeaders | 200 | adjacentFragmentError |
+  Szenario: Origin liefert bei bekannter Fragmentstörung sicheres ErsatzHTML
+    Angenommen explizite HTTPdaten liegen vor
+      | Fixture | Fault |
+      | spec/fixtures/http/shop.json | Product |
+    Wenn der Shop liefert eine HTTPansicht
+      | Method | URL |
+      | GET | /fragments/de-DE/produkt/testmodell--p-phone?sku=RED-256 |
+    Dann die HTTPantwort enthält die sichtbaren Vertragswerte
+      | Field | Value |
+      | Status | 200 |
+      | Header:Cache-Control | private,no-store |
+      | Body | Daten vorübergehend nicht verfügbar |
+      | Absent | In den Warenkorb |
+      | Absent | 120,00 EUR |
 
-  Szenariogrundriss: Kontextwechsel darf keinen falschen Cachetreffer liefern
-    Angenommen ein vollständiges Detailfragment ist gecacht
-      | SKU | Locale | Market | Currency | RootVersion | ComplianceMarker |
-      | BLUE | de-DE | DE | EUR | 1 | blue-verified |
-    Wenn ein abweichender Request am Cache eingeht
-      | ChangedContext | Value |
-      | <kontext> | <wert> |
-    Dann lautet die Cachebeobachtung
-      | ReuseOldFragment | ValidateBeforeCache | PersonalDataInKey |
-      | false | true | false |
-    Beispiele:
-      | kontext | wert |
-      | SKU | RED |
-      | Locale | fr-FR |
-      | Market | FR |
-      | Currency | USD |
-      | RootVersion | 2 |
-      | HX-Request | true |
+  Szenario: Persönliche Anfragen werden auch bei Kompositionsheader nicht zerlegt
+    Wenn der Shop liefert eine HTTPansicht
+      | Method | URL | Session | Composition |
+      | GET | /de-DE/warenkorb | test-session-a | 1 |
+    Dann die HTTPantwort enthält die sichtbaren Vertragswerte
+      | Field | Value |
+      | Status | 200 |
+      | Header:Cache-Control | private,no-store |
+      | Absent | <esi:include |
 
-  Szenario: Pflichtdatenwechsel begrenzt die ansonsten gültige TTL
-    Angenommen ein öffentliches Angebot wechselt seinen Pflichtdatenstand
-      | Now | NextValidityBoundary | DefaultTTLSeconds |
-      | 2026-10-31T23:59:58Z | 2026-11-01T00:00:00Z | 5 |
-    Wenn das Fragment ausgeliefert wird
-    Dann lautet die Cachebegrenzung
-      | MaximumTTLSeconds | StaleAfterBoundary |
-      | 2 | false |
-
-  Szenario: Persönlicher Badge wird separat geladen
-    Wenn zwei Gäste denselben statischen Rahmen laden
-      | Guest | CartQuantity |
-      | a | 2 |
-      | b | 7 |
-    Dann lautet die sichtbare Trennung
-      | SharedFrameBadge | PrivateBadgeA | PrivateBadgeB | PrivateCacheControl |
-      | Warenkorb | 2 | 7 | private,no-store |
+  Szenario: Nicht dynamische Route benötigt keinen ESIabruf
+    Wenn der Shop liefert eine HTTPansicht
+      | Method | URL | Composition |
+      | GET | /de-DE/service | 1 |
+    Dann die HTTPantwort enthält die sichtbaren Vertragswerte
+      | Field | Value |
+      | Status | 200 |
+      | Absent | <esi:include |
