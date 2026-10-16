@@ -43,12 +43,11 @@ func (current *world) repeatEnvelope(input *godog.Table) error {
 
 func (current *world) stopAfterCheckpoint() error {
 	if err := current.waitPosition(current.priorCheckpoint); err != nil {
-		current.cancel()
-		return err
+		return errors.Join(err, current.closeStream(), current.streamFailure())
 	}
 
 	current.cancel()
-	current.err = <-current.stopped
+	current.err = current.streamResult()
 	if errors.Is(current.err, context.Canceled) {
 		current.err = nil
 	}
