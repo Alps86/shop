@@ -10,7 +10,7 @@ import (
 )
 
 func (current *world) measure(table *godog.Table) (err error) {
-	if err := os.MkdirAll(current.directory, 0750); err != nil {
+	if err := current.prepareMeasurements(); err != nil {
 		return err
 	}
 
@@ -98,4 +98,20 @@ func (current *world) parseProfile(data map[string]string) error {
 	}
 
 	return nil
+}
+
+func (current *world) prepareMeasurements() error {
+	if err := current.initializeInternal(); err != nil {
+		return err
+	}
+
+	return os.MkdirAll(current.directory, 0750)
+}
+
+func (current *world) initializeInternal() error {
+	if current.internal == "" {
+		current.internal = os.Getenv("SHOP_PERFORMANCE_INTERNAL_URL")
+	}
+
+	return validateInternalOrigin(current.internal)
 }

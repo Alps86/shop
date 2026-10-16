@@ -3,14 +3,12 @@ package performance_test
 import (
 	"fmt"
 	"github.com/cucumber/godog"
-	"os"
 	"strconv"
 	"strings"
 )
 
 func (current *world) direct(table *godog.Table) (err error) {
-	current.internal = os.Getenv("SHOP_PERFORMANCE_INTERNAL_URL")
-	if err := validateInternalOrigin(current.internal); err != nil {
+	if err := current.initializeInternal(); err != nil {
 		return err
 	}
 

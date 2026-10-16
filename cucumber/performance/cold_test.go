@@ -47,9 +47,13 @@ func (current *world) curlSamples(route, path, cookie string, data map[string]st
 func (current *world) executeCold(batch coldBatch) ([]sample, error) {
 	config := batch.config(current.public)
 	command := current.curlCommand(config)
-	batch.started = time.Now()
-	output, commandError := command.Output()
-	batch.ended = time.Now()
+	output, commandError := current.phaseOutput(poolPhaseInput{route: batch.route, cache: "cold-cache-services-ready"}, func() ([]byte, error) {
+		batch.started = time.Now()
+		payload, err := command.Output()
+		batch.ended = time.Now()
+
+		return payload, err
+	})
 	samples, readError := current.readCold(batch, output)
 
 	return samples, errors.Join(require(commandError, "Standardwerkzeug curl"), readError)

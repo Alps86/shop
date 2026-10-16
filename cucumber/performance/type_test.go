@@ -9,10 +9,12 @@ import (
 	"github.com/Alps86/shop/internal/domain/value"
 	"go.temporal.io/sdk/client"
 	"net/http"
+	"sync/atomic"
 	"time"
 )
 
 type world struct {
+	poolPhases       []poolPhase
 	originalCaptured bool
 	store            *postgres.Store
 	temporal         client.Client
@@ -231,4 +233,34 @@ type snapshotPool struct {
 type snapshotRequest struct {
 	ctx context.Context
 	url string
+}
+
+type poolPhaseInput struct {
+	route string
+	cache string
+}
+
+type poolAction func() ([]byte, error)
+
+type poolPhase struct {
+	Route                         string
+	Cache                         string
+	Boundary                      string
+	Start                         snapshotPool
+	End                           snapshotPool
+	LifetimeEvidence              string
+	Comparison                    string
+	ConditionalOnSamePoolLifetime bool
+	ConditionalDeltas             map[string]uint64
+	Note                          string
+}
+
+type phaseFixture struct {
+	writeFailed  atomic.Bool
+	current      world
+	before       string
+	after        string
+	beforeStatus int
+	afterStatus  int
+	calls        atomic.Int64
 }

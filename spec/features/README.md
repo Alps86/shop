@@ -114,4 +114,4 @@ Alle hier konkretisierten Fach-/Seitenverträge sind Demo-Kern. Produktionsbacku
 - [Gespeicherte Karten](adapter/suche/gespeicherte-karte.feature): Sourcefreier Storedfields-Transport erhält vollständige öffentliche Karten und verwirft fehlende, defekte oder inkonsistente Identitäten und Payloads.
 - [Explizite Korrektur](adapter/suche/korrektur.feature): Normale Haupttreffer bleiben von öffentlichen, bewusst auszuwählenden vollständigen Wortkorrekturen getrennt.
 
-| [Messdiagnose](adapter/betrieb/messdiagnose.feature) | Technische Zuordnung ursprünglicher paralleler Messantworten und öffentliche Header-Allowlist. |
+| [Messdiagnose](adapter/betrieb/messdiagnose.feature) | Technische Zuordnung ursprünglicher Messantworten, öffentliche Header-Allowlist und begrenzte Poolbeobachtung erreichter Lastphasen. |

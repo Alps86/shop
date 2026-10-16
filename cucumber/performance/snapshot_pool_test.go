@@ -23,7 +23,7 @@ func (current *world) readSnapshotPool(ctx context.Context) snapshotPool {
 
 	proof.Values, err = parseSnapshotPool(response.body)
 	if err != nil {
-		proof.Error = err.Error()
+		proof.Error = "Pool statistics invalid or incomplete"
 	}
 
 	return proof

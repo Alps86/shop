@@ -15,6 +15,7 @@ import (
 func TestCapture(t *testing.T) {
 	t.Setenv("SHOP_PERFORMANCE_OPENSEARCH_URL", "")
 	t.Setenv("SHOP_PERFORMANCE_SEARCH_INDEX", "")
+	t.Setenv("SHOP_PERFORMANCE_INTERNAL_URL", "")
 	options := &godog.Options{Format: "pretty", Paths: []string{"../../spec/features"}, Tags: "~@spec-only && @performance-capture", Strict: true, TestingT: t}
 	suite := godog.TestSuite{Name: "performance-capture", Options: options, ScenarioInitializer: registerCapture}
 	if suite.Run() != 0 {
@@ -23,6 +24,8 @@ func TestCapture(t *testing.T) {
 }
 
 func registerCapture(ctx *godog.ScenarioContext) {
+	ctx.Step("^ungültige interne Origins bereits vor öffentlichen Messungen abgewiesen werden$", verifyEarlyInternalOrigin)
+	ctx.Step("^Poolbeobachtungen die erreichten Lastphasen begrenzt umschließen$", verifyPoolPhases)
 	ctx.Step("^kalte curl-Antworten unabhängig von ihrer Abschlussreihenfolge zugeordnet werden$", verifyCaptureMapping)
 	ctx.Step("^ursprüngliche kalte Fehlerantworten vor dem Cleanup dauerhaft erhalten bleiben$", verifyOriginalBodies)
 	ctx.Step("^Diagnoseheader ausschließlich erlaubte öffentliche Werte enthalten$", verifyCaptureHeaders)

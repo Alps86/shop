@@ -36,7 +36,9 @@ func (current *world) warmSamples(route, path, cookie string) error {
 }
 
 func (current *world) heyResult(origin, route, path, cookie string) ([]sample, error) {
-	output, err := current.hey(origin, path, cookie, strconv.Itoa(current.expectedRequests))
+	output, err := current.phaseOutput(poolPhaseInput{route: route, cache: "warm"}, func() ([]byte, error) {
+		return current.hey(origin, path, cookie, strconv.Itoa(current.expectedRequests))
+	})
 	if err != nil {
 		return nil, err
 	}
