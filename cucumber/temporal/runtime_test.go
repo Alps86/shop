@@ -3,6 +3,7 @@ package temporal_test
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/Alps86/shop/internal/adapter/temporal"
 	"github.com/Alps86/shop/internal/application"
@@ -10,6 +11,7 @@ import (
 	"github.com/Alps86/shop/internal/domain/value"
 	"github.com/cucumber/godog"
 	"go.temporal.io/sdk/worker"
+	"google.golang.org/grpc/status"
 	"time"
 )
 
@@ -117,10 +119,14 @@ func (current *world) awaitCartWorker(table *godog.Table) error {
 	// Start spawns pollers; only a successful query proves cold history replay.
 	encoded, err := current.connection.QueryWorkflow(ctx, "cart/"+current.id, current.runID, "ProcessStatus")
 	if err != nil {
-		return err
+		return fmt.Errorf("Restart.Readiness QueryWorkflow: type=%T grpc=%s canceled=%t caller=%s: %w", err, status.Code(err), errors.Is(err, context.Canceled), fmt.Sprint(ctx.Err()), err)
 	}
 
-	return encoded.Get(&current.processStatus)
+	if err := encoded.Get(&current.processStatus); err != nil {
+		return fmt.Errorf("Restart.Readiness Decode: %w", err)
+	}
+
+	return nil
 }
 
 func (current *world) resumeCart() error {
