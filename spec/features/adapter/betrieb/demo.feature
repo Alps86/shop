@@ -325,8 +325,8 @@ Funktionalität: Reale Demo und ehrliche Performanceabnahme
       | Status | Contains |
       | 200 | 409,00 EUR |
     Wenn der öffentliche Produktcache wird tatsächlich wiederverwendet
-      | Path | MinimumHits | TimeoutSeconds |
-      | /de-DE/produkt/fairphone-5--p-fairphone5?sku=FP5-GREEN-128 | 1 | 3 |
+      | Path | MinimumHits | TimeoutSeconds | TTLSeconds |
+      | /de-DE/produkt/fairphone-5--p-fairphone5?sku=FP5-GREEN-128 | 1 | 3 | 5 |
     Dann die öffentliche Antwort enthält
       | Status | Contains |
       | 200 | 409,00 EUR |
@@ -346,8 +346,15 @@ Funktionalität: Reale Demo und ehrliche Performanceabnahme
       | Jar |
       | neutral |
     Und die aktuelle Formularantwort wird begrenzt abgewartet
-      | Path | HX | Status | Contains | TimeoutSeconds |
-      | /de-DE/kategorie/smartphones--smartphones?color=moss-green | true | 200 | 419,00 EUR | 2 |
+      | Path | Status | Contains | Excludes | TimeoutSeconds |
+      | /de-DE/produkt/fairphone-5--p-fairphone5?sku=FP5-GREEN-128 | 200 | 419,00 EUR | 409,00 EUR | 2 |
+    Dann die neue Produktantwort wird vor Ablauf des ursprünglichen Cacheobjekts beobachtet
+    Wenn der Gast ruft die öffentliche Ansicht auf
+      | Path | HX |
+      | /de-DE/kategorie/smartphones--smartphones?color=moss-green | true |
+    Dann die öffentliche Antwort enthält
+      | Status | Contains |
+      | 200 | 419,00 EUR |
     Und der Gast ruft die öffentliche Ansicht auf
       | Path |
       | /de-DE/produkt/fairphone-5--p-fairphone5?sku=FP5-GREEN-128 |
@@ -367,8 +374,14 @@ Funktionalität: Reale Demo und ehrliche Performanceabnahme
       | Jar |
       | neutral |
     Und die aktuelle Formularantwort wird begrenzt abgewartet
-      | Path | HX | Status | Contains | TimeoutSeconds |
-      | /de-DE/kategorie/smartphones--smartphones?color=moss-green | true | 200 | 409,00 EUR | 2 |
+      | Path | Status | Contains | Excludes | TimeoutSeconds |
+      | /de-DE/produkt/fairphone-5--p-fairphone5?sku=FP5-GREEN-128 | 200 | 409,00 EUR | 419,00 EUR | 2 |
+    Und der Gast ruft die öffentliche Ansicht auf
+      | Path | HX |
+      | /de-DE/kategorie/smartphones--smartphones?color=moss-green | true |
+    Dann die öffentliche Antwort enthält
+      | Status | Contains |
+      | 200 | 409,00 EUR |
 
   @demo-http
   Szenario: Zwei bestätigte HTTPgastkäufe konkurrieren um genau eine verfügbare Einheit

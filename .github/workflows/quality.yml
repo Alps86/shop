@@ -219,6 +219,81 @@ jobs:
             curl --fail --silent --show-error --max-time 5 "http://127.0.0.1:$port/_nodes/stats/indices,jvm,process,os,thread_pool" > "$directory/opensearch-$port-nodes.json" 2> "$directory/opensearch-$port-nodes.stderr" || printf 'OSnodes %s nicht verfügbar\n' "$port" >> "$directory/unavailable.txt"
             curl --fail --silent --show-error --max-time 5 "http://127.0.0.1:$port/_stats/request_cache,search" > "$directory/opensearch-$port-search.json" 2> "$directory/opensearch-$port-search.stderr" || printf 'OSindexstats %s nicht verfügbar\n' "$port" >> "$directory/unavailable.txt"
           done
+      - name: Tatsächliche vollständige Lastwerte und Aussagegrenzen ausgeben
+        if: always()
+        run: |
+          cat /tmp/shop-benchmark-results/demo-cold-start.json
+          cat /tmp/shop-benchmark-results/benchmark-cold-start.json
+          cat /tmp/shop-benchmark-results/measurement.json
+      - name: Einmaliges begrenztes JVM-Profil der persönlichen Suche
+        if: always()
+        continue-on-error: true
+        timeout-minutes: 5
+        run: |
+          set +e
+          directory=/tmp/shop-benchmark-results/jfr-personal
+          mkdir -p "$directory"
+          printf 'Zusätzliche spätere Diagnose, kein Ersatz der Originalsuite. Profil enthält 100 Warmups und danach 1000 Requests/c10; identische hey-Flags, persönlicher Cookie aus eigener Fixture. JFR profile verursacht Zusatzkosten. Zeitlimits können Diagnose unvollständig machen; keine Wiederholung.\n' > "$directory/boundary.txt"
+          if ! jq -e '.Schema == env.SHOP_PERFORMANCE_SCHEMA and .PublicURL == env.SHOP_PERFORMANCE_PUBLIC_URL and (.OrderCookie | startswith("shop_session="))' "$SHOP_PERFORMANCE_STATE_FILE" > "$directory/state-validation.txt" 2> "$directory/state-validation.stderr"; then
+            printf 'Eigene passende persönliche Fixture fehlt.\n' > "$directory/unavailable.txt"
+            exit 0
+          fi
+          cookie=$(jq -r .OrderCookie "$SHOP_PERFORMANCE_STATE_FILE")
+          endpoint="$SHOP_PERFORMANCE_PUBLIC_URL/de-DE/suche?q=Synthetischer"
+          http_status=$(timeout 15s curl --silent --show-error --max-time 10 -H "Cookie: $cookie" -D /tmp/shop-personal-probe.headers -o /tmp/shop-personal-probe.body -w '%{http_code}' "$endpoint" 2> "$directory/probe.stderr")
+          probe_status=$?
+          printf 'exit=%s http=%s\n' "$probe_status" "$http_status" > "$directory/probe-status.txt"
+          awk 'tolower($0) ~ /^(http\/|cache-control:|vary:)/ {print}' /tmp/shop-personal-probe.headers > "$directory/probe-headers.txt"
+          if [ "$probe_status" -ne 0 ] || [ "$http_status" != 200 ] || ! grep -qi '^Cache-Control:.*private' /tmp/shop-personal-probe.headers || ! grep -qi '^Cache-Control:.*no-store' /tmp/shop-personal-probe.headers || ! grep -q 'bench-product-01' /tmp/shop-personal-probe.body; then
+            printf 'Persönliche SSR-Vorprobe nicht gültig.\n' > "$directory/unavailable.txt"
+            exit 0
+          fi
+          container=$(docker compose -p shop-benchmark -f compose.yml -f compose.benchmark.yml ps -q opensearch)
+          if [ "$(printf '%s' "$container" | wc -w)" -ne 1 ]; then
+            printf 'Benchmarkcontainer fehlt oder ist uneindeutig.\n' > "$directory/unavailable.txt"
+            exit 0
+          fi
+          jdk=/usr/share/opensearch/jdk/bin
+          timeout 15s docker exec "$container" "$jdk/jcmd" -l > "$directory/jcmd-list.txt" 2> "$directory/jcmd-list.stderr"
+          jvm=$(awk '$2 ~ /(^|\/)org.opensearch.bootstrap.OpenSearch$/ {print $1}' "$directory/jcmd-list.txt")
+          if [ "$(printf '%s' "$jvm" | wc -w)" -ne 1 ]; then
+            printf 'Genau eine eigene OpenSearch-JVM nicht nachgewiesen.\n' > "$directory/unavailable.txt"
+            exit 0
+          fi
+          user_id=$(timeout 10s docker exec "$container" id -u)
+          jvm_user_id=$(timeout 10s docker exec "$container" cat "/proc/$jvm/status" | awk '/^Uid:/ {print $3}')
+          printf 'container=%s jvm=%s user=%s jvmEffectiveUser=%s\n' "$container" "$jvm" "$user_id" "$jvm_user_id" > "$directory/identity.txt"
+          if [ -z "$user_id" ] || [ "$user_id" != "$jvm_user_id" ]; then
+            printf 'Gleicher effektiver JVM-Benutzer nicht nachgewiesen.\n' > "$directory/unavailable.txt"
+            exit 0
+          fi
+          name="shop-personal-${{ github.job }}"
+          recording="/tmp/$name.jfr"
+          timeout 15s docker exec "$container" "$jdk/jcmd" "$jvm" JFR.start "name=$name" settings=profile duration=120s maxsize=64m "filename=$recording" > "$directory/start.txt" 2> "$directory/start.stderr"
+          start_status=$?
+          printf '%s\n' "$start_status" > "$directory/start-exit.txt"
+          if [ "$start_status" -ne 0 ]; then
+            printf 'JFR-Start fehlgeschlagen, kein Attach erzwungen.\n' > "$directory/unavailable.txt"
+            exit 0
+          fi
+          date --utc --iso-8601=ns > "$directory/warmup-start.txt"
+          timeout 30s "$SHOP_HEY" -n 100 -c 10 -o csv -disable-redirects -disable-compression -t 15 -H "Cookie: $cookie" "$endpoint" > "$directory/warmup.csv" 2> "$directory/warmup.stderr"
+          printf '%s\n' "$?" > "$directory/warmup-exit.txt"
+          date --utc --iso-8601=ns > "$directory/warmup-end.txt"
+          date --utc --iso-8601=ns > "$directory/load-start.txt"
+          timeout 60s "$SHOP_HEY" -n 1000 -c 10 -o csv -disable-redirects -disable-compression -t 15 -H "Cookie: $cookie" "$endpoint" > "$directory/load.csv" 2> "$directory/load.stderr"
+          printf '%s\n' "$?" > "$directory/load-exit.txt"
+          date --utc --iso-8601=ns > "$directory/load-end.txt"
+          timeout 15s docker exec "$container" "$jdk/jcmd" "$jvm" JFR.dump "name=$name" "filename=$recording" > "$directory/dump.txt" 2> "$directory/dump.stderr"
+          printf '%s\n' "$?" > "$directory/dump-exit.txt"
+          timeout 15s docker exec "$container" "$jdk/jcmd" "$jvm" JFR.stop "name=$name" > "$directory/stop.txt" 2> "$directory/stop.stderr"
+          printf '%s\n' "$?" > "$directory/stop-exit.txt"
+          timeout 15s docker cp "$container:$recording" "$directory/recording.jfr" > "$directory/copy.txt" 2> "$directory/copy.stderr"
+          printf '%s\n' "$?" > "$directory/copy-exit.txt"
+          timeout 20s docker exec "$container" "$jdk/jfr" summary "$recording" > "$directory/summary.txt" 2> "$directory/summary.stderr"
+          printf '%s\n' "$?" > "$directory/summary-exit.txt"
+          timeout 20s docker exec "$container" "$jdk/jfr" print --json --stack-depth 64 --events jdk.ExecutionSample,jdk.NativeMethodSample,jdk.ObjectAllocationSample,jdk.ThreadPark,jdk.JavaMonitorEnter,jdk.GarbageCollection,jdk.GCPhasePause,jdk.CPULoad,jdk.ThreadCPULoad "$recording" > "$directory/events.json" 2> "$directory/events.stderr"
+          printf '%s\n' "$?" > "$directory/events-exit.txt"
       - name: Eigene beobachtende Collectorprozesse auch nach Testfehlern beenden
         if: always()
         run: |
@@ -230,12 +305,6 @@ jobs:
               fi
             fi
           done
-      - name: Tatsächliche vollständige Lastwerte und Aussagegrenzen ausgeben
-        if: always()
-        run: |
-          cat /tmp/shop-benchmark-results/demo-cold-start.json
-          cat /tmp/shop-benchmark-results/benchmark-cold-start.json
-          cat /tmp/shop-benchmark-results/measurement.json
       - name: Compose-Ausgabe sichern
         if: always()
         run: docker compose logs --no-color
@@ -378,6 +447,81 @@ jobs:
             curl --fail --silent --show-error --max-time 5 "http://127.0.0.1:$port/_nodes/stats/indices,jvm,process,os,thread_pool" > "$directory/opensearch-$port-nodes.json" 2> "$directory/opensearch-$port-nodes.stderr" || printf 'OSnodes %s nicht verfügbar\n' "$port" >> "$directory/unavailable.txt"
             curl --fail --silent --show-error --max-time 5 "http://127.0.0.1:$port/_stats/request_cache,search" > "$directory/opensearch-$port-search.json" 2> "$directory/opensearch-$port-search.stderr" || printf 'OSindexstats %s nicht verfügbar\n' "$port" >> "$directory/unavailable.txt"
           done
+      - name: Tatsächliche vollständige Lastwerte und Aussagegrenzen ausgeben
+        if: always()
+        run: |
+          cat /tmp/shop-benchmark-results/demo-cold-start.json
+          cat /tmp/shop-benchmark-results/benchmark-cold-start.json
+          cat /tmp/shop-benchmark-results/measurement.json
+      - name: Einmaliges begrenztes JVM-Profil der persönlichen Suche
+        if: always()
+        continue-on-error: true
+        timeout-minutes: 5
+        run: |
+          set +e
+          directory=/tmp/shop-benchmark-results/jfr-personal
+          mkdir -p "$directory"
+          printf 'Zusätzliche spätere Diagnose, kein Ersatz der Originalsuite. Profil enthält 100 Warmups und danach 1000 Requests/c10; identische hey-Flags, persönlicher Cookie aus eigener Fixture. JFR profile verursacht Zusatzkosten. Zeitlimits können Diagnose unvollständig machen; keine Wiederholung.\n' > "$directory/boundary.txt"
+          if ! jq -e '.Schema == env.SHOP_PERFORMANCE_SCHEMA and .PublicURL == env.SHOP_PERFORMANCE_PUBLIC_URL and (.OrderCookie | startswith("shop_session="))' "$SHOP_PERFORMANCE_STATE_FILE" > "$directory/state-validation.txt" 2> "$directory/state-validation.stderr"; then
+            printf 'Eigene passende persönliche Fixture fehlt.\n' > "$directory/unavailable.txt"
+            exit 0
+          fi
+          cookie=$(jq -r .OrderCookie "$SHOP_PERFORMANCE_STATE_FILE")
+          endpoint="$SHOP_PERFORMANCE_PUBLIC_URL/de-DE/suche?q=Synthetischer"
+          http_status=$(timeout 15s curl --silent --show-error --max-time 10 -H "Cookie: $cookie" -D /tmp/shop-personal-probe.headers -o /tmp/shop-personal-probe.body -w '%{http_code}' "$endpoint" 2> "$directory/probe.stderr")
+          probe_status=$?
+          printf 'exit=%s http=%s\n' "$probe_status" "$http_status" > "$directory/probe-status.txt"
+          awk 'tolower($0) ~ /^(http\/|cache-control:|vary:)/ {print}' /tmp/shop-personal-probe.headers > "$directory/probe-headers.txt"
+          if [ "$probe_status" -ne 0 ] || [ "$http_status" != 200 ] || ! grep -qi '^Cache-Control:.*private' /tmp/shop-personal-probe.headers || ! grep -qi '^Cache-Control:.*no-store' /tmp/shop-personal-probe.headers || ! grep -q 'bench-product-01' /tmp/shop-personal-probe.body; then
+            printf 'Persönliche SSR-Vorprobe nicht gültig.\n' > "$directory/unavailable.txt"
+            exit 0
+          fi
+          container=$(docker compose -p shop-benchmark -f compose.yml -f compose.benchmark.yml ps -q opensearch)
+          if [ "$(printf '%s' "$container" | wc -w)" -ne 1 ]; then
+            printf 'Benchmarkcontainer fehlt oder ist uneindeutig.\n' > "$directory/unavailable.txt"
+            exit 0
+          fi
+          jdk=/usr/share/opensearch/jdk/bin
+          timeout 15s docker exec "$container" "$jdk/jcmd" -l > "$directory/jcmd-list.txt" 2> "$directory/jcmd-list.stderr"
+          jvm=$(awk '$2 ~ /(^|\/)org.opensearch.bootstrap.OpenSearch$/ {print $1}' "$directory/jcmd-list.txt")
+          if [ "$(printf '%s' "$jvm" | wc -w)" -ne 1 ]; then
+            printf 'Genau eine eigene OpenSearch-JVM nicht nachgewiesen.\n' > "$directory/unavailable.txt"
+            exit 0
+          fi
+          user_id=$(timeout 10s docker exec "$container" id -u)
+          jvm_user_id=$(timeout 10s docker exec "$container" cat "/proc/$jvm/status" | awk '/^Uid:/ {print $3}')
+          printf 'container=%s jvm=%s user=%s jvmEffectiveUser=%s\n' "$container" "$jvm" "$user_id" "$jvm_user_id" > "$directory/identity.txt"
+          if [ -z "$user_id" ] || [ "$user_id" != "$jvm_user_id" ]; then
+            printf 'Gleicher effektiver JVM-Benutzer nicht nachgewiesen.\n' > "$directory/unavailable.txt"
+            exit 0
+          fi
+          name="shop-personal-${{ github.job }}"
+          recording="/tmp/$name.jfr"
+          timeout 15s docker exec "$container" "$jdk/jcmd" "$jvm" JFR.start "name=$name" settings=profile duration=120s maxsize=64m "filename=$recording" > "$directory/start.txt" 2> "$directory/start.stderr"
+          start_status=$?
+          printf '%s\n' "$start_status" > "$directory/start-exit.txt"
+          if [ "$start_status" -ne 0 ]; then
+            printf 'JFR-Start fehlgeschlagen, kein Attach erzwungen.\n' > "$directory/unavailable.txt"
+            exit 0
+          fi
+          date --utc --iso-8601=ns > "$directory/warmup-start.txt"
+          timeout 30s "$SHOP_HEY" -n 100 -c 10 -o csv -disable-redirects -disable-compression -t 15 -H "Cookie: $cookie" "$endpoint" > "$directory/warmup.csv" 2> "$directory/warmup.stderr"
+          printf '%s\n' "$?" > "$directory/warmup-exit.txt"
+          date --utc --iso-8601=ns > "$directory/warmup-end.txt"
+          date --utc --iso-8601=ns > "$directory/load-start.txt"
+          timeout 60s "$SHOP_HEY" -n 1000 -c 10 -o csv -disable-redirects -disable-compression -t 15 -H "Cookie: $cookie" "$endpoint" > "$directory/load.csv" 2> "$directory/load.stderr"
+          printf '%s\n' "$?" > "$directory/load-exit.txt"
+          date --utc --iso-8601=ns > "$directory/load-end.txt"
+          timeout 15s docker exec "$container" "$jdk/jcmd" "$jvm" JFR.dump "name=$name" "filename=$recording" > "$directory/dump.txt" 2> "$directory/dump.stderr"
+          printf '%s\n' "$?" > "$directory/dump-exit.txt"
+          timeout 15s docker exec "$container" "$jdk/jcmd" "$jvm" JFR.stop "name=$name" > "$directory/stop.txt" 2> "$directory/stop.stderr"
+          printf '%s\n' "$?" > "$directory/stop-exit.txt"
+          timeout 15s docker cp "$container:$recording" "$directory/recording.jfr" > "$directory/copy.txt" 2> "$directory/copy.stderr"
+          printf '%s\n' "$?" > "$directory/copy-exit.txt"
+          timeout 20s docker exec "$container" "$jdk/jfr" summary "$recording" > "$directory/summary.txt" 2> "$directory/summary.stderr"
+          printf '%s\n' "$?" > "$directory/summary-exit.txt"
+          timeout 20s docker exec "$container" "$jdk/jfr" print --json --stack-depth 64 --events jdk.ExecutionSample,jdk.NativeMethodSample,jdk.ObjectAllocationSample,jdk.ThreadPark,jdk.JavaMonitorEnter,jdk.GarbageCollection,jdk.GCPhasePause,jdk.CPULoad,jdk.ThreadCPULoad "$recording" > "$directory/events.json" 2> "$directory/events.stderr"
+          printf '%s\n' "$?" > "$directory/events-exit.txt"
       - name: Eigene beobachtende Collectorprozesse auch nach Testfehlern beenden
         if: always()
         run: |
@@ -389,12 +533,6 @@ jobs:
               fi
             fi
           done
-      - name: Tatsächliche vollständige Lastwerte und Aussagegrenzen ausgeben
-        if: always()
-        run: |
-          cat /tmp/shop-benchmark-results/demo-cold-start.json
-          cat /tmp/shop-benchmark-results/benchmark-cold-start.json
-          cat /tmp/shop-benchmark-results/measurement.json
       - name: Compose-Ausgabe sichern
         if: always()
         run: docker compose logs --no-color

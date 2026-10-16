@@ -18,21 +18,22 @@ import (
 )
 
 type world struct {
-	deployment  *deployment
-	clients     map[string]*http.Client
-	client      *http.Client
-	response    response
-	forms       []form
-	saved       url.Values
-	order       application.OrderView
-	orderPath   string
-	cartID      string
-	runs        map[string]string
-	snapshot    string
-	prepared    map[string]url.Values
-	attempts    []purchaseAttempt
-	orders      []value.OrderID
-	searchCache searchCacheProof
+	deployment   *deployment
+	clients      map[string]*http.Client
+	client       *http.Client
+	response     response
+	forms        []form
+	saved        url.Values
+	order        application.OrderView
+	orderPath    string
+	cartID       string
+	runs         map[string]string
+	snapshot     string
+	prepared     map[string]url.Values
+	attempts     []purchaseAttempt
+	orders       []value.OrderID
+	searchCache  searchCacheProof
+	productCache searchCacheEntry
 }
 
 type purchaseAttempt struct {
@@ -61,9 +62,10 @@ type deployment struct {
 }
 
 type response struct {
-	status int
-	header http.Header
-	body   string
+	requested time.Time
+	status    int
+	header    http.Header
+	body      string
 }
 
 type form struct {

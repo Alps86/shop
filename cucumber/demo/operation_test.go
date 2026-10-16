@@ -22,6 +22,7 @@ func (current *world) registerOperations(ctx *godog.ScenarioContext) {
 	ctx.Step(`^die echten konkurrierenden Käufe ergeben$`, current.concurrentObserved)
 	ctx.Step(`^ein vorbereitetes Abschlussformular wird gesendet$`, current.submitPrepared)
 	ctx.Step(`^der öffentliche Produktcache wird tatsächlich wiederverwendet$`, current.cacheHit)
+	ctx.Step(`^die neue Produktantwort wird vor Ablauf des ursprünglichen Cacheobjekts beobachtet$`, current.productCacheFresh)
 	current.registerSearchCache(ctx)
 }
 

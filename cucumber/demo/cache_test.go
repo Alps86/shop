@@ -13,6 +13,10 @@ import (
 
 func (current *world) cacheHit(table *godog.Table) error {
 	data := read(table)[0]
+	if err := current.rememberProductCache(data); err != nil {
+		return err
+	}
+
 	before, err := current.deployment.cacheHits()
 	if err != nil {
 		return err
@@ -89,4 +93,23 @@ func parseCounter(output, name string) (int64, error) {
 	}
 
 	return 0, fmt.Errorf("Varnishcachezähler fehlt: %s", output)
+}
+
+func (current *world) rememberProductCache(data map[string]string) error {
+	seconds, err := strconv.Atoi(data["TTLSeconds"])
+	if err != nil {
+		return err
+	}
+
+	current.productCache = searchCacheEntry{path: data["Path"], stored: current.response.requested, ttl: time.Duration(seconds) * time.Second}
+
+	return nil
+}
+
+func (current *world) productCacheFresh() error {
+	if err := current.productCache.fresh(); err != nil {
+		return fmt.Errorf("Produktinvalidierung nicht vor ursprünglichem Ablauf beobachtet: %w", err)
+	}
+
+	return nil
 }

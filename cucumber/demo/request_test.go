@@ -70,6 +70,7 @@ func (current *world) getAt(target, path, hx string) error {
 }
 
 func (current *world) send(request *http.Request) error {
+	requested := time.Now()
 	response, err := current.client.Do(request)
 	if err != nil {
 		return err
@@ -80,6 +81,7 @@ func (current *world) send(request *http.Request) error {
 	}()
 	body, err := io.ReadAll(response.Body)
 	current.response = acceptResponse(response, body)
+	current.response.requested = requested
 	current.forms = parseForms(current.response.body)
 
 	return err
