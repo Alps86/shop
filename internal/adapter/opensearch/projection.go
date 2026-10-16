@@ -108,6 +108,7 @@ func (document Document) metadata(product catalog.Product, config Config) Docume
 
 	document.CategoryIDs = config.categoryClosure(append([]value.CategoryID{product.PrimaryCategoryID}, product.AdditionalCategoryIDs...))
 	document.Suggest = config.suggestionNames(document.Name, document.CategoryIDs)
+	document.Words = suggestionWords(append(document.Suggest, document.Brand))
 
 	return document
 }

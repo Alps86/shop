@@ -57,11 +57,26 @@ Funktionalität: Tatsächliche PostgreSQL-Lesefehler
 
   Szenario: Die Diagnose stammt aus einer tatsächlich ausgeführten Datenbankabfrage
     Wenn ein persistenter Lesevertrag aufgerufen wird
-      | Operation |
-      | diagnostics |
+      | Operation | PoolMaxConns |
+      | diagnostics | 3 |
     Dann lautet das öffentliche SQL-Leseergebnis
       | Code | PostgreSQL | PendingProcesses | ProjectionEvents | Checkpoints | ReplicationSlots |
       | OK | ready | 0 | 1 | {} | {} |
+    Und lautet das öffentliche SQL-Leseergebnis
+      | PoolMaxConns |
+      | 3 |
+    Und enthält die Pooldiagnose folgende numerische Mindestwerte
+      | Feld | Minimum |
+      | PoolNumCPU | 1 |
+      | PoolAcquireCount | 1 |
+      | PoolAcquireDurationNanoseconds | 0 |
+      | PoolEmptyAcquireCount | 0 |
+      | PoolEmptyAcquireWaitTimeNanoseconds | 0 |
+      | PoolCanceledAcquireCount | 0 |
+      | PoolAcquiredConns | 0 |
+      | PoolIdleConns | 0 |
+      | PoolConstructingConns | 0 |
+      | PoolTotalConns | 0 |
 
   Szenariogrundriss: Kündigung eines Requests wird über die echte SQL-Grenze erhalten
     Wenn ein bereits gekündigter Kontext die öffentliche SQL-Grenze erreicht

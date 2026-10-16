@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"context"
+	"errors"
 	"github.com/Alps86/shop/internal/adapter/postgres"
 	"github.com/Alps86/shop/internal/application"
 	"go.temporal.io/sdk/client"
@@ -19,8 +20,7 @@ func Open(ctx context.Context, config Config) (*App, error) {
 
 	app := &App{Config: config, Store: store}
 	if err := app.connect(ctx); err != nil {
-		store.Close()
-		return nil, err
+		return nil, errors.Join(err, app.Close(ctx))
 	}
 
 	return app, nil
@@ -50,14 +50,20 @@ func (app *App) connectTemporal(ctx context.Context, snapshot application.AdminC
 	}
 
 	app.Client = connection
-	app.bind(snapshot)
 
-	return nil
+	return app.bind(snapshot)
 }
 
 func (app *App) Close(ctx context.Context) error {
-	err := app.Consumer.Close(ctx)
-	app.Client.Close()
+	var err error
+	if app.Consumer != nil {
+		err = app.Consumer.Close(ctx)
+	}
+
+	if app.Client != nil {
+		app.Client.Close()
+	}
+
 	app.Store.Close()
 
 	return err

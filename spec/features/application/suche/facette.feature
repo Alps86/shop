@@ -50,3 +50,17 @@ Funktionalität: Variantenkonsistente disjunktive Suche
     Dann lautet die Modellkarte
       | ProductID | ChosenSKU | VariantCount | CardCount |
       | p-a | a-red | 2 | 1 |
+
+  Szenario: Mehrere Filter behalten kanonische Drahtbytes und vollständige Ergebnisse
+    Wenn die öffentliche Suche ausgeführt wird
+      | Brand | Color | StorageGB | MaxPrice | Sort | Page |
+      | [] | red | 256 | 13000 | relevance | 1 |
+    Dann lautet das Suchergebnis
+      | ProductIDs | TotalProducts | BrandAlpha | BrandBeta | BrandGamma | SelectedZeroChip |
+      | p-b | 1 | 0 | 1 | 0 | none |
+    Und lautet die Modellkarte
+      | ProductID | ChosenSKU | VariantCount | CardCount |
+      | p-b | b-red | 1 | 1 |
+    Und die Filterabfrage identische vollständige Suchantworten und Drahtbytes behält
+      | Attempts | PostFilter |
+      | 8 | {"bool":{"filter":[{"nested":{"path":"variants","query":{"bool":{"filter":[{"terms":{"variants.options.color":["red"]}},{"range":{"variants.price":{"lte":13000}}},{"range":{"variants.numbers.storageCapacity":{"gte":256000000,"lte":256000000}}}]}},"score_mode":"none"}}]}} |

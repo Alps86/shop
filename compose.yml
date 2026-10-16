@@ -39,9 +39,11 @@ services:
       interval: 2s
       timeout: 3s
       retries: 60
-  shop:
+  content:
     build: .
-    environment:
+    user: "0:0"
+    command: [content]
+    environment: &shop-environment
       SHOP_POSTGRES_DSN: postgres://shop:local-demo-only@postgres:5432/shop?sslmode=disable
       SHOP_SCHEMA: demo
       SHOP_TEMPORAL_ADDRESS: temporal:7233
@@ -52,17 +54,78 @@ services:
       SHOP_CDC_PUBLICATION: shop_demo
       SHOP_CDC_SLOT: shop_demo
       SHOP_LISTEN: 0.0.0.0:8080
-      SHOP_SEED_FILE: /demo/synthetic-start.json
-    ports: ["127.0.0.1:8080:8080"]
+      SHOP_BACKEND_LISTEN: 0.0.0.0:8081
+      SHOP_PUBLIC_ORIGIN: http://localhost:8080
+      SHOP_CONTENT_DIRECTORY: /srv/shop/web
+      SHOP_CONTENT_SOURCE: /generated
+      SHOP_CACHE_ENDPOINT: http://varnish:80/
+      SHOP_CACHE_KEY: local-demo-cache-key-at-least-32-bytes
+      SHOP_CSRF_KEY: local-demo-csrf-key-at-least-32-bytes
+      SHOP_SEED_FILE: /demo/katalog.json
+    volumes: [generated-content:/generated]
+    depends_on:
+      postgres: {condition: service_healthy}
+  hugo:
+    image: ghcr.io/gohugoio/hugo:v0.168.0@sha256:1fb8fe7f417abd5802d86747d297728aa48078d763159e7dff6559fe3f8bb8e7
+    user: "0:0"
+    entrypoint: [/bin/sh, -ec]
+    command:
+      - cp -R /source/. /tmp/site; cp /generated/*.md /tmp/site/content/; exec hugo --source /tmp/site --destination /public --cleanDestinationDir --noBuildLock
+    environment:
+      HUGO_CACHEDIR: /tmp/hugo-cache
+    volumes:
+      - ./web:/source:ro
+      - generated-content:/generated:ro
+      - public-content:/public
+    depends_on:
+      content: {condition: service_completed_successfully}
+  shop:
+    build: .
+    environment: *shop-environment
+    ports: ["127.0.0.1:8081:8081"]
+    volumes: [public-content:/srv/shop/web:ro]
     depends_on:
       postgres: {condition: service_healthy}
       temporal: {condition: service_healthy}
+      hugo: {condition: service_completed_successfully}
     healthcheck:
       test: [CMD, /shop, healthcheck]
       interval: 2s
       timeout: 3s
       retries: 60
+  nginx:
+    image: nginx:1.30.6@sha256:eb1c896deef834f4e056829fd6dadac8305501f16cc71ba65fb252c8d0aa168e
+    command: [nginx, -c, /etc/nginx/shop.conf, -g, "daemon off;"]
+    volumes:
+      - ./deploy/nginx/nginx.conf:/etc/nginx/shop.conf:ro
+      - public-content:/srv/shop/web:ro
+    depends_on:
+      shop: {condition: service_healthy}
+      hugo: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, curl, --fail, --silent, "http://127.0.0.1:8082/health"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  varnish:
+    image: varnish:9.1.0@sha256:842a2874f49d5b9eb7690a8fe0b6d3a66d8045b2d2a96154b4a804e2cbd8ac33
+    entrypoint: [/bin/sh, -ec]
+    command:
+      - sed 's/SHOP_CACHE_KEY/local-demo-cache-key-at-least-32-bytes/g' /etc/varnish/source.vcl > /tmp/shop.vcl; exec /usr/local/bin/docker-varnish-entrypoint -f /tmp/shop.vcl -p vsl_mask=-ReqHeader,-BereqHeader,-RespHeader,-BerespHeader,-ReqUnset,-BereqUnset,-RespUnset,-BerespUnset
+    environment:
+      VARNISH_SIZE: 256M
+    ports: ["127.0.0.1:8080:80"]
+    volumes: [./deploy/varnish/default.vcl:/etc/varnish/source.vcl:ro]
+    depends_on:
+      nginx: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, curl, --fail, --silent, "http://127.0.0.1/health"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
 volumes:
   postgres-data:
   temporal-data:
   search-data:
+  generated-content:
+  public-content:

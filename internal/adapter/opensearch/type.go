@@ -67,7 +67,7 @@ type HitTotal struct {
 }
 
 type Hit struct {
-	Source Document             `json:"_source"`
+	Fields StoredProductFields  `json:"fields"`
 	Inner  map[string]InnerPage `json:"inner_hits"`
 }
 
@@ -80,7 +80,7 @@ type VariantPage struct {
 }
 
 type VariantHit struct {
-	Source Variant `json:"_source"`
+	Fields StoredVariantFields `json:"fields"`
 }
 
 type SuggestionGroup struct {
@@ -107,17 +107,30 @@ type Document struct {
 	CategoryIDs []value.CategoryID `json:"category_ids"`
 	Variants    []Variant          `json:"variants"`
 	Suggest     []string           `json:"suggest"`
+	Words       []string           `json:"words"`
 	Visibility  string             `json:"visibility"`
 }
 
+type documentJSON Document
+
+type StoredProductFields struct {
+	ProductID []value.ProductID `json:"product_id"`
+}
+
+type StoredVariantFields struct {
+	SKU         []value.SKU `json:"variants.sku"`
+	CardPayload [][]byte    `json:"variants.card_payload"`
+}
+
 type Variant struct {
-	Margin    int64                         `json:"margin"`
-	SKU       value.SKU                     `json:"sku"`
-	Price     int64                         `json:"price"`
-	Available int64                         `json:"available"`
-	Options   map[string][]value.OptionCode `json:"options"`
-	Numbers   map[string]int64              `json:"numbers"`
-	Card      application.ProductCard       `json:"card"`
+	Margin      int64                         `json:"margin"`
+	SKU         value.SKU                     `json:"sku"`
+	Price       int64                         `json:"price"`
+	Available   int64                         `json:"available"`
+	Options     map[string][]value.OptionCode `json:"options"`
+	Numbers     map[string]int64              `json:"numbers"`
+	Card        application.ProductCard       `json:"card"`
+	CardPayload []byte                        `json:"card_payload"`
 }
 
 type FailureResponse struct {
@@ -163,4 +176,46 @@ type ProductCount struct {
 
 type Ranking struct {
 	Interests []sale.CategoryInterest
+}
+
+type multiSearchLines []JSON
+
+type searchRequest struct {
+	Path    string
+	Payload any
+	Multi   bool
+}
+
+type multiSearchResponse struct {
+	Responses []multiSearchPart `json:"responses"`
+}
+
+type multiSearchPart struct {
+	SearchResponse
+	Status   int             `json:"status"`
+	Error    json.RawMessage `json:"error"`
+	TimedOut bool            `json:"timed_out"`
+	Shards   searchShards    `json:"_shards"`
+}
+
+type searchShards struct {
+	Failed int `json:"failed"`
+}
+
+type storedSearchCard struct {
+	application.ProductCard
+	Compliance storedCardCompliance
+}
+
+type storedCardCompliance struct {
+	catalog.ProductCompliance
+	Safety              catalog.SafetyInformation             `json:",omitzero"`
+	ChemicalLabel       value.Optional[catalog.ChemicalLabel] `json:",omitzero"`
+	EnergyLabel         value.Optional[catalog.EnergyLabel]   `json:",omitzero"`
+	NetContent          value.Optional[catalog.Measurement]   `json:",omitzero"`
+	UnitPriceBasis      value.Optional[catalog.Measurement]   `json:",omitzero"`
+	Documents           []catalog.ProductDocument             `json:",omitzero"`
+	Notices             []catalog.RequiredNotice              `json:",omitzero"`
+	RequiredFields      []string                              `json:",omitzero"`
+	NonApplicableReason string                                `json:",omitzero"`
 }

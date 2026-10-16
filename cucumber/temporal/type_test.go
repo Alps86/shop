@@ -1,6 +1,7 @@
 package temporal_test
 
 import (
+	"context"
 	"github.com/Alps86/shop/internal/adapter/postgres"
 	"github.com/Alps86/shop/internal/adapter/temporal"
 	"github.com/Alps86/shop/internal/application"
@@ -89,4 +90,12 @@ type failedFulfillment struct {
 
 type fixedClock struct {
 	At time.Time
+}
+
+type restartReadiness struct {
+	ctx      context.Context
+	interval time.Duration
+	probes   int
+	canceled int
+	first    string
 }

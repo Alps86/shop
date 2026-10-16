@@ -17,7 +17,7 @@ Funktionalität: Ehrliche Suchdienstfehler
       | <Verbindung> | <Status> | <Antwort> | controlled |
     Wenn die echte öffentliche Suche abgefragt wird
       | Text | Page | Sort |
-      | Alpha | 1 | relevance |
+      | A | 1 | relevance |
     Dann liefert die Suchverbindung
       | Code | TotalProducts |
       | <Fehler> | 0 |
@@ -28,9 +28,9 @@ Funktionalität: Ehrliche Suchdienstfehler
       | invalid | 503 | {} | DependencyUnavailable |
       | open | 503 | {} | SearchUnavailable |
       | open | 200 | invalid-json | SearchUnavailable |
-      | open | 200 | {"hits":{"hits":[{"_source":{"product_id":"p-a"}}]}} | SearchUnavailable |
-      | open | 200 | {"hits":{"hits":[{"_source":{"product_id":"p-a"},"inner_hits":{"chosen":{"hits":{"hits":[{"_source":{"sku":"a-red","card":{"ProductID":"p-b","SKU":"a-red"}}}]}}}}]}} | SearchUnavailable |
-      | open | 200 | {"hits":{"hits":[{"_source":{"product_id":"p-a"},"inner_hits":{"chosen":{"hits":{"hits":[{"_source":{"sku":"a-red","card":{"ProductID":"p-a","SKU":"a-blue"}}}]}}}}]}} | SearchUnavailable |
+      | open | 200 | {"hits":{"hits":[{"fields":{"product_id":["p-a"]}}]}} | SearchUnavailable |
+      | open | 200 | {"hits":{"hits":[{"inner_hits":{"chosen":{"hits":{"hits":[{"fields":{"variants.sku":["a-red"],"variants.card_payload":["eyJQcm9kdWN0SUQiOiJwLWIiLCJTS1UiOiJhLXJlZCJ9"]}}]}}},"fields":{"product_id":["p-a"]}}]}} | SearchUnavailable |
+      | open | 200 | {"hits":{"hits":[{"inner_hits":{"chosen":{"hits":{"hits":[{"fields":{"variants.sku":["a-red"],"variants.card_payload":["eyJQcm9kdWN0SUQiOiJwLWEiLCJTS1UiOiJhLWJsdWUifQ=="]}}]}}},"fields":{"product_id":["p-a"]}}]}} | SearchUnavailable |
       | open | 200 | {"aggregations":{"facet_brand":false}} | SearchUnavailable |
       | open | 200 | {"aggregations":{"facet_price":{"variants":{"matching":{"values":{"buckets":[{"key":{}}]}}}}}} | SearchUnavailable |
 
@@ -136,7 +136,7 @@ Funktionalität: Ehrliche Suchdienstfehler
   Szenario: Wiederholte Vorschläge verschiedener Gruppen werden stabil dedupliziert
     Angenommen die Suchdienstverbindung eine explizite Protokollstörung liefert
       | Connection | Status | Body | Clock |
-      | open | 200 | {"hits":{"total":{"value":0},"hits":[]},"suggest":{"catalog":[{"options":[{"text":"Alpha Z"},{"text":"Beta"},{"text":"Zeta"},{"text":"Alpha A"},{"text":"Alpha A"}]},{"options":[{"text":"Gamma"},{"text":"Alpha B"},{"text":"Alpha C"}]}]}} | controlled |
+      | open | 200 | {"responses":[{"status":200,"hits":{"total":{"value":0},"hits":[]}},{"status":200,"suggest":{"catalog":[{"options":[{"text":"Alpha Z"},{"text":"Beta"},{"text":"Zeta"},{"text":"Alpha A"},{"text":"Alpha A"}]},{"options":[{"text":"Gamma"},{"text":"Alpha B"},{"text":"Alpha C"}]}]}}]} | controlled |
     Wenn Vorschläge angefragt werden
       | Query | Page | Sort |
       | Alpha | 1 | relevance |
@@ -203,7 +203,7 @@ Funktionalität: Ehrliche Suchdienstfehler
   Szenariogrundriss: Schreibprojektionen erhalten mehr Zeit während öffentliche Suche ihr Fehlerbudget behält
     Angenommen der echte Suchdienst über eine verzögerte Verbindung angesprochen wird
       | Milliseconds | Client |
-      | 600 | <Client> |
+      | 800 | <Client> |
     Wenn der Suchadapter die Verwaltungsoperation ausführt
       | Operation | ProductID |
       | apply | p-a |
@@ -218,9 +218,33 @@ Funktionalität: Ehrliche Suchdienstfehler
       | SearchUnavailable |
     Und bleibt die öffentliche Suchantwort innerhalb des Fehlerbudgets
       | MaximumMilliseconds |
-      | 500 |
+      | 750 |
 
     Beispiele:
       | Client |
       | default |
       | custom |
+
+  Szenario: Wiederholte vollständige Suchanfragen nutzen den echten Indexrequestcache
+    Angenommen der echte Suchantwortkörper zur Transportprüfung beobachtet wird
+      | CaptureResponse |
+      | true |
+    Wenn die echte öffentliche Suche abgefragt wird
+      | Text | Page | Sort |
+      | Alpha | 1 | relevance |
+    Dann liefert die Suchverbindung
+      | Code | TotalProducts |
+      | OK | 1 |
+    Angenommen der echte Suchindex seinen Requestcachezähler vormerkt
+    Wenn die identische öffentliche Suche mehrfach ausgeführt wird
+      | Attempts |
+      | 3 |
+    Dann der Suchindex echte Requestcachetreffer meldet
+      | MinimumHitDelta |
+      | 6 |
+    Und liefert die Suchverbindung
+      | Code | TotalProducts |
+      | OK | 1 |
+    Und die echte Suchantwort nur benötigte Rootdaten und die vollständige Variantkarte enthält
+      | RootFields | ProductID |
+      | 1 | p-a |

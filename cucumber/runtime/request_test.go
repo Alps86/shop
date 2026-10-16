@@ -7,6 +7,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"io"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -29,7 +30,7 @@ func (current *world) request(table *godog.Table) error {
 }
 
 func (current *world) cleanup(ctx context.Context, _ *godog.Scenario, _ error) (context.Context, error) {
-	err := errors.Join(current.stopCommand(), current.stopRuntime())
+	err := errors.Join(current.stopCommand(), current.stopRuntime(), os.RemoveAll(current.contentDirectory))
 	if current.app == nil {
 		return ctx, err
 	}
@@ -66,7 +67,7 @@ func (current *world) releaseDatabase(ctx context.Context) error {
 func (current *world) removeResources(ctx context.Context, connection *pgx.Conn) error {
 	_, publicationError := connection.Exec(ctx, "DROP PUBLICATION IF EXISTS "+pgx.Identifier{current.config.Publication}.Sanitize())
 	_, schemaError := connection.Exec(ctx, "DROP SCHEMA "+pgx.Identifier{current.config.Schema}.Sanitize()+" CASCADE")
-	request, err := http.NewRequestWithContext(ctx, http.MethodDelete, current.config.SearchEndpoint+"/"+current.config.SearchIndex+"*", nil)
+	request, err := http.NewRequestWithContext(ctx, http.MethodDelete, current.resourceSearchEndpoint+"/"+current.config.SearchIndex+"*", nil)
 	if err != nil {
 		return errors.Join(publicationError, schemaError, err)
 	}

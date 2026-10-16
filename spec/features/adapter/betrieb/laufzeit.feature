@@ -136,3 +136,21 @@ Funktionalität: Laufzeitkomposition der echten Adapter
     Dann lautet das Ergebnis der Laufzeitoperation
       | Code |
       | DependencyUnavailable |
+
+  Szenario: Nicht erreichbare Suchinitialisierung sperrt die Kaufbereitschaft nicht
+    Wenn die Laufzeit mit echten Dienstverbindungen geöffnet wird
+      | PostgresEnv | TemporalEnv | SearchEnv | Namespace | Listen | Locale | Currency | Market | SearchEndpoint |
+      | SHOP_TEST_POSTGRES_DSN | SHOP_TEST_TEMPORAL_ADDRESS | SHOP_TEST_OPENSEARCH_URL | default | 127.0.0.1:0 | de-DE | EUR | DE | http://127.0.0.1:1 |
+    Und Worker Projektor und HTTP-Dienst gestartet werden
+    Und die vollständige Bereitschaft begrenzt abgewartet wird
+      | Path | TimeoutSeconds | Contains |
+      | /ready | 10 | CDC:SearchUnavailable |
+    Dann liefert die Laufzeitdiagnose
+      | Status | Contains |
+      | 200 | CDC:SearchUnavailable |
+    Wenn die Bereitschaft nach dem technischen Retryintervall erneut abgefragt wird
+      | Path | Milliseconds |
+      | /ready | 1100 |
+    Dann liefert die Laufzeitdiagnose
+      | Status | Contains |
+      | 200 | CDC:SearchUnavailable |

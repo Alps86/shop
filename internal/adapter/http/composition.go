@@ -14,7 +14,7 @@ func (handler *Handler) fragment(writer http.ResponseWriter, request *http.Reque
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(request.Context(), 150*time.Millisecond)
+	ctx, cancel := context.WithTimeout(request.Context(), 750*time.Millisecond)
 	defer cancel()
 	clone := request.Clone(ctx)
 	clone.URL.Path = strings.TrimPrefix(request.URL.Path, "/fragments")
@@ -48,24 +48,36 @@ func (path routePath) fragmentAllowed() bool {
 }
 
 func (page *Page) composition(request *http.Request) {
-	if request.Header.Get("X-Shop-Composition") != "1" {
-		return
-	}
-
-	if (requestView{request}).session() != "" {
-		return
-	}
-
-	if !routePath(request.URL.Path).fragmentAllowed() {
+	if !page.canCompose(request) {
 		return
 	}
 
 	page.SSIHeader = template.HTML(`<!--# include virtual="/_static/header.html" -->`)
 	page.SSIFooter = template.HTML(`<!--# include virtual="/_static/footer.html" -->`)
+	if request.URL.Path == "/de-DE/suche" {
+		return
+	}
+
 	page.Fragment.URL = "/fragments" + request.URL.RequestURI()
 	if page.Detail.Product.ID != "" {
 		page.rootVersion()
 	}
+}
+
+func (page Page) canCompose(request *http.Request) bool {
+	if page.Status != http.StatusOK {
+		return false
+	}
+
+	if request.Header.Get("X-Shop-Composition") != "1" {
+		return false
+	}
+
+	if (requestView{request}).session() != "" {
+		return false
+	}
+
+	return routePath(request.URL.Path).fragmentAllowed()
 }
 
 func (handler *Handler) fragmentFailure(writer http.ResponseWriter) {
@@ -76,6 +88,10 @@ func (handler *Handler) fragmentFailure(writer http.ResponseWriter) {
 
 func (page Page) surrogateKeys() string {
 	keys := []string{}
+	if page.Path == "/de-DE/suche" {
+		keys = append(keys, "shop:public-search")
+	}
+
 	for _, card := range page.Search.Cards {
 		keys = append(keys, string(card.SKU))
 	}

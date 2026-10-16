@@ -24,7 +24,11 @@ func (current *world) sqlFixture(input *godog.Table) error {
 	return nil
 }
 
-func (current *world) readDiagnostics(_ map[string]string) error {
+func (current *world) readDiagnostics(row map[string]string) error {
+	if err := current.diagnosticPool(row); err != nil {
+		return err
+	}
+
 	current.observed, current.err = current.store.Diagnostics(context.Background())
 	if current.observed == nil {
 		current.observed = map[string]string{}

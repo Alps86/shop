@@ -16,6 +16,7 @@ func (current *world) readSteps(ctx *godog.ScenarioContext) {
 	ctx.Step(`^lautet das öffentliche SQL-Leseergebnis$`, current.readObserved)
 	ctx.Step(`^das persistierte Gastprofil gewählt wird$`, current.selectProfile)
 	ctx.Step(`^die Gastfähigkeit um Tage gealtert wird$`, current.ageSession)
+	ctx.Step(`^enthält die Pooldiagnose folgende numerische Mindestwerte$`, current.poolObserved)
 }
 
 func (current *world) openGuest() error {

@@ -3,6 +3,7 @@ package opensearch_test
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -11,7 +12,7 @@ import (
 )
 
 func (transport *captureTransport) RoundTrip(request *http.Request) (*http.Response, error) {
-	if strings.HasSuffix(request.URL.Path, "/_search") {
+	if strings.HasSuffix(request.URL.Path, "search") {
 		payload, err := io.ReadAll(request.Body)
 		if err != nil {
 			return nil, err
@@ -21,7 +22,7 @@ func (transport *captureTransport) RoundTrip(request *http.Request) (*http.Respo
 		transport.payload = payload
 	}
 
-	return http.DefaultTransport.RoundTrip(request)
+	return transport.forward(request)
 }
 
 func (current *world) queryReplaced() bool {
@@ -50,4 +51,24 @@ func (expected row) maximum(count int) error {
 	}
 
 	return nil
+}
+
+func (transport *captureTransport) forward(request *http.Request) (*http.Response, error) {
+	if !transport.observeResponse {
+		return http.DefaultTransport.RoundTrip(request)
+	}
+
+	response, err := http.DefaultTransport.RoundTrip(request)
+	if err != nil {
+		return nil, err
+	}
+
+	payload, readError := io.ReadAll(response.Body)
+	closeError := response.Body.Close()
+	response.Body = io.NopCloser(bytes.NewReader(payload))
+	if strings.HasSuffix(request.URL.Path, "search") {
+		transport.response = payload
+	}
+
+	return response, errors.Join(readError, closeError)
 }

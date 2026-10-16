@@ -29,6 +29,7 @@ func (current *world) register(ctx *godog.ScenarioContext) {
 	ctx.Step(`^der HTTPadapter wird initialisiert$`, current.construct)
 	ctx.Step(`^die Adapterinitialisierung meldet$`, current.initializationResult)
 	current.registerComposition(ctx)
+	current.registerBudget(ctx)
 	ctx.Step(`^der Shop liefert eine HTTPansicht$`, current.request)
 	ctx.Step(`^die HTTPantwort enthält die sichtbaren Vertragswerte$`, current.expect)
 	ctx.Step(`^der verwendete Applicationport erhält$`, current.expectPort)
@@ -93,4 +94,6 @@ func (current *world) registerComposition(ctx *godog.ScenarioContext) {
 	ctx.Step(`^die Fragmentcachefrist verstreicht$`, current.awaitFragmentExpiry)
 	ctx.Step(`^getrennte Gastcookiejars werden eingerichtet$`, current.prepareClients)
 	ctx.Step(`^die öffentliche Rahmenantwort wird verglichen$`, current.compareFrame)
+	ctx.Step(`^die Suchaufrufe ab jetzt gezählt werden$`, current.resetSearchCalls)
+	ctx.Step(`^die Suchportaufrufe der Komposition entsprechen$`, current.searchCalls)
 }

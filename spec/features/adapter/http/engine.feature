@@ -29,6 +29,30 @@ Funktionalität: Echte Standardenginekomposition
       | /de-DE/service | | Technik verstehen. In Ruhe entscheiden. |
       | /de-DE/kategorie/smartphones--c-phone | | data-frame="hugo" |
 
+  Szenario: Die kuratierte Markenwelt stammt aus Hugo und benötigt keine Suche
+    Und die Suchaufrufe ab jetzt gezählt werden
+      | Fault |
+      | Search |
+    Wenn die zusammengesetzte HTTPansicht wird angefordert
+      | URL | Cookie |
+      | /de-DE/marken | |
+    Dann die HTTPantwort enthält die sichtbaren Vertragswerte
+      | Field | Value |
+      | Status | 200 |
+      | Body | Drei Marken aus unserer Demoauswahl |
+      | Body | href="/de-DE/suche?brand=Fairphone" |
+      | Body | href="/de-DE/suche?brand=Constructa" |
+      | Body | href="/de-DE/suche?brand=Dr.%20Becher" |
+      | Body | rel="canonical" href="/de-DE/marken" |
+      | Body | <header data-composition="nginx-ssi" |
+      | Body | <footer data-composition="nginx-ssi" |
+      | Header:Cache-Control | public,max-age=0 |
+      | Absent | <!--# |
+      | Absent | <esi:include |
+    Und die Suchportaufrufe der Komposition entsprechen
+      | SearchCalls |
+      | 0 |
+
   Szenario: Persönlicher Cart umgeht den gemeinsamen Fragmentcache
     Wenn die zusammengesetzte HTTPansicht wird angefordert
       | URL | Cookie |

@@ -110,10 +110,8 @@ func (store *Store) productInventory(ctx context.Context, db database, product c
 func (repository CatalogRepository) Snapshot(ctx context.Context) (application.AdminCatalogSnapshot, error) {
 	result := application.AdminCatalogSnapshot{}
 	reads := map[string]any{"product": &result.Products, "family": &result.Families, "category": &result.Categories, "discount": &result.DiscountRules, "inventory": &result.Inventory}
-	for kind, destination := range reads {
-		if err := repository.store.documents(ctx, kind, destination); err != nil {
-			return application.AdminCatalogSnapshot{}, err
-		}
+	if err := repository.readSnapshot(ctx, reads); err != nil {
+		return application.AdminCatalogSnapshot{}, err
 	}
 
 	return result, nil
@@ -124,8 +122,9 @@ func (repository CatalogRepository) Category(ctx context.Context, id value.Categ
 		return application.CategoryView{}, err
 	}
 
-	snapshot, err := repository.Snapshot(ctx)
-	if err != nil {
+	snapshot := application.AdminCatalogSnapshot{}
+	reads := map[string]any{"family": &snapshot.Families, "category": &snapshot.Categories}
+	if err := repository.readSnapshot(ctx, reads); err != nil {
 		return application.CategoryView{}, err
 	}
 
@@ -230,4 +229,14 @@ func (repository CatalogRepository) topAttributes(product catalog.Product, varia
 	}
 
 	return chosen
+}
+
+func (repository CatalogRepository) readSnapshot(ctx context.Context, reads map[string]any) error {
+	for kind, destination := range reads {
+		if err := repository.store.documents(ctx, kind, destination); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

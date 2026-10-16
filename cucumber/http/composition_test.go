@@ -103,7 +103,7 @@ func (current *world) composedRequest(table *godog.Table) error {
 		return err
 	}
 
-	request.Header.Set("Cookie", fields["Cookie"])
+	configureEngineRequest(request, fields)
 	response, err := current.engineClient(fields["Jar"]).Do(request)
 	if err != nil {
 		return err
@@ -264,4 +264,16 @@ func (current *world) engineOrigin(engine *compositionEngine) error {
 func (current *world) awaitFragmentExpiry(table *godog.Table) error {
 	time.Sleep(time.Duration(readCount(read(table)[0]["Milliseconds"])) * time.Millisecond)
 	return nil
+}
+
+func configureEngineRequest(request *http.Request, fields map[string]string) {
+	for header, field := range map[string]string{"Cookie": "Cookie", "HX-Request": "HTMX", "Authorization": "Authorization"} {
+		if fields[field] != "" {
+			request.Header.Set(header, fields[field])
+		}
+	}
+
+	if fields["Host"] != "" {
+		request.Host = fields["Host"]
+	}
 }

@@ -1,0 +1,66 @@
+{
+  "TotalProducts": 1,
+  "Cards": [
+    {
+      "ProductID": "p-pool",
+      "URL": "/de-DE/produkt/testmodell--p-phone?sku=RED-256",
+      "Name": "Testmodell <b>",
+      "SKU": "POOL",
+      "Image": {
+        "URL": "/assets/product.svg",
+        "AltText": {
+          "de-DE": "Galerie RED-256"
+        }
+      },
+      "UnitPrice": {
+        "MinorUnits": 12000,
+        "Currency": "EUR"
+      },
+      "AvailableQuantity": 7,
+      "VariantCount": 3,
+      "TopAttributes": {
+        "storageCapacity": {
+          "Type": "number",
+          "Number": {
+            "Present": true,
+            "Value": "256"
+          }
+        }
+      },
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "Notices": [
+          {
+            "Code": "notice",
+            "Text": {
+              "de-DE": "verified-blue"
+            },
+            "Placement": [
+              "detail",
+              "listing"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "Facets": [
+    {
+      "Code": "brand",
+      "Values": [
+        {
+          "Value": "Alpha",
+          "ProductCount": 1
+        }
+      ]
+    }
+  ],
+  "Page": 1,
+  "PageSize": 12,
+  "Degraded": false,
+  "Suggestions": []
+}

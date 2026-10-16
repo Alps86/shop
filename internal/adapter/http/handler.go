@@ -172,7 +172,7 @@ func newConfig(config Config) (Config, error) {
 }
 
 func (renderer Renderer) functions() template.FuncMap {
-	return template.FuncMap{"money": renderer.money, "text": renderer.localized, "attribute": renderer.attribute, "productURL": renderer.productURL, "categoryURL": renderer.categoryURL, "basePrice": renderer.basePrice, "field": renderer.fieldValue, "quantity": renderer.itemQuantity, "can": renderer.can}
+	return template.FuncMap{"suggestionURL": suggestionURL, "money": renderer.money, "text": renderer.localized, "attribute": renderer.attribute, "productURL": renderer.productURL, "categoryURL": renderer.categoryURL, "basePrice": renderer.basePrice, "field": renderer.fieldValue, "quantity": renderer.itemQuantity, "can": renderer.can}
 }
 
 func newRenderer(config Config) (Renderer, error) {

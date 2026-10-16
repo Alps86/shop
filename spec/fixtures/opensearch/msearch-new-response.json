@@ -1,0 +1,79 @@
+{
+  "responses": [
+    {
+      "hits": {
+        "total": {
+          "value": 1
+        },
+        "hits": [
+          {
+            "inner_hits": {
+              "chosen": {
+                "hits": {
+                  "hits": [
+                    {
+                      "fields": {
+                        "variants.sku": [
+                          "POOL"
+                        ],
+                        "variants.card_payload": [
+                          "eyJQcm9kdWN0SUQiOiJwLXBvb2wiLCJVUkwiOiIvZGUtREUvcHJvZHVrdC90ZXN0bW9kZWxsLS1wLXBob25lP3NrdT1SRUQtMjU2IiwiTmFtZSI6Ik1vZGVsIG5ldyIsIlNLVSI6IlBPT0wiLCJJbWFnZSI6eyJVUkwiOiIvYXNzZXRzL3Byb2R1Y3Quc3ZnIiwiQWx0VGV4dCI6eyJkZS1ERSI6IkdhbGVyaWUgUkVELTI1NiJ9fSwiVW5pdFByaWNlIjp7Ik1pbm9yVW5pdHMiOjEyMDAwLCJDdXJyZW5jeSI6IkVVUiJ9LCJBdmFpbGFibGVRdWFudGl0eSI6NywiVmFyaWFudENvdW50IjozLCJUb3BBdHRyaWJ1dGVzIjp7InN0b3JhZ2VDYXBhY2l0eSI6eyJUeXBlIjoibnVtYmVyIiwiTnVtYmVyIjp7IlByZXNlbnQiOnRydWUsIlZhbHVlIjoiMjU2In19fSwiQ29tcGxpYW5jZSI6eyJDb250ZXh0Ijp7Ik1hcmtldCI6IkRFIiwiTG9jYWxlIjoiZGUtREUiLCJWZXJpZmljYXRpb25TdGF0dXMiOiJ2ZXJpZmllZCJ9LCJOb3RpY2VzIjpbeyJDb2RlIjoibm90aWNlIiwiVGV4dCI6eyJkZS1ERSI6InZlcmlmaWVkLWJsdWUifSwiUGxhY2VtZW50IjpbImRldGFpbCIsImxpc3RpbmciXX1dfX0="
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "fields": {
+              "product_id": [
+                "p-pool"
+              ]
+            }
+          }
+        ]
+      },
+      "aggregations": {
+        "facet_brand": {
+          "values": {
+            "buckets": [
+              {
+                "key": "Alpha",
+                "doc_count": 1
+              }
+            ]
+          }
+        }
+      },
+      "status": 200,
+      "timed_out": false,
+      "_shards": {
+        "failed": 0
+      }
+    },
+    {
+      "status": 200,
+      "timed_out": false,
+      "_shards": {
+        "failed": 0
+      },
+      "hits": {
+        "total": {
+          "value": 999
+        },
+        "hits": []
+      },
+      "suggest": {
+        "catalog": [
+          {
+            "options": [
+              {
+                "text": "Phone old"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

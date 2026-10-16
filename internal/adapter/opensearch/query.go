@@ -17,7 +17,7 @@ func (adapter Adapter) searchBody(query application.SearchQuery) (JSON, error) {
 	base := adapter.baseQuery(query)
 	base["should"] = []JSON{inner}
 	base["minimum_should_match"] = 0
-	body := JSON{"from": (query.Page - 1) * 12, "size": 12, "track_total_hits": true, "query": (Ranking{Interests: query.Interests}).query(JSON{"bool": base}), "post_filter": selection, "sort": plan.productSort(variant), "aggs": adapter.facets(plan)}
+	body := JSON{"_source": false, "stored_fields": []string{"product_id"}, "from": (query.Page - 1) * 12, "size": 12, "track_total_hits": true, "query": (Ranking{Interests: query.Interests}).query(JSON{"bool": base}), "post_filter": selection, "sort": plan.productSort(variant), "aggs": adapter.facets(plan)}
 	adapter.suggestBody(body, query)
 
 	return body, nil
@@ -31,7 +31,7 @@ func (adapter Adapter) baseQuery(query application.SearchQuery) JSON {
 
 	text := JSON{"match_all": JSON{}}
 	if strings.TrimSpace(query.Text) != "" {
-		text = JSON{"multi_match": JSON{"query": query.Text, "fields": []string{"name^3", "brand.text^2", "description"}, "fuzziness": "AUTO", "prefix_length": 2}}
+		text = JSON{"multi_match": JSON{"query": query.Text, "fields": []string{"name^3", "brand.text^2", "description"}}}
 	}
 
 	return JSON{"must": []JSON{text}, "filter": filters}

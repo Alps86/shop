@@ -30,13 +30,9 @@ func (current *world) changedConfiguration(table *godog.Table) error {
 }
 
 func (current *world) configurationOperation(ctx context.Context, config runtime.Config, operation string) error {
-	if operation == "healthcheck" {
-		current.err = config.Execute(ctx, []string{"healthcheck"})
-		return nil
-	}
-
-	if operation == "run" {
-		current.err = config.Execute(ctx, nil)
+	commands := map[string][]string{"content": {"content"}, "healthcheck": {"healthcheck"}, "run": nil}
+	if arguments, exists := commands[operation]; exists {
+		current.err = config.Execute(ctx, arguments)
 		return nil
 	}
 
@@ -67,7 +63,12 @@ func (current *world) changeConfiguration(config *runtime.Config, data map[strin
 }
 
 func (current *world) configurationFields(config *runtime.Config) map[string]*string {
-	return map[string]*string{"Schema": &config.Schema, "DSN": &config.DSN, "TemporalAddress": &config.TemporalAddress, "TemporalNamespace": &config.TemporalNamespace, "SearchEndpoint": &config.SearchEndpoint, "Listen": &config.Listen, "SeedFile": &config.SeedFile}
+	fields := current.frontendFields(config)
+	for key, target := range map[string]*string{"Schema": &config.Schema, "DSN": &config.DSN, "TemporalAddress": &config.TemporalAddress, "TemporalNamespace": &config.TemporalNamespace, "SearchEndpoint": &config.SearchEndpoint, "Listen": &config.Listen, "SeedFile": &config.SeedFile} {
+		fields[key] = target
+	}
+
+	return fields
 }
 
 func (current *world) tryOpen(ctx context.Context, config runtime.Config) {

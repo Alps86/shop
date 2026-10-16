@@ -82,7 +82,9 @@ func (handler *Handler) afterCart(writer http.ResponseWriter, request *http.Requ
 	}
 
 	page.useCart(cart)
+	handler.cartRecommendations(request, &page)
 	writer.Header().Set("HX-Push-Url", target)
+	writer.Header().Set("HX-Trigger", "cartChanged")
 	handler.render(writer, request, page)
 }
 
@@ -109,9 +111,16 @@ func (handler *Handler) place(writer http.ResponseWriter, request *http.Request,
 		return
 	}
 
-	target := "/de-DE/bestellung/" + string(result.OrderID)
+	handler.redirectOrder(writer, request, result.OrderID)
+}
+
+func (handler *Handler) redirectOrder(writer http.ResponseWriter, request *http.Request, id value.OrderID) {
+	target := "/de-DE/bestellung/" + string(id)
 	if request.Header.Get("HX-Request") == "true" {
 		writer.Header().Set("HX-Redirect", target)
+		writer.WriteHeader(http.StatusOK)
+
+		return
 	}
 
 	http.Redirect(writer, request, target, http.StatusSeeOther)

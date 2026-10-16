@@ -1,0 +1,47 @@
+# language: de
+@performance-capture
+Funktionalität: Ursprüngliche Messantworten eindeutig und ohne private Header zuordnen
+  Die Abschlussreihenfolge paralleler curl-Aufrufe bestimmt nicht die Antwortdatei.
+  Fehlerdiagnosen übernehmen ausschließlich die vereinbarten öffentlichen Header.
+
+  Szenario: Umgekehrte Abschlussreihenfolge bewahrt Dateizuordnung und tatsächlichen Status
+    Dann kalte curl-Antworten unabhängig von ihrer Abschlussreihenfolge zugeordnet werden
+      | JSON                                                                                                                                                                              | File | Error              |
+      | {"urlnum":1,"filename_effective":"/tmp/capture-contract/1","url_effective":"http://127.0.0.1:8080/de-DE/kategorie/test","http_code":503}                                              | 1    | Messroute HTTP 503 |
+      | {"urlnum":0,"filename_effective":"/tmp/capture-contract/0","url_effective":"http://127.0.0.1:8080/de-DE/kategorie/test","http_code":200}                                              | 0    | <nil>              |
+
+  Szenario: Private Wireheader gelangen nicht in Diagnoseartefakte
+    Dann Diagnoseheader ausschließlich erlaubte öffentliche Werte enthalten
+      | Name          | Value             |
+      | Content-Type  | text/html         |
+      | Cache-Control | no-store          |
+      | Retry-After   | 1                 |
+      | Cookie        | private-session   |
+      | Authorization | private-token     |
+      | Set-Cookie    | private-response  |
+
+  Szenario: Originalfehler und Body bleiben nach temporärem Cleanup bestehen
+    Dann ursprüngliche kalte Fehlerantworten vor dem Cleanup dauerhaft erhalten bleiben
+      | Status | Body                       |
+      | 503    | <html>unavailable</html>   |
+      | 200    | <html>missing</html>       |
+
+  Szenario: Phasenstatistik bewahrt Messausgabe und trennt fehlende oder zurückgesetzte Zähler
+    Dann Poolbeobachtungen die erreichten Lastphasen begrenzt umschließen
+      | Route | Cache | Boundary | BeforeStatus | Before | AfterStatus | After | ActionError | Payload | Calls | Comparison | Deltas |
+      | category | warm | requestStart-to-last-composed-HTML-byte | 200 | map[PoolMaxConns:4 PoolAcquiredConns:0 PoolIdleConns:4 PoolConstructingConns:0 PoolTotalConns:4 PoolAcquireCount:100 PoolAcquireDurationNanoseconds:1000 PoolEmptyAcquireCount:2 PoolEmptyAcquireWaitTimeNanoseconds:200 PoolCanceledAcquireCount:0 PoolNumCPU:4] | 200 | map[PoolMaxConns:4 PoolAcquiredConns:0 PoolIdleConns:4 PoolConstructingConns:0 PoolTotalConns:4 PoolAcquireCount:130 PoolAcquireDurationNanoseconds:1900 PoolEmptyAcquireCount:7 PoolEmptyAcquireWaitTimeNanoseconds:900 PoolCanceledAcquireCount:1 PoolNumCPU:4] |  | unchanged-tool-output | 2 | conditional | {"PoolAcquireCount":30,"PoolAcquireDurationNanoseconds":900,"PoolEmptyAcquireCount":5,"PoolEmptyAcquireWaitTimeNanoseconds":700,"PoolCanceledAcquireCount":1} |
+      | category | cold-cache-services-ready | requestStart-to-last-composed-HTML-byte | 200 | map[PoolMaxConns:4 PoolAcquiredConns:0 PoolIdleConns:4 PoolConstructingConns:0 PoolTotalConns:4 PoolAcquireCount:100 PoolAcquireDurationNanoseconds:1000 PoolEmptyAcquireCount:2 PoolEmptyAcquireWaitTimeNanoseconds:200 PoolCanceledAcquireCount:0 PoolNumCPU:4] | 200 | map[PoolMaxConns:4 PoolAcquiredConns:0 PoolIdleConns:4 PoolConstructingConns:0 PoolTotalConns:4 PoolAcquireCount:130 PoolAcquireDurationNanoseconds:1900 PoolEmptyAcquireCount:7 PoolEmptyAcquireWaitTimeNanoseconds:900 PoolCanceledAcquireCount:1 PoolNumCPU:4] |  | unchanged-tool-output | 2 | conditional | {"PoolAcquireCount":30,"PoolAcquireDurationNanoseconds":900,"PoolEmptyAcquireCount":5,"PoolEmptyAcquireWaitTimeNanoseconds":700,"PoolCanceledAcquireCount":1} |
+      | personalized-search | warm | requestStart-to-last-composed-HTML-byte | 200 | map[PoolMaxConns:4 PoolAcquiredConns:0 PoolIdleConns:4 PoolConstructingConns:0 PoolTotalConns:4 PoolAcquireCount:100 PoolAcquireDurationNanoseconds:1000 PoolEmptyAcquireCount:2 PoolEmptyAcquireWaitTimeNanoseconds:200 PoolCanceledAcquireCount:0 PoolNumCPU:4] | 200 | map[PoolMaxConns:4 PoolAcquiredConns:0 PoolIdleConns:4 PoolConstructingConns:0 PoolTotalConns:4 PoolAcquireCount:130 PoolAcquireDurationNanoseconds:1900 PoolEmptyAcquireCount:7 PoolEmptyAcquireWaitTimeNanoseconds:900 PoolCanceledAcquireCount:1 PoolNumCPU:4] |  | unchanged-tool-output | 2 | conditional | {"PoolAcquireCount":30,"PoolAcquireDurationNanoseconds":900,"PoolEmptyAcquireCount":5,"PoolEmptyAcquireWaitTimeNanoseconds":700,"PoolCanceledAcquireCount":1} |
+      | personalized-search | cold-cache-services-ready | requestStart-to-last-composed-HTML-byte | 200 | map[PoolMaxConns:4 PoolAcquiredConns:0 PoolIdleConns:4 PoolConstructingConns:0 PoolTotalConns:4 PoolAcquireCount:100 PoolAcquireDurationNanoseconds:1000 PoolEmptyAcquireCount:2 PoolEmptyAcquireWaitTimeNanoseconds:200 PoolCanceledAcquireCount:0 PoolNumCPU:4] | 200 | map[PoolMaxConns:4 PoolAcquiredConns:0 PoolIdleConns:4 PoolConstructingConns:0 PoolTotalConns:4 PoolAcquireCount:130 PoolAcquireDurationNanoseconds:1900 PoolEmptyAcquireCount:7 PoolEmptyAcquireWaitTimeNanoseconds:900 PoolCanceledAcquireCount:1 PoolNumCPU:4] | original-tool-error | unchanged-tool-output | 2 | conditional | {"PoolAcquireCount":30,"PoolAcquireDurationNanoseconds":900,"PoolEmptyAcquireCount":5,"PoolEmptyAcquireWaitTimeNanoseconds":700,"PoolCanceledAcquireCount":1} |
+      | category | warm | requestStart-to-last-Go-response-byte | 200 | map[PoolMaxConns:4 PoolAcquiredConns:0 PoolIdleConns:4 PoolConstructingConns:0 PoolTotalConns:4 PoolAcquireCount:100 PoolAcquireDurationNanoseconds:1000 PoolEmptyAcquireCount:2 PoolEmptyAcquireWaitTimeNanoseconds:200 PoolCanceledAcquireCount:0 PoolNumCPU:4] | 200 | map[PoolMaxConns:4 PoolAcquiredConns:0 PoolIdleConns:4 PoolConstructingConns:0 PoolTotalConns:4 PoolAcquireCount:130 PoolAcquireDurationNanoseconds:1900 PoolEmptyAcquireCount:7 PoolEmptyAcquireWaitTimeNanoseconds:900 PoolCanceledAcquireCount:1 PoolNumCPU:4] |  | direct-output | 0 |  | null |
+      | category | warm | requestStart-to-last-Go-fragment-byte | 200 | map[PoolMaxConns:4 PoolAcquiredConns:0 PoolIdleConns:4 PoolConstructingConns:0 PoolTotalConns:4 PoolAcquireCount:100 PoolAcquireDurationNanoseconds:1000 PoolEmptyAcquireCount:2 PoolEmptyAcquireWaitTimeNanoseconds:200 PoolCanceledAcquireCount:0 PoolNumCPU:4] | 200 | map[PoolMaxConns:4 PoolAcquiredConns:0 PoolIdleConns:4 PoolConstructingConns:0 PoolTotalConns:4 PoolAcquireCount:130 PoolAcquireDurationNanoseconds:1900 PoolEmptyAcquireCount:7 PoolEmptyAcquireWaitTimeNanoseconds:900 PoolCanceledAcquireCount:1 PoolNumCPU:4] |  | direct-output | 0 |  | null |
+      | personalized-search | warm | requestStart-to-last-composed-HTML-byte | 200 | map[PoolMaxConns:4 PoolAcquiredConns:0 PoolIdleConns:4 PoolConstructingConns:0 PoolTotalConns:4 PoolAcquireCount:100 PoolAcquireDurationNanoseconds:1000 PoolEmptyAcquireCount:2 PoolEmptyAcquireWaitTimeNanoseconds:200 PoolCanceledAcquireCount:0 PoolNumCPU:4] | 503 | map[PoolMaxConns:4 PoolAcquiredConns:0 PoolIdleConns:4 PoolConstructingConns:0 PoolTotalConns:4 PoolAcquireCount:130 PoolAcquireDurationNanoseconds:1900 PoolEmptyAcquireCount:7 PoolEmptyAcquireWaitTimeNanoseconds:900 PoolCanceledAcquireCount:1 PoolNumCPU:4] |  | unchanged-tool-output | 2 | not-comparable: snapshot status missing, not 200, incomplete or failed | null |
+      | personalized-search | warm | requestStart-to-last-composed-HTML-byte | 200 | map[PoolMaxConns:4 PoolAcquiredConns:0 PoolIdleConns:4 PoolConstructingConns:0 PoolTotalConns:4 PoolAcquireCount:100 PoolAcquireDurationNanoseconds:1000 PoolEmptyAcquireCount:2 PoolEmptyAcquireWaitTimeNanoseconds:200 PoolCanceledAcquireCount:0 PoolNumCPU:4] | 200 | map[PoolMaxConns:4 PoolAcquiredConns:0 PoolIdleConns:4 PoolConstructingConns:0 PoolTotalConns:4 PoolAcquireCount:130 PoolAcquireDurationNanoseconds:1900 PoolEmptyAcquireCount:7 PoolEmptyAcquireWaitTimeNanoseconds:900 PoolCanceledAcquireCount:1] |  | unchanged-tool-output | 2 | not-comparable: snapshot status missing, not 200, incomplete or failed | null |
+      | personalized-search | warm | requestStart-to-last-composed-HTML-byte | 200 | map[PoolMaxConns:4 PoolAcquiredConns:0 PoolIdleConns:4 PoolConstructingConns:0 PoolTotalConns:4 PoolAcquireCount:100 PoolAcquireDurationNanoseconds:1000 PoolEmptyAcquireCount:2 PoolEmptyAcquireWaitTimeNanoseconds:200 PoolCanceledAcquireCount:0 PoolNumCPU:4] | 200 | map[PoolMaxConns:4 PoolAcquiredConns:0 PoolIdleConns:4 PoolConstructingConns:0 PoolTotalConns:4 PoolAcquireCount:1 PoolAcquireDurationNanoseconds:1900 PoolEmptyAcquireCount:7 PoolEmptyAcquireWaitTimeNanoseconds:900 PoolCanceledAcquireCount:1 PoolNumCPU:4] |  | unchanged-tool-output | 2 | not-comparable: cumulative counter decreased | null |
+
+  Szenario: Interner Origin ist eine Vorbedingung der öffentlichen Messung
+    Dann ungültige interne Origins bereits vor öffentlichen Messungen abgewiesen werden
+      | Origin                  | Error                                                               |
+      |                         | SHOP_PERFORMANCE_INTERNAL_URL benötigt eine explizite Loopback-IP    |
+      | http://example.invalid  | SHOP_PERFORMANCE_INTERNAL_URL benötigt eine explizite Loopback-IP    |
+      | http://192.0.2.1        | direkter Go-Origin muss Loopback sein                               |

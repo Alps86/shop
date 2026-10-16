@@ -79,8 +79,13 @@ func (double catalogDouble) Snapshot(context.Context) (application.AdminCatalogS
 	return double.current.fixture.AdminCatalog, double.current.portError("Snapshot")
 }
 
-func (double searchDouble) Search(_ context.Context, query application.SearchQuery) (application.SearchResult, error) {
+func (double searchDouble) Search(ctx context.Context, query application.SearchQuery) (application.SearchResult, error) {
+	if err := double.current.waitSearch(ctx); err != nil {
+		return application.SearchResult{}, err
+	}
+
 	double.current.lastQuery = query
+
 	return double.current.fixture.Search, double.current.portError("Search")
 }
 

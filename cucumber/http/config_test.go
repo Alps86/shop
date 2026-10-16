@@ -13,6 +13,7 @@ import (
 
 func (current *world) configure(table *godog.Table) error {
 	current.options = read(table)[0]
+	current.fragmentFault.Store(current.options["FragmentFault"] == "connectionClose")
 	if source, exists := current.options["Routes"]; exists {
 		return json.Unmarshal([]byte(source), &current.fixture.Routes)
 	}

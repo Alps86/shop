@@ -3,12 +3,16 @@ package temporal_test
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/Alps86/shop/internal/adapter/temporal"
 	"github.com/Alps86/shop/internal/application"
 	"github.com/Alps86/shop/internal/domain/sale"
 	"github.com/Alps86/shop/internal/domain/value"
 	"github.com/cucumber/godog"
+	"go.temporal.io/api/serviceerror"
+	"go.temporal.io/sdk/worker"
+	"google.golang.org/grpc/status"
 	"time"
 )
 
@@ -81,18 +85,132 @@ func (store *cartStore) Expire(_ context.Context, _ value.CartID, now time.Time)
 	return store.cart, nil
 }
 
-func (current *world) restart() error {
+func (current *world) restart(table *godog.Table) error {
 	if err := current.resumeCart(); err != nil {
 		return err
 	}
 
-	current.runner.Stop()
+	current.stopColdWorker()
 	current.runner = current.adapter.Worker()
 	if err := current.runner.Start(); err != nil {
 		return err
 	}
 
+	if err := current.awaitCartWorker(table); err != nil {
+		return err
+	}
+
 	return current.resumeCart()
+}
+
+func (current *world) stopColdWorker() {
+	current.runner.Stop()
+	// This serial fixture has no other live worker; a process restart loses this cache.
+	worker.PurgeStickyWorkflowCache()
+}
+
+func (current *world) awaitCartWorker(table *godog.Table) error {
+	timeout, err := time.ParseDuration(current.rows(table)[0]["ReadinessTimeout"])
+	if err != nil {
+		return err
+	}
+
+	interval, err := time.ParseDuration(current.rows(table)[0]["ReadinessPollInterval"])
+	if err != nil {
+		return err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	readiness := restartReadiness{ctx: ctx, interval: interval}
+
+	return readiness.await(current)
+}
+
+func (readiness *restartReadiness) await(current *world) error {
+	for {
+		if err := readiness.ctx.Err(); err != nil {
+			return readiness.failure("Caller", err)
+		}
+
+		ready, err := readiness.observe(current)
+		if err != nil {
+			return err
+		}
+
+		if ready {
+			readiness.report()
+			return nil
+		}
+
+		if err := readiness.wait(); err != nil {
+			return readiness.failure("Caller", err)
+		}
+	}
+}
+
+func (readiness *restartReadiness) observe(current *world) (bool, error) {
+	readiness.probes++
+	encoded, err := current.connection.QueryWorkflow(readiness.ctx, "cart/"+current.id, current.runID, "ProcessStatus")
+	if err != nil {
+		return false, readiness.queryError(err)
+	}
+
+	if err := readiness.ctx.Err(); err != nil {
+		return false, readiness.failure("Caller", err)
+	}
+
+	if err := encoded.Get(&current.processStatus); err != nil {
+		return false, readiness.failure("Decode", err)
+	}
+
+	if err := readiness.ctx.Err(); err != nil {
+		return false, readiness.failure("Caller", err)
+	}
+
+	return true, nil
+}
+
+func (readiness *restartReadiness) queryError(err error) error {
+	if caller := readiness.ctx.Err(); caller != nil {
+		return readiness.failure("Caller", caller)
+	}
+
+	var canceled *serviceerror.Canceled
+	if !errors.As(err, &canceled) {
+		return readiness.failure("QueryWorkflow", err)
+	}
+
+	readiness.canceled++
+	if readiness.first == "" {
+		readiness.first = readiness.classify(err)
+		fmt.Printf("Restart.Readiness QueryWorkflow noch nicht bereit: probes=%d firstCanceled=%s\n", readiness.probes, readiness.first)
+	}
+
+	return nil
+}
+
+func (readiness *restartReadiness) wait() error {
+	timer := time.NewTimer(readiness.interval)
+	defer timer.Stop()
+	select {
+	case <-readiness.ctx.Done():
+		return readiness.ctx.Err()
+	case <-timer.C:
+		return nil
+	}
+}
+
+func (readiness *restartReadiness) classify(err error) string {
+	return fmt.Sprintf("type=%T grpc=%s canceled=%t caller=%s: %v", err, status.Code(err), errors.Is(err, context.Canceled), fmt.Sprint(readiness.ctx.Err()), err)
+}
+
+func (readiness *restartReadiness) failure(phase string, err error) error {
+	return fmt.Errorf("Restart.Readiness %s probes=%d canceledProbes=%d firstCanceled=%s last=%s: %w", phase, readiness.probes, readiness.canceled, readiness.first, readiness.classify(err), err)
+}
+
+func (readiness *restartReadiness) report() {
+	fmt.Printf("Restart.Readiness bereit: probes=%d canceledProbes=%d firstCanceled=%s\n", readiness.probes, readiness.canceled, readiness.first)
 }
 
 func (current *world) resumeCart() error {
@@ -168,7 +286,7 @@ func (current *world) statusObserved(table *godog.Table, status temporal.Status)
 
 func (current *world) registerRuntime(ctx *godog.ScenarioContext) {
 	ctx.Step(`^ein Worker den gespeicherten Cart übernimmt$`, current.prepare)
-	ctx.Step(`^der Worker vollständig neu startet$`, current.restart)
+	ctx.Step(`^der Worker mit geleertem lokalen SDK-Cache neu startet und seine History wieder bereitsteht$`, current.restart)
 	ctx.Step(`^ein echtes Workflowupdate gesendet wird$`, current.update)
 	ctx.Step(`^antwortet der weitergeführte Prozess$`, current.observed)
 }

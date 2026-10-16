@@ -3,7 +3,6 @@ package opensearch
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
 	"github.com/Alps86/shop/internal/domain/value"
 	"io"
@@ -12,7 +11,7 @@ import (
 )
 
 func (adapter Adapter) send(ctx context.Context, method, path string, payload any) (Reply, error) {
-	body, err := json.Marshal(payload)
+	body, err := encodePayload(payload)
 	if err != nil {
 		return Reply{}, value.NewError("InvalidInput", "Projection")
 	}
@@ -26,9 +25,10 @@ func (adapter Adapter) request(ctx context.Context, method, path string, body []
 		return Reply{}, value.NewError("DependencyUnavailable", "OpenSearch")
 	}
 
-	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("Content-Type", requestContentType(path))
 	response, err := adapter.config.HTTP.Do(request)
 	if err != nil {
+		logTransportFailure(ctx, err)
 		return Reply{}, value.NewError("SearchUnavailable", "OpenSearch")
 	}
 
@@ -43,4 +43,12 @@ func (adapter Adapter) receive(response *http.Response) (Reply, error) {
 	}
 
 	return Reply{Status: response.StatusCode, Body: data}, nil
+}
+
+func requestContentType(path string) string {
+	if strings.HasSuffix(path, "/_msearch") {
+		return "application/x-ndjson"
+	}
+
+	return "application/json"
 }

@@ -17,7 +17,7 @@
   <a href="/de-DE/warenkorb">Zubehör ablehnen</a>
 </section>
 {{end}}
-{{if not .Guest.UserID}}{{template "start" .}}{{end}}
+{{if not .Cart.Cart.ID}}{{template "start" .}}{{end}}
 {{if not .Cart.Cart.Items}}
 <p>Dein Warenkorb ist leer.</p><a href="/de-DE/">Weiter einkaufen</a>
 {{end}}
