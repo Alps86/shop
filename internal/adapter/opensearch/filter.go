@@ -3,6 +3,8 @@ package opensearch
 import (
 	"github.com/Alps86/shop/internal/application"
 	"github.com/Alps86/shop/internal/domain/value"
+	"maps"
+	"slices"
 )
 
 func (plan FilterPlan) selection(variant JSON, inner bool) JSON {
@@ -47,12 +49,12 @@ func NewFilterPlan(query application.SearchQuery) (FilterPlan, error) {
 
 func (plan FilterPlan) variant() JSON {
 	filters := []JSON{}
-	for code, predicate := range plan.Predicates {
+	for _, code := range slices.Sorted(maps.Keys(plan.Predicates)) {
 		if code == plan.Omit {
 			continue
 		}
 
-		filters = append(filters, predicate)
+		filters = append(filters, plan.Predicates[code])
 	}
 
 	return JSON{"bool": JSON{"filter": filters}}

@@ -42,3 +42,42 @@ Funktionalität: Vollständige Modellkarten aus gespeicherten Suchfeldern
       | Payload null Wert | {"hits":{"hits":[{"fields":{"product_id":["p-a"]},"inner_hits":{"chosen":{"hits":{"hits":[{"fields":{"variants.sku":["a-red"],"variants.card_payload":[null]}}]}}}}]}} |
       | SKU fehlt | {"hits":{"hits":[{"fields":{"product_id":["p-a"]},"inner_hits":{"chosen":{"hits":{"hits":[{"fields":{"variants.card_payload":["e30="]}}]}}}}]}} |
       | Payload falscher Typ | {"hits":{"hits":[{"fields":{"product_id":["p-a"]},"inner_hits":{"chosen":{"hits":{"hits":[{"fields":{"variants.sku":["a-red"],"variants.card_payload":false}}]}}}}]}} |
+
+  Szenario: Technischer Kartenpayload spart nur tatsächlich nullwertige Compliancefelder
+    Angenommen eine vollständige technische Suchkarte vorbereitet ist
+      | Fixture | Compliance |
+      | spec/fixtures/opensearch/pool-expected.json | {} |
+    Wenn das Projektionsdokument seinen gespeicherten Kartenpayload erzeugt
+    Dann der Kartenpayload ausschließlich echte Nullwerte auslässt
+      | Field | Present |
+      | Context | true |
+      | ApplicableRules | true |
+      | Safety | false |
+      | ChemicalLabel | false |
+      | EnergyLabel | false |
+      | NetContent | false |
+      | UnitPriceBasis | false |
+      | Documents | false |
+      | Notices | false |
+      | RequiredFields | false |
+      | NonApplicableReason | false |
+    Und der bestehende Suchdecoder die vollständige Karte unverändert rekonstruiert
+      | Text | Sort | Page |
+      | A | relevance | 1 |
+
+  Szenariogrundriss: Aktive Daten und nichtnullwertige inaktive Werte bleiben vollständig erhalten
+    Angenommen eine vollständige technische Suchkarte vorbereitet ist
+      | Fixture | Compliance |
+      | spec/fixtures/opensearch/pool-expected.json | <Compliance> |
+    Wenn das Projektionsdokument seinen gespeicherten Kartenpayload erzeugt
+    Dann der Kartenpayload ausschließlich echte Nullwerte auslässt
+      | Field | Present |
+      | <Feld> | true |
+    Und der bestehende Suchdecoder die vollständige Karte unverändert rekonstruiert
+      | Text | Sort | Page |
+      | A | relevance | 1 |
+    Beispiele:
+      | Fall | Compliance | Feld |
+      | aktive Pflichtdaten | {"Context":{"Market":"DE","Locale":"de-DE","ValidFrom":{"Present":true,"Value":"2026-10-15T00:00:00Z"},"ValidUntil":{"Present":true,"Value":"2027-10-15T00:00:00Z"},"VerificationStatus":"verified"},"ApplicableRules":[{"Code":"Energy","Market":"DE","ValidUntil":{"Present":true,"Value":"2027-10-15T00:00:00Z"}}],"Safety":{"Warnings":[{"Code":"warning","Text":{"de-DE":"Warnung"},"Placement":["listing"]}]},"ChemicalLabel":{"Present":true,"Value":{"ProductIdentifier":"Reiniger","SignalWord":{"de-DE":"Achtung"},"UFI":"UFI-TEST"}},"EnergyLabel":{"Present":true,"Value":{"EfficiencyClass":"A","ScaleMin":"A","ScaleMax":"G","EPRELRegistrationNumber":"123","LabelDocuments":[{"Kind":"energyLabel","URL":"https://example.invalid/label"}]}},"NetContent":{"Present":true,"Value":{"Value":"0.5","Unit":"L"}},"UnitPriceBasis":{"Present":true,"Value":{"Value":"1","Unit":"L"}},"Documents":[{"Kind":"manual","URL":"https://example.invalid/manual"}],"Notices":[{"Code":"notice","Text":{"de-DE":"Hinweis"},"Placement":["listing"]}],"RequiredFields":["Manufacturer"],"NonApplicableReason":"nachgewiesen"} | ChemicalLabel |
+      | inaktiv mit erhaltenem Wert | {"ChemicalLabel":{"Present":false,"Value":{"ProductIdentifier":"nicht loeschen","SignalWord":{}}},"EnergyLabel":{"Present":false,"Value":{"EPRELURL":"https://example.invalid/retained"}},"NetContent":{"Present":false,"Value":{"Value":"0","Unit":"L"}},"UnitPriceBasis":{"Present":false,"Value":{"Value":"0","Unit":"L"}}} | ChemicalLabel |
+      | angelegte leere Sammlungen | {"Safety":{"Warnings":[],"Instructions":[]},"Documents":[],"Notices":[],"RequiredFields":[]} | Safety |

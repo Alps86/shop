@@ -201,3 +201,21 @@ type multiSearchPart struct {
 type searchShards struct {
 	Failed int `json:"failed"`
 }
+
+type storedSearchCard struct {
+	application.ProductCard
+	Compliance storedCardCompliance
+}
+
+type storedCardCompliance struct {
+	catalog.ProductCompliance
+	Safety              catalog.SafetyInformation             `json:",omitzero"`
+	ChemicalLabel       value.Optional[catalog.ChemicalLabel] `json:",omitzero"`
+	EnergyLabel         value.Optional[catalog.EnergyLabel]   `json:",omitzero"`
+	NetContent          value.Optional[catalog.Measurement]   `json:",omitzero"`
+	UnitPriceBasis      value.Optional[catalog.Measurement]   `json:",omitzero"`
+	Documents           []catalog.ProductDocument             `json:",omitzero"`
+	Notices             []catalog.RequiredNotice              `json:",omitzero"`
+	RequiredFields      []string                              `json:",omitzero"`
+	NonApplicableReason string                                `json:",omitzero"`
+}

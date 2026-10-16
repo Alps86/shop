@@ -39,6 +39,7 @@ type cacheStatistics struct {
 }
 
 type world struct {
+	codec         *cardCodecProbe
 	msearch       *msearchProbe
 	pool          *poolProbe
 	cacheBefore   int64
@@ -124,4 +125,18 @@ type sourceEnvelope struct {
 
 type protocolEnvelope struct {
 	Responses []json.RawMessage `json:"responses"`
+}
+
+type cardCodecProbe struct {
+	original application.ProductCard
+	document cardCodecDocument
+}
+
+type cardCodecDocument struct {
+	Variants []cardCodecVariant `json:"variants"`
+}
+
+type cardCodecVariant struct {
+	Card        application.ProductCard `json:"card"`
+	CardPayload []byte                  `json:"card_payload"`
 }
