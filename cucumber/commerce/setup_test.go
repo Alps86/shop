@@ -36,6 +36,7 @@ func (current *world) open(table *godog.Table) error {
 func (current *world) configure(data row) {
 	suffix := strings.ToLower(rand.Text()[:10])
 	current.config = runtime.Config{DSN: os.Getenv("SHOP_TEST_POSTGRES_DSN"), Schema: "commerce_" + suffix, TemporalAddress: os.Getenv("TEMPORAL_ADDRESS"), TemporalNamespace: data["Namespace"], TaskQueue: "commerce_" + suffix, SearchEndpoint: os.Getenv("SHOP_TEST_OPENSEARCH_URL"), SearchIndex: "shop-commerce-" + suffix, Publication: "commerce_pub_" + suffix, Slot: "commerce_slot_" + suffix, Listen: "127.0.0.1:0", Context: value.RequestContext{Locale: value.Locale(data["Locale"]), Currency: value.Currency(data["Currency"]), Market: value.CountryCode(data["Market"])}}
+	current.config.Frontend = runtime.FrontendConfig{PublicOrigin: "http://localhost", ContentDirectory: os.TempDir(), CacheEndpoint: "http://127.0.0.1:1", CacheKey: "runtime-cache-key-01234567890123456789", CSRFKey: "runtime-csrf-key-01234567890123456789", BackendListen: "127.0.0.1:0"}
 	if data["OpenSearch"] == "down" {
 		current.config.SearchEndpoint = data["SearchEndpoint"]
 	}

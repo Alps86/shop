@@ -19,6 +19,8 @@ func NewEnvironmentConfig() Config {
 		Slot:              os.Getenv("SHOP_CDC_SLOT"),
 		Listen:            os.Getenv("SHOP_LISTEN"),
 		SeedFile:          os.Getenv("SHOP_SEED_FILE"),
+		ContentSource:     os.Getenv("SHOP_CONTENT_SOURCE"),
+		Frontend:          environmentFrontend(),
 		Context:           value.RequestContext{Locale: "de-DE", Currency: "EUR", Market: "DE"},
 	}
 }
@@ -29,6 +31,10 @@ func (config Config) Validate() error {
 	}
 
 	if err := config.validateConnections(); err != nil {
+		return err
+	}
+
+	if err := config.Frontend.Validate(); err != nil {
 		return err
 	}
 

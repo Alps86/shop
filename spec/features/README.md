@@ -101,3 +101,6 @@ Jeder kohärente Slice durchläuft fachliches Red → Green → Refactor. Fehlen
 ## Demo und spätere Vertiefung
 
 Alle hier konkretisierten Fach-/Seitenverträge sind Demo-Kern. Produktionsbackup/HA, öffentliches TLS-/Secret-/Rate-Limitkonzept, juristische Gesamtfreigabe, exhaustive Ausfallkombinationen, dauerhafte Kontowiederherstellung, echte Zahlung/Fulfillment, Akeneo und Workfloweditor/Migration bleiben Folgearbeit gemäß [Risiken](../architecture/11-risiken.md). Keine breite Browsermatrix oder zusätzliche Perfektionshärtung blockiert die vorführbare Demo. Die Messszenarien definieren das Verfahren, ihre Syntaxprüfung belegt keine Laufzeit und keine SLA-Erfüllung.
+
+- [Inhaltsaufbau](adapter/betrieb/inhalt.feature): Der Inhaltsbefehl erzeugt versionsgebundene Hugo-Artefakte aus dem tatsächlichen Katalog.
+- [Inhaltsausgabe](adapter/betrieb/inhaltsausgabe.feature): IO-Unterbrechungen beim Frontmatter- und Markdown-Schreiben erhalten den ursprünglichen Fehler.

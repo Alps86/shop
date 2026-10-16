@@ -1,0 +1,24 @@
+services:
+  postgres:
+    ports: !override ["127.0.0.1:25432:5432"]
+  temporal:
+    ports: !override ["127.0.0.1:27233:7233", "127.0.0.1:28233:8233"]
+  opensearch:
+    ports: !override ["127.0.0.1:29200:9200"]
+  content:
+    environment: &benchmark-environment
+      SHOP_SCHEMA: demo_benchmark
+      SHOP_TASK_QUEUE: demo_benchmark
+      SHOP_SEARCH_INDEX: shop-benchmark
+      SHOP_CDC_PUBLICATION: demo_benchmark
+      SHOP_CDC_SLOT: demo_benchmark
+      SHOP_PUBLIC_ORIGIN: http://localhost:28080
+    volumes:
+      - ./spec/fixtures/demo/benchmark.json:/demo/katalog.json:ro
+  shop:
+    environment: *benchmark-environment
+    ports: !override ["127.0.0.1:28081:8081"]
+    volumes:
+      - ./spec/fixtures/demo/benchmark.json:/demo/katalog.json:ro
+  varnish:
+    ports: !override ["127.0.0.1:28080:80"]

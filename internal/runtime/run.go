@@ -34,15 +34,11 @@ func (app *App) Run(ctx context.Context) error {
 
 	defer worker.Stop()
 	group, running := errgroup.WithContext(ctx)
-	group.Go(func() error {
-		return app.project(running)
-	})
-	group.Go(func() error {
-		return app.dispatch(running)
-	})
-	group.Go(func() error {
-		return app.serve(running)
-	})
+	for _, task := range []func(context.Context) error{app.project, app.dispatch, app.serve, app.serveBackend} {
+		group.Go(func() error {
+			return task(running)
+		})
+	}
 
 	return group.Wait()
 }

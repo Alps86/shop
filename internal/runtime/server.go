@@ -18,9 +18,22 @@ func (app *App) serve(ctx context.Context) error {
 }
 
 func (app *App) Serve(ctx context.Context, listener net.Listener) error {
+	return app.serveHandler(ctx, listener, app.Handler)
+}
+
+func (app *App) serveBackend(ctx context.Context) error {
+	listener, err := net.Listen("tcp", app.Config.Frontend.BackendListen)
+	if err != nil {
+		return err
+	}
+
+	return app.serveHandler(ctx, listener, app.Backend)
+}
+
+func (app *App) serveHandler(ctx context.Context, listener net.Listener, handler http.Handler) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
-	server := &http.Server{Handler: app.Handler, ReadHeaderTimeout: 5 * time.Second}
+	server := &http.Server{Handler: handler, ReadHeaderTimeout: 5 * time.Second}
 	stopped := make(chan error, 1)
 	go func() {
 		<-ctx.Done()

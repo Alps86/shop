@@ -1,0 +1,1465 @@
+{
+  "DatasetVersion": "demo-real-v1",
+  "SourceURL": "https://github.com/Alps86/shop/issues/14",
+  "RetrievedAt": "2026-10-16T00:00:00Z",
+  "LicenseNote": "Begrenzter quellengeprüfter Vorführkatalog. Alle Preise, Lagerbestände, eigenen SKUs, Einkaufskosten, Paar-Rabatte und Co-Purchase-Zahlen sind ausdrücklich fiktive Demodaten. Quellen/Modellgrenzen siehe spec/demo/datenquellen.md. Eigene neutrale SVG; keine Rechte an Herstellerfotos behauptet. Verifizierung bezeichnet Quellenzuordnung, keine vollständige Rechtskonformitätsgarantie.",
+  "Products": [
+    {
+      "ID": "p-fairphone5-case",
+      "FamilyID": "f-case",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Fairphone 5 Schutzhuelle"
+      },
+      "Description": {
+        "de-DE": "Schutzhülle in Matte Black; laut Hersteller ausschließlich mit Fairphone 5 kompatibel. Fiktiver Demopreis und Demobestand. Kein Schutzversprechen über die Herstellerbeschreibung hinaus."
+      },
+      "Brand": "Fairphone",
+      "PrimaryCategoryID": "accessories",
+      "Slug": "fairphone-5-schutzhuelle",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "FairPhone B.V.",
+        "PostalAddress": {
+          "Street": "Van Diemenstraat 200, Floor 3",
+          "PostalCode": "1013 CP",
+          "City": "Amsterdam",
+          "Country": "NL"
+        },
+        "ElectronicAddress": "support@fairphone.com",
+        "Phone": "+31 85 225 0203"
+      },
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified",
+          "ValidFrom": {
+            "Present": true,
+            "Value": "2026-10-16T00:00:00Z"
+          }
+        },
+        "ApplicableRules": [
+          {
+            "Code": "GPSR-2023-988-Art19",
+            "Market": "DE",
+            "ValidFrom": {
+              "Present": true,
+              "Value": "2026-10-15T00:00:00Z"
+            }
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "RuleReference"
+        ],
+        "Safety": {
+          "Warnings": [],
+          "Instructions": []
+        },
+        "Documents": [],
+        "Notices": []
+      },
+      "Variants": [
+        {
+          "SKU": "FP5-CASE-BLACK",
+          "Attributes": {
+            "caseColor": {
+              "Type": "select",
+              "Options": [
+                "matte-black"
+              ]
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Produktillustration; keine Herstellerabbildung"
+          }
+        }
+      ],
+      "AdditionalCategoryIDs": [
+        "mobile"
+      ]
+    },
+    {
+      "ID": "p-fairphone5",
+      "FamilyID": "f-smartphone",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Fairphone 5"
+      },
+      "Description": {
+        "de-DE": "Simuliertes Demoangebot des FP5 mit fünf tatsächlich belegten Farb-/Speicherkombinationen. Preise und Lagerbestand sind fiktiv; keine Behauptung aktueller Herstellerlieferbarkeit. Energieklasse B, Skala A–G, EPREL 2378858."
+      },
+      "Brand": "Fairphone",
+      "PrimaryCategoryID": "smartphones",
+      "Slug": "fairphone-5",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "FairPhone B.V.",
+        "PostalAddress": {
+          "Street": "Van Diemenstraat 200, Floor 3",
+          "PostalCode": "1013 CP",
+          "City": "Amsterdam",
+          "Country": "NL"
+        },
+        "ElectronicAddress": "support@fairphone.com",
+        "Phone": "+31 85 225 0203"
+      },
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified",
+          "ValidFrom": {
+            "Present": true,
+            "Value": "2026-10-16T00:00:00Z"
+          }
+        },
+        "ApplicableRules": [
+          {
+            "Code": "GPSR-2023-988-Art19",
+            "Market": "DE",
+            "ValidFrom": {
+              "Present": true,
+              "Value": "2026-10-15T00:00:00Z"
+            }
+          },
+          {
+            "Code": "ENERGY-2023-1669",
+            "Market": "DE",
+            "ValidFrom": {
+              "Present": true,
+              "Value": "2026-10-15T00:00:00Z"
+            }
+          },
+          {
+            "Code": "ElektroG-17-18",
+            "Market": "DE",
+            "ValidFrom": {
+              "Present": true,
+              "Value": "2026-10-15T00:00:00Z"
+            }
+          },
+          {
+            "Code": "BATTERY-2023-1542-BattDG",
+            "Market": "DE",
+            "ValidFrom": {
+              "Present": true,
+              "Value": "2026-10-15T00:00:00Z"
+            }
+          },
+          {
+            "Code": "DATAACT-2023-2854-Art3-2",
+            "Market": "DE",
+            "ValidFrom": {
+              "Present": true,
+              "Value": "2026-10-15T00:00:00Z"
+            }
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "Warnings",
+          "RuleReference",
+          "Class",
+          "Scale",
+          "Label",
+          "InformationSheet",
+          "Model",
+          "EPREL",
+          "DisposalNotice",
+          "ApplicableBatteryNotice",
+          "dataActInformation"
+        ],
+        "Safety": {
+          "Warnings": [
+            {
+              "Code": "FP5-Safety",
+              "Rules": [
+                {
+                  "Code": "GPSR-2023-988-Art19",
+                  "Market": "DE",
+                  "ValidFrom": {
+                    "Present": true,
+                    "Value": "2026-10-15T00:00:00Z"
+                  }
+                }
+              ],
+              "Text": {
+                "de-DE": "Nur kompatibles, unbeschädigtes Ladezubehör verwenden. Nicht bei Feuchtigkeit laden. Ungeeignete Akkus oder missbräuchliche Akkunutzung können Brand, Explosion oder Auslaufen verursachen. Kleinteile von kleinen Kindern fernhalten. Sicherheitshinweise im deutschen Abschnitt der Herstelleranleitung beachten."
+              },
+              "Placement": [
+                "listing",
+                "detail",
+                "cart",
+                "checkout"
+              ]
+            }
+          ],
+          "Instructions": [
+            {
+              "Kind": "safetyInstructions",
+              "Locale": "de-DE",
+              "Model": "FP5",
+              "SKU": "",
+              "URL": "https://support.fairphone.com/hc/en-us/article_attachments/14779133028626",
+              "Version": "Herstellerhandbuch; Deutsch Druckseiten 5–7"
+            }
+          ]
+        },
+        "Documents": [
+          {
+            "Kind": "dataActInformation",
+            "Locale": "de-DE",
+            "Model": "FP5",
+            "SKU": "",
+            "URL": "https://raw.githubusercontent.com/Alps86/shop/53f1a713f898a0d347e48a4d1b6f4524399aed4a/spec/demo/fairphone-dateninformation.de.md",
+            "Version": "Eigene deutsche Dateninformation 16.10.2026; Quelle April2026 mit Draft-Metadatentitel"
+          }
+        ],
+        "Notices": [
+          {
+            "Code": "DisposalNotice",
+            "Rules": [
+              {
+                "Code": "ElektroG-17-18",
+                "Market": "DE",
+                "ValidFrom": {
+                  "Present": true,
+                  "Value": "2026-10-15T00:00:00Z"
+                }
+              }
+            ],
+            "Text": {
+              "de-DE": "Elektrogerät und Akku getrennt vom Hausmüll sammeln. Am Lebensende zur sicheren Entsorgung oder zum Recycling zu einer von den örtlichen Behörden bestimmten Sammelstelle bringen. Herstellerinformationen zur Rücknahme beachten; diese Demo bietet keinen eigenen realen Rücknahmeservice."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          },
+          {
+            "Code": "ApplicableBatteryNotice",
+            "Rules": [
+              {
+                "Code": "BATTERY-2023-1542-BattDG",
+                "Market": "DE",
+                "ValidFrom": {
+                  "Present": true,
+                  "Value": "2026-10-15T00:00:00Z"
+                }
+              }
+            ],
+            "Text": {
+              "de-DE": "FP5 enthält einen wiederaufladbaren Lithium-Ionen-Akku F5AC1. Vor der Entnahme das Telefon ausschalten, Rückdeckel an der unteren rechten Kerbe abnehmen und Akku an seiner unteren Kerbe herausheben. Nur passende Akkus verwenden. Altakku zur örtlichen Batteriesammelstelle; nicht mit normaler Post versenden."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          },
+          {
+            "Code": "DataActNotice",
+            "Rules": [
+              {
+                "Code": "DATAACT-2023-2854-Art3-2",
+                "Market": "DE",
+                "ValidFrom": {
+                  "Present": true,
+                  "Value": "2026-10-15T00:00:00Z"
+                }
+              }
+            ],
+            "Text": {
+              "de-DE": "Dieses vernetzte Gerät erzeugt je nach Software, App-Nutzung und Berechtigungen Produkt- und Dienstdaten. Arten, Formate, geschätzte Mengen, Speicherung und Zugang sind in der verlinkten eigenen deutschen Dateninformation beschrieben. Herstellerquelle April 2026; keine offizielle Übersetzung."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ],
+        "EnergyLabel": {
+          "Present": true,
+          "Value": {
+            "SupplierModelIdentifier": "FP5",
+            "EPRELRegistrationNumber": "2378858",
+            "EPRELURL": "https://eprel.ec.europa.eu/screen/product/smartphonestablets20231669/2378858",
+            "EfficiencyClass": "B",
+            "ScaleMin": "G",
+            "ScaleMax": "A",
+            "LabelDocuments": [
+              {
+                "Kind": "energyLabel",
+                "Locale": "de-DE",
+                "Model": "FP5",
+                "SKU": "FP5-BLACK-128",
+                "URL": "https://eprel.ec.europa.eu/labels/smartphonestablets20231669/Label_2378858.pdf",
+                "Version": "Abruf 2026-10-16"
+              },
+              {
+                "Kind": "energyLabel",
+                "Locale": "de-DE",
+                "Model": "FP5",
+                "SKU": "FP5-GREEN-128",
+                "URL": "https://eprel.ec.europa.eu/labels/smartphonestablets20231669/Label_2378858.pdf",
+                "Version": "Abruf 2026-10-16"
+              },
+              {
+                "Kind": "energyLabel",
+                "Locale": "de-DE",
+                "Model": "FP5",
+                "SKU": "FP5-BLACK-256",
+                "URL": "https://eprel.ec.europa.eu/labels/smartphonestablets20231669/Label_2378858.pdf",
+                "Version": "Abruf 2026-10-16"
+              },
+              {
+                "Kind": "energyLabel",
+                "Locale": "de-DE",
+                "Model": "FP5",
+                "SKU": "FP5-BLUE-256",
+                "URL": "https://eprel.ec.europa.eu/labels/smartphonestablets20231669/Label_2378858.pdf",
+                "Version": "Abruf 2026-10-16"
+              },
+              {
+                "Kind": "energyLabel",
+                "Locale": "de-DE",
+                "Model": "FP5",
+                "SKU": "FP5-TRANSPARENT-256",
+                "URL": "https://eprel.ec.europa.eu/labels/smartphonestablets20231669/Label_2378858.pdf",
+                "Version": "Abruf 2026-10-16"
+              }
+            ],
+            "InformationSheets": [
+              {
+                "Kind": "productInformationSheet",
+                "Locale": "de-DE",
+                "Model": "FP5",
+                "SKU": "FP5-BLACK-128",
+                "URL": "https://eprel.ec.europa.eu/fiches/smartphonestablets20231669/Fiche_2378858_DE.pdf",
+                "Version": "Abruf 2026-10-16"
+              },
+              {
+                "Kind": "productInformationSheet",
+                "Locale": "de-DE",
+                "Model": "FP5",
+                "SKU": "FP5-GREEN-128",
+                "URL": "https://eprel.ec.europa.eu/fiches/smartphonestablets20231669/Fiche_2378858_DE.pdf",
+                "Version": "Abruf 2026-10-16"
+              },
+              {
+                "Kind": "productInformationSheet",
+                "Locale": "de-DE",
+                "Model": "FP5",
+                "SKU": "FP5-BLACK-256",
+                "URL": "https://eprel.ec.europa.eu/fiches/smartphonestablets20231669/Fiche_2378858_DE.pdf",
+                "Version": "Abruf 2026-10-16"
+              },
+              {
+                "Kind": "productInformationSheet",
+                "Locale": "de-DE",
+                "Model": "FP5",
+                "SKU": "FP5-BLUE-256",
+                "URL": "https://eprel.ec.europa.eu/fiches/smartphonestablets20231669/Fiche_2378858_DE.pdf",
+                "Version": "Abruf 2026-10-16"
+              },
+              {
+                "Kind": "productInformationSheet",
+                "Locale": "de-DE",
+                "Model": "FP5",
+                "SKU": "FP5-TRANSPARENT-256",
+                "URL": "https://eprel.ec.europa.eu/fiches/smartphonestablets20231669/Fiche_2378858_DE.pdf",
+                "Version": "Abruf 2026-10-16"
+              }
+            ]
+          }
+        }
+      },
+      "Variants": [
+        {
+          "SKU": "FP5-BLACK-128",
+          "Attributes": {
+            "color": {
+              "Type": "select",
+              "Options": [
+                "matte-black"
+              ]
+            },
+            "storageCapacity": {
+              "Type": "measurement",
+              "Measurement": {
+                "Present": true,
+                "Value": {
+                  "Value": "128",
+                  "Unit": "GB"
+                }
+              }
+            },
+            "ram": {
+              "Type": "measurement",
+              "Measurement": {
+                "Present": true,
+                "Value": {
+                  "Value": "6",
+                  "Unit": "GB"
+                }
+              }
+            }
+          }
+        },
+        {
+          "SKU": "FP5-GREEN-128",
+          "Attributes": {
+            "color": {
+              "Type": "select",
+              "Options": [
+                "moss-green"
+              ]
+            },
+            "storageCapacity": {
+              "Type": "measurement",
+              "Measurement": {
+                "Present": true,
+                "Value": {
+                  "Value": "128",
+                  "Unit": "GB"
+                }
+              }
+            },
+            "ram": {
+              "Type": "measurement",
+              "Measurement": {
+                "Present": true,
+                "Value": {
+                  "Value": "6",
+                  "Unit": "GB"
+                }
+              }
+            }
+          }
+        },
+        {
+          "SKU": "FP5-BLACK-256",
+          "Attributes": {
+            "color": {
+              "Type": "select",
+              "Options": [
+                "matte-black"
+              ]
+            },
+            "storageCapacity": {
+              "Type": "measurement",
+              "Measurement": {
+                "Present": true,
+                "Value": {
+                  "Value": "256",
+                  "Unit": "GB"
+                }
+              }
+            },
+            "ram": {
+              "Type": "measurement",
+              "Measurement": {
+                "Present": true,
+                "Value": {
+                  "Value": "8",
+                  "Unit": "GB"
+                }
+              }
+            }
+          }
+        },
+        {
+          "SKU": "FP5-BLUE-256",
+          "Attributes": {
+            "color": {
+              "Type": "select",
+              "Options": [
+                "sky-blue"
+              ]
+            },
+            "storageCapacity": {
+              "Type": "measurement",
+              "Measurement": {
+                "Present": true,
+                "Value": {
+                  "Value": "256",
+                  "Unit": "GB"
+                }
+              }
+            },
+            "ram": {
+              "Type": "measurement",
+              "Measurement": {
+                "Present": true,
+                "Value": {
+                  "Value": "8",
+                  "Unit": "GB"
+                }
+              }
+            }
+          }
+        },
+        {
+          "SKU": "FP5-TRANSPARENT-256",
+          "Attributes": {
+            "color": {
+              "Type": "select",
+              "Options": [
+                "transparent"
+              ]
+            },
+            "storageCapacity": {
+              "Type": "measurement",
+              "Measurement": {
+                "Present": true,
+                "Value": {
+                  "Value": "256",
+                  "Unit": "GB"
+                }
+              }
+            },
+            "ram": {
+              "Type": "measurement",
+              "Measurement": {
+                "Present": true,
+                "Value": {
+                  "Value": "8",
+                  "Unit": "GB"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Produktillustration; keine Herstellerabbildung"
+          }
+        }
+      ],
+      "AdditionalCategoryIDs": [
+        "mobile"
+      ],
+      "Accessories": [
+        {
+          "ProductID": "p-fairphone5-case",
+          "CompatibleSKUs": [
+            "FP5-BLACK-128",
+            "FP5-GREEN-128",
+            "FP5-BLACK-256",
+            "FP5-BLUE-256",
+            "FP5-TRANSPARENT-256"
+          ]
+        }
+      ]
+    },
+    {
+      "ID": "p-constructa-cwf14n30",
+      "FamilyID": "f-washingmachine",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Constructa CWF14N30"
+      },
+      "Description": {
+        "de-DE": "Simuliertes Demoangebot einer 8-kg-Waschmaschine. Energieklasse A, Skala A–G, EPREL 2219955. Home Connect/WiFi: Nein; lokaler Datenzugang laut Data-Act-Erklärung. Preis und Lagerbestand sind fiktiv."
+      },
+      "Brand": "Constructa",
+      "PrimaryCategoryID": "home",
+      "Slug": "constructa-cwf14n30",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "BSH Hausgeräte GmbH",
+        "PostalAddress": {
+          "Street": "Carl-Wery-Straße 34",
+          "PostalCode": "81739",
+          "City": "München",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "infoneff@bshg.com",
+        "Phone": "+49 89 4590 04"
+      },
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified",
+          "ValidFrom": {
+            "Present": true,
+            "Value": "2026-10-16T00:00:00Z"
+          }
+        },
+        "ApplicableRules": [
+          {
+            "Code": "GPSR-2023-988-Art19",
+            "Market": "DE",
+            "ValidFrom": {
+              "Present": true,
+              "Value": "2026-10-15T00:00:00Z"
+            }
+          },
+          {
+            "Code": "ENERGY-2019-2014",
+            "Market": "DE",
+            "ValidFrom": {
+              "Present": true,
+              "Value": "2026-10-15T00:00:00Z"
+            }
+          },
+          {
+            "Code": "ElektroG-17-18",
+            "Market": "DE",
+            "ValidFrom": {
+              "Present": true,
+              "Value": "2026-10-15T00:00:00Z"
+            }
+          },
+          {
+            "Code": "BATTERY-2023-1542-BattDG-conditional",
+            "Market": "DE",
+            "ValidFrom": {
+              "Present": true,
+              "Value": "2026-10-15T00:00:00Z"
+            }
+          },
+          {
+            "Code": "DATAACT-2023-2854-Art3-2",
+            "Market": "DE",
+            "ValidFrom": {
+              "Present": true,
+              "Value": "2026-10-15T00:00:00Z"
+            }
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "Warnings",
+          "RuleReference",
+          "Class",
+          "Scale",
+          "Label",
+          "InformationSheet",
+          "Model",
+          "EPREL",
+          "DisposalNotice",
+          "ApplicableBatteryNotice",
+          "dataActInformation"
+        ],
+        "Safety": {
+          "Warnings": [
+            {
+              "Code": "CWF14N30-Safety",
+              "Rules": [
+                {
+                  "Code": "GPSR-2023-988-Art19",
+                  "Market": "DE",
+                  "ValidFrom": {
+                    "Present": true,
+                    "Value": "2026-10-15T00:00:00Z"
+                  }
+                }
+              ],
+              "Text": {
+                "de-DE": "Bei Transportschaden nicht anschließen. Gerät nur an vorschriftsmäßig installierter geerdeter Steckdose betreiben. Kinder unter 3 Jahren und Haustiere fernhalten; Kinder dürfen nicht im Gerät spielen. Vor Entsorgung spannungsfrei machen; danach Leitung durchtrennen und Türschloss gegen Einschließen unbrauchbar machen. Vollständige deutsche Anleitung beachten."
+              },
+              "Placement": [
+                "listing",
+                "detail",
+                "cart",
+                "checkout"
+              ]
+            }
+          ],
+          "Instructions": [
+            {
+              "Kind": "userManual",
+              "Locale": "de-DE",
+              "Model": "CWF14N30",
+              "SKU": "",
+              "URL": "https://media3.bsh-group.com/Documents/9002037180_A.pdf",
+              "Version": "9002037180_A; Deutsch"
+            }
+          ]
+        },
+        "Documents": [
+          {
+            "Kind": "dataActInformation",
+            "Locale": "de-DE",
+            "Model": "CWF14N30",
+            "SKU": "",
+            "URL": "https://media3.bsh-group.com/Documents/legalcollection_CWF14N30_de-DE.pdf",
+            "Version": "1.0ncp vom 25.08.2025"
+          },
+          {
+            "Kind": "disposalInformation",
+            "Locale": "de-DE",
+            "Model": "CWF14N30",
+            "SKU": "",
+            "URL": "https://media3.bsh-group.com/Documents/29121638_2026_06_08_Website_Entsorgung_und_Recycling.pdf",
+            "Version": "Allgemeine Herstellerinformation 08.06.2026"
+          }
+        ],
+        "Notices": [
+          {
+            "Code": "DisposalNotice",
+            "Rules": [
+              {
+                "Code": "ElektroG-17-18",
+                "Market": "DE",
+                "ValidFrom": {
+                  "Present": true,
+                  "Value": "2026-10-15T00:00:00Z"
+                }
+              }
+            ],
+            "Text": {
+              "de-DE": "Elektroaltgeräte nicht im Haus-, Rest- oder Biomüll entsorgen. Getrennte Sammlung über kommunale Wertstoffhöfe oder gesetzlich vorgesehene Handelsrücknahme. Aktuelle örtliche Wege bei Gemeinde oder Fachhändler erfragen. Kein realer Rücknahmeservice dieses Demonstrationsshops."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          },
+          {
+            "Code": "ApplicableBatteryNotice",
+            "Rules": [
+              {
+                "Code": "BATTERY-2023-1542-BattDG-conditional",
+                "Market": "DE",
+                "ValidFrom": {
+                  "Present": true,
+                  "Value": "2026-10-15T00:00:00Z"
+                }
+              }
+            ],
+            "Text": {
+              "de-DE": "Soweit vorhanden: Nicht vom Altgerät umschlossene Batterien und Akkus vor Abgabe trennen; zerstörungsfrei entnehmbare Lampen ebenfalls entnehmen. Altbatterien getrennt zur vorgesehenen Sammelstelle geben. Bei lithiumhaltigen Altbatterien metallene Kontakte zuvor mit Klebeband isolieren. Dies sind bedingte Herstellerhinweise; ein bestimmter interner Akku oder Batterieabwesenheit dieses Modells wird nicht behauptet."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          },
+          {
+            "Code": "DataActNotice",
+            "Rules": [
+              {
+                "Code": "DATAACT-2023-2854-Art3-2",
+                "Market": "DE",
+                "ValidFrom": {
+                  "Present": true,
+                  "Value": "2026-10-15T00:00:00Z"
+                }
+              }
+            ],
+            "Text": {
+              "de-DE": "Auch ohne Home Connect/WiFi erzeugt dieses Gerät lokal gespeicherte Nutzungs- und Zustandsdaten. Die deutsche modellbezogene Data-Act-Information beschreibt Format, Umfang, Überschreiben und Zugang über einen Kundendiensttechnikereinsatz. Auslese-/Bereitstellungsvorgang kostenlos; weitere Einsatzkosten können anfallen."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ],
+        "EnergyLabel": {
+          "Present": true,
+          "Value": {
+            "SupplierModelIdentifier": "CWF14N30",
+            "EPRELRegistrationNumber": "2219955",
+            "EPRELURL": "https://eprel.ec.europa.eu/screen/product/washingmachines2019/2219955",
+            "EfficiencyClass": "A",
+            "ScaleMin": "G",
+            "ScaleMax": "A",
+            "LabelDocuments": [
+              {
+                "Kind": "energyLabel",
+                "Locale": "de-DE",
+                "Model": "CWF14N30",
+                "SKU": "CWF14N30",
+                "URL": "https://eprel.ec.europa.eu/labels/washingmachines2019/Label_2219955.pdf",
+                "Version": "Abruf 2026-10-16"
+              }
+            ],
+            "InformationSheets": [
+              {
+                "Kind": "productInformationSheet",
+                "Locale": "de-DE",
+                "Model": "CWF14N30",
+                "SKU": "CWF14N30",
+                "URL": "https://eprel.ec.europa.eu/fiches/washingmachines2019/Fiche_2219955_DE.pdf",
+                "Version": "Abruf 2026-10-16"
+              }
+            ]
+          }
+        }
+      },
+      "Variants": [
+        {
+          "SKU": "CWF14N30"
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Produktillustration; keine Herstellerabbildung"
+          }
+        }
+      ],
+      "Attributes": {
+        "loadCapacity": {
+          "Type": "measurement",
+          "Measurement": {
+            "Present": true,
+            "Value": {
+              "Value": "8",
+              "Unit": "kg"
+            }
+          }
+        },
+        "spinSpeed": {
+          "Type": "measurement",
+          "Measurement": {
+            "Present": true,
+            "Value": {
+              "Value": "1400",
+              "Unit": "rpm"
+            }
+          }
+        }
+      }
+    },
+    {
+      "ID": "p-drbecher-entkalker",
+      "FamilyID": "f-descaler",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "DR. BECHER@home Schnell Entkalker 500 ml"
+      },
+      "Description": {
+        "de-DE": "500-ml-Dosierflasche mit verifizierter Kennzeichnung aus dem verlinkten deutschen Sicherheitsdatenblatt. Keine pauschale Eignung für jedes Gerät; Anwendung nach Herstellerangaben. Preis und Lagerbestand sind fiktiv."
+      },
+      "Brand": "Dr. Becher",
+      "PrimaryCategoryID": "coffee",
+      "Slug": "dr-becher-schnell-entkalker",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "Dr. Becher GmbH",
+        "PostalAddress": {
+          "Street": "Vor den Specken 3",
+          "PostalCode": "30926",
+          "City": "Seelze",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "info@drbecher.de",
+        "Phone": "+49 5137 9901 0"
+      },
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified",
+          "ValidFrom": {
+            "Present": true,
+            "Value": "2026-10-16T00:00:00Z"
+          }
+        },
+        "ApplicableRules": [
+          {
+            "Code": "GPSR-2023-988-Art19-sectoral",
+            "Market": "DE",
+            "ValidFrom": {
+              "Present": true,
+              "Value": "2026-10-15T00:00:00Z"
+            }
+          },
+          {
+            "Code": "CLP-1272-2008",
+            "Market": "DE",
+            "ValidFrom": {
+              "Present": true,
+              "Value": "2026-10-15T00:00:00Z"
+            }
+          },
+          {
+            "Code": "CLP-2024-2865-2025-2439-transitions",
+            "Market": "DE",
+            "ValidFrom": {
+              "Present": true,
+              "Value": "2026-10-15T00:00:00Z"
+            }
+          },
+          {
+            "Code": "PAngV-4-5",
+            "Market": "DE",
+            "ValidFrom": {
+              "Present": true,
+              "Value": "2026-10-15T00:00:00Z"
+            }
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "Warnings",
+          "RuleReference",
+          "VerifiedClassification",
+          "Supplier",
+          "Pictograms",
+          "SignalWord",
+          "Statements"
+        ],
+        "Safety": {
+          "Warnings": [
+            {
+              "Code": "SchnellEntkalker-Label",
+              "Rules": [
+                {
+                  "Code": "CLP-1272-2008",
+                  "Market": "DE",
+                  "ValidFrom": {
+                    "Present": true,
+                    "Value": "2026-10-15T00:00:00Z"
+                  }
+                }
+              ],
+              "Text": {
+                "de-DE": "Gefahr. Verursacht schwere Verätzungen der Haut und schwere Augenschäden. Darf nicht in die Hände von Kindern gelangen. Schutzhandschuhe, Schutzkleidung, Augenschutz tragen. Vollständige H-/P-Hinweise und das deutsche Sicherheitsdatenblatt beachten."
+              },
+              "Placement": [
+                "listing",
+                "detail",
+                "cart",
+                "checkout"
+              ]
+            }
+          ],
+          "Instructions": []
+        },
+        "Documents": [
+          {
+            "Kind": "safetyDataSheet",
+            "Locale": "de-DE",
+            "Model": "Schnell Entkalker 500 ml",
+            "SKU": "DB-ENTKALKER-500",
+            "URL": "https://www.drbecherhome.de/sdb/bah/DE/SDB_4000602009667.pdf",
+            "Version": "Version 2.0; Revision 15.12.2025; Datumsabweichungen siehe Provenienz"
+          },
+          {
+            "Kind": "ingredientInformation",
+            "Locale": "de-DE",
+            "Model": "Schnell Entkalker 500 ml",
+            "SKU": "",
+            "URL": "https://www.drbecherhome.de/isa/bah/DE/ISA_4000602009667.pdf",
+            "Version": "04.01.2024; älter als SDB"
+          }
+        ],
+        "Notices": [],
+        "NetContent": {
+          "Present": true,
+          "Value": {
+            "Value": "500",
+            "Unit": "ml"
+          }
+        },
+        "UnitPriceBasis": {
+          "Present": true,
+          "Value": {
+            "Value": "1",
+            "Unit": "l"
+          }
+        },
+        "ChemicalLabel": {
+          "Present": true,
+          "Value": {
+            "ProductIdentifier": "DR. BECHER@home Schnell Entkalker",
+            "Supplier": {
+              "Name": "Dr. Becher GmbH",
+              "PostalAddress": {
+                "Street": "Vor den Specken 3",
+                "PostalCode": "30926",
+                "City": "Seelze",
+                "Country": "DE"
+              },
+              "ElectronicAddress": "info@drbecher.de",
+              "Phone": "+49 5137 9901 0"
+            },
+            "NominalQuantity": {
+              "Present": true,
+              "Value": {
+                "Value": "500",
+                "Unit": "ml"
+              }
+            },
+            "Pictograms": [
+              {
+                "Code": "GHS05",
+                "ImageURL": "https://pubchem.ncbi.nlm.nih.gov/images/ghs/GHS05.gif",
+                "AltText": {
+                  "de-DE": "GHS05: Ätzwirkung; schwere Verätzungen und Augenschäden"
+                }
+              }
+            ],
+            "SignalWord": {
+              "de-DE": "Gefahr"
+            },
+            "HazardStatements": [
+              {
+                "Code": "H314",
+                "Text": {
+                  "de-DE": "Verursacht schwere Verätzungen der Haut und schwere Augenschäden"
+                }
+              }
+            ],
+            "PrecautionaryStatements": [
+              {
+                "Code": "P102",
+                "Text": {
+                  "de-DE": "Darf nicht in die Hände von Kindern gelangen"
+                }
+              },
+              {
+                "Code": "P280",
+                "Text": {
+                  "de-DE": "Schutzhandschuhe, Schutzkleidung, Augenschutz tragen"
+                }
+              },
+              {
+                "Code": "P303+P361+P353",
+                "Text": {
+                  "de-DE": "BEI BERÜHRUNG MIT DER HAUT (oder dem Haar): Alle kontaminierten Kleidungsstücke sofort ausziehen. Haut mit Wasser abwaschen"
+                }
+              },
+              {
+                "Code": "P305+P351+P338",
+                "Text": {
+                  "de-DE": "BEI KONTAKT MIT DEN AUGEN: Einige Minuten lang behutsam mit Wasser spülen. Eventuell vorhandene Kontaktlinsen nach Möglichkeit entfernen. Weiter spülen"
+                }
+              },
+              {
+                "Code": "P310",
+                "Text": {
+                  "de-DE": "Sofort GIFTINFORMATIONSZENTRUM, Arzt anrufen"
+                }
+              },
+              {
+                "Code": "P501",
+                "Text": {
+                  "de-DE": "Inhalt/Behälter gemäß nationalen Vorschriften der Entsorgung zuführen."
+                }
+              }
+            ],
+            "SupplementalStatements": [],
+            "UFI": "FEXK-HXDG-S28D-50NV"
+          }
+        }
+      },
+      "Variants": [
+        {
+          "SKU": "DB-ENTKALKER-500",
+          "GTIN": "4000602009667",
+          "ManufacturerPartNumber": "1966000"
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Produktillustration; keine Herstellerabbildung"
+          }
+        }
+      ]
+    }
+  ],
+  "Families": [
+    {
+      "ID": "f-smartphone",
+      "Version": 1,
+      "Name": {
+        "de-DE": "Smartphones"
+      },
+      "Attributes": [
+        {
+          "Code": "color",
+          "Name": {
+            "de-DE": "Farbe"
+          },
+          "Type": "select",
+          "Level": "variant",
+          "Required": true,
+          "Options": [
+            {
+              "Code": "matte-black",
+              "Label": {
+                "de-DE": "Matte Black"
+              }
+            },
+            {
+              "Code": "moss-green",
+              "Label": {
+                "de-DE": "Moss Green"
+              }
+            },
+            {
+              "Code": "sky-blue",
+              "Label": {
+                "de-DE": "Sky Blue"
+              }
+            },
+            {
+              "Code": "transparent",
+              "Label": {
+                "de-DE": "Transparent"
+              }
+            }
+          ]
+        },
+        {
+          "Code": "storageCapacity",
+          "Name": {
+            "de-DE": "Speicher"
+          },
+          "Type": "measurement",
+          "Level": "variant",
+          "Required": true,
+          "Unit": "GB"
+        },
+        {
+          "Code": "ram",
+          "Name": {
+            "de-DE": "Arbeitsspeicher"
+          },
+          "Type": "measurement",
+          "Level": "variant",
+          "Required": true,
+          "Unit": "GB"
+        }
+      ]
+    },
+    {
+      "ID": "f-case",
+      "Version": 1,
+      "Name": {
+        "de-DE": "Schutzhüllen"
+      },
+      "Attributes": [
+        {
+          "Code": "caseColor",
+          "Name": {
+            "de-DE": "Hüllenfarbe"
+          },
+          "Type": "select",
+          "Level": "variant",
+          "Required": true,
+          "Options": [
+            {
+              "Code": "matte-black",
+              "Label": {
+                "de-DE": "Matte Black"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "ID": "f-washingmachine",
+      "Version": 1,
+      "Name": {
+        "de-DE": "Waschmaschinen"
+      },
+      "Attributes": [
+        {
+          "Code": "loadCapacity",
+          "Name": {
+            "de-DE": "Beladungsmenge"
+          },
+          "Type": "measurement",
+          "Level": "product",
+          "Required": true,
+          "Unit": "kg"
+        },
+        {
+          "Code": "spinSpeed",
+          "Name": {
+            "de-DE": "Schleuderdrehzahl"
+          },
+          "Type": "measurement",
+          "Level": "product",
+          "Required": true,
+          "Unit": "rpm"
+        }
+      ]
+    },
+    {
+      "ID": "f-descaler",
+      "Version": 1,
+      "Name": {
+        "de-DE": "Entkalker"
+      }
+    }
+  ],
+  "Categories": [
+    {
+      "ID": "mobile",
+      "Version": 1,
+      "Name": {
+        "de-DE": "Mobilgeräte"
+      },
+      "Description": {
+        "de-DE": "Begrenzter Vorführkatalog; alle Preise und Bestände simuliert."
+      },
+      "Slug": "mobilgeraete",
+      "FilterAttributes": [
+        "color",
+        "storageCapacity",
+        "ram",
+        "caseColor"
+      ],
+      "TopAttributes": [
+        "color",
+        "storageCapacity",
+        "ram"
+      ]
+    },
+    {
+      "ID": "home",
+      "Version": 1,
+      "Name": {
+        "de-DE": "Haushalt"
+      },
+      "Description": {
+        "de-DE": "Begrenzter Vorführkatalog; alle Preise und Bestände simuliert."
+      },
+      "Slug": "haushalt",
+      "FilterAttributes": [
+        "loadCapacity",
+        "spinSpeed"
+      ],
+      "TopAttributes": [
+        "loadCapacity",
+        "spinSpeed"
+      ]
+    },
+    {
+      "ID": "coffee",
+      "Version": 1,
+      "Name": {
+        "de-DE": "Kaffee und Pflege"
+      },
+      "Description": {
+        "de-DE": "Begrenzter Vorführkatalog; alle Preise und Bestände simuliert."
+      },
+      "Slug": "kaffee-pflege",
+      "FilterAttributes": [],
+      "TopAttributes": []
+    },
+    {
+      "ID": "smartphones",
+      "Version": 1,
+      "Name": {
+        "de-DE": "Smartphones"
+      },
+      "Description": {
+        "de-DE": "Begrenzter Vorführkatalog; alle Preise und Bestände simuliert."
+      },
+      "Slug": "smartphones",
+      "FilterAttributes": [
+        "color",
+        "storageCapacity",
+        "ram"
+      ],
+      "TopAttributes": [
+        "color",
+        "storageCapacity",
+        "ram"
+      ],
+      "ParentID": {
+        "Present": true,
+        "Value": "mobile"
+      }
+    },
+    {
+      "ID": "accessories",
+      "Version": 1,
+      "Name": {
+        "de-DE": "Zubehör"
+      },
+      "Description": {
+        "de-DE": "Begrenzter Vorführkatalog; alle Preise und Bestände simuliert."
+      },
+      "Slug": "zubehoer",
+      "FilterAttributes": [
+        "caseColor"
+      ],
+      "TopAttributes": [
+        "caseColor"
+      ],
+      "ParentID": {
+        "Present": true,
+        "Value": "mobile"
+      }
+    }
+  ],
+  "Inventories": [
+    {
+      "SKU": "FP5-BLACK-128",
+      "Price": {
+        "MinorUnits": 39900,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 20,
+      "Revision": 1
+    },
+    {
+      "SKU": "FP5-GREEN-128",
+      "Price": {
+        "MinorUnits": 40900,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 20,
+      "Revision": 1
+    },
+    {
+      "SKU": "FP5-BLACK-256",
+      "Price": {
+        "MinorUnits": 44900,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 20,
+      "Revision": 1
+    },
+    {
+      "SKU": "FP5-BLUE-256",
+      "Price": {
+        "MinorUnits": 45900,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 20,
+      "Revision": 1
+    },
+    {
+      "SKU": "FP5-TRANSPARENT-256",
+      "Price": {
+        "MinorUnits": 46900,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 20,
+      "Revision": 1
+    },
+    {
+      "SKU": "FP5-CASE-BLACK",
+      "Price": {
+        "MinorUnits": 1990,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 40,
+      "Revision": 1
+    },
+    {
+      "SKU": "CWF14N30",
+      "Price": {
+        "MinorUnits": 64900,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 8,
+      "Revision": 1
+    },
+    {
+      "SKU": "DB-ENTKALKER-500",
+      "Price": {
+        "MinorUnits": 799,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 30,
+      "Revision": 1
+    }
+  ],
+  "DiscountRules": [
+    {
+      "ID": "demo-phone-case-v1",
+      "Version": 1,
+      "MainProductID": "p-fairphone5",
+      "AccessoryID": "p-fairphone5-case",
+      "Amount": {
+        "MinorUnits": 500,
+        "Currency": "EUR"
+      },
+      "Scope": "pair"
+    }
+  ],
+  "CoPurchaseStatistics": [
+    {
+      "SourceProductID": "p-fairphone5",
+      "TargetProductID": "p-fairphone5-case",
+      "BasketCount": 12,
+      "WindowStart": "2026-09-01T00:00:00Z",
+      "WindowEnd": "2026-10-01T00:00:00Z",
+      "DatasetVersion": "synthetic-demo-v1"
+    },
+    {
+      "SourceProductID": "p-fairphone5-case",
+      "TargetProductID": "p-fairphone5",
+      "BasketCount": 12,
+      "WindowStart": "2026-09-01T00:00:00Z",
+      "WindowEnd": "2026-10-01T00:00:00Z",
+      "DatasetVersion": "synthetic-demo-v1"
+    }
+  ],
+  "PurchaseCosts": {
+    "FP5-BLACK-128": {
+      "MinorUnits": 29925,
+      "Currency": "EUR"
+    },
+    "FP5-GREEN-128": {
+      "MinorUnits": 30675,
+      "Currency": "EUR"
+    },
+    "FP5-BLACK-256": {
+      "MinorUnits": 33675,
+      "Currency": "EUR"
+    },
+    "FP5-BLUE-256": {
+      "MinorUnits": 34425,
+      "Currency": "EUR"
+    },
+    "FP5-TRANSPARENT-256": {
+      "MinorUnits": 35175,
+      "Currency": "EUR"
+    },
+    "FP5-CASE-BLACK": {
+      "MinorUnits": 1492,
+      "Currency": "EUR"
+    },
+    "CWF14N30": {
+      "MinorUnits": 48675,
+      "Currency": "EUR"
+    },
+    "DB-ENTKALKER-500": {
+      "MinorUnits": 599,
+      "Currency": "EUR"
+    }
+  }
+}

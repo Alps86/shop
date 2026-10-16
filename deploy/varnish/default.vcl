@@ -18,6 +18,7 @@ sub vcl_recv {
         ban("obj.http.Surrogate-Key ~ " + req.http.X-Cache-SKU);
         return (synth(200));
     }
+    if (req.url ~ "^/(health|ready)$") { return (pass); }
     unset req.http.X-Shop-Fragment;
     if (req.url ~ "^/backend") { return (synth(404)); }
     if (req.url ~ "^/fragments/" && req.esi_level == 0) { return (synth(404)); }

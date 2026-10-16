@@ -1,0 +1,4355 @@
+{
+  "DatasetVersion": "benchmark-synthetic-v1",
+  "SourceURL": "https://github.com/Alps86/shop/issues/14",
+  "RetrievedAt": "2026-10-16T00:00:00Z",
+  "LicenseNote": "Ausschließlich eigene synthetische Benchmarkdaten: 30Products/90Variants/5Categories, keine realen Herstellerprodukte. Sämtliche Herstellerkontakte, Identitäten, Attribute, Preise, Bestände und Einkaufskosten fiktiv. Technischer verified-Status ist keine reale Pflichtdaten- oder Rechtsfreigabe. Nur in getrenntem Messschema/Index verwenden. Vier Profile über vorhandene Applicationports, keine Gäste in dieser Fixture.",
+  "Products": [
+    {
+      "ID": "bench-product-01",
+      "FamilyID": "bench-family",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Synthetischer Messartikel 01"
+      },
+      "Description": {
+        "de-DE": "Reiner technischer Benchmarkdatensatz. Fiktiver neutraler Messartikel ohne behauptete reale elektrische, chemische, medizinische oder sonstige regulierte Produkteigenschaft. Kein reales Kaufangebot; alle Kennungen, Kontakte, Preise und Bestände sind synthetisch."
+      },
+      "Brand": "Synthetisch A",
+      "PrimaryCategoryID": "mobile",
+      "Slug": "synthetischer-messartikel-01",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "Fiktiver Benchmarkhersteller",
+        "PostalAddress": {
+          "Street": "Fiktiver Messweg 1",
+          "PostalCode": "12345",
+          "City": "Synthetische Messstadt",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "benchmark@example.invalid"
+      },
+      "Variants": [
+        {
+          "SKU": "BENCH-01-A",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "a"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-01-B",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "b"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-01-C",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "c"
+              ]
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Darstellung eines synthetischen Messartikels"
+          }
+        }
+      ],
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "ApplicableRules": [
+          {
+            "Code": "SyntheticBenchmark-NotARealOffer",
+            "Market": "DE"
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "RuleReference"
+        ],
+        "Notices": [
+          {
+            "Code": "SyntheticBenchmark",
+            "Text": {
+              "de-DE": "Ausschließlich synthetische Messdaten. Keine reale Ware, keine Hersteller- oder Rechtskonformitätsbehauptung. Checkout und Zahlung sind Simulation."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "ID": "bench-product-02",
+      "FamilyID": "bench-family",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Synthetischer Messartikel 02"
+      },
+      "Description": {
+        "de-DE": "Reiner technischer Benchmarkdatensatz. Fiktiver neutraler Messartikel ohne behauptete reale elektrische, chemische, medizinische oder sonstige regulierte Produkteigenschaft. Kein reales Kaufangebot; alle Kennungen, Kontakte, Preise und Bestände sind synthetisch."
+      },
+      "Brand": "Synthetisch B",
+      "PrimaryCategoryID": "home",
+      "Slug": "synthetischer-messartikel-02",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "Fiktiver Benchmarkhersteller",
+        "PostalAddress": {
+          "Street": "Fiktiver Messweg 1",
+          "PostalCode": "12345",
+          "City": "Synthetische Messstadt",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "benchmark@example.invalid"
+      },
+      "Variants": [
+        {
+          "SKU": "BENCH-02-A",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "a"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-02-B",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "b"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-02-C",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "c"
+              ]
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Darstellung eines synthetischen Messartikels"
+          }
+        }
+      ],
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "ApplicableRules": [
+          {
+            "Code": "SyntheticBenchmark-NotARealOffer",
+            "Market": "DE"
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "RuleReference"
+        ],
+        "Notices": [
+          {
+            "Code": "SyntheticBenchmark",
+            "Text": {
+              "de-DE": "Ausschließlich synthetische Messdaten. Keine reale Ware, keine Hersteller- oder Rechtskonformitätsbehauptung. Checkout und Zahlung sind Simulation."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "ID": "bench-product-03",
+      "FamilyID": "bench-family",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Synthetischer Messartikel 03"
+      },
+      "Description": {
+        "de-DE": "Reiner technischer Benchmarkdatensatz. Fiktiver neutraler Messartikel ohne behauptete reale elektrische, chemische, medizinische oder sonstige regulierte Produkteigenschaft. Kein reales Kaufangebot; alle Kennungen, Kontakte, Preise und Bestände sind synthetisch."
+      },
+      "Brand": "Synthetisch C",
+      "PrimaryCategoryID": "coffee",
+      "Slug": "synthetischer-messartikel-03",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "Fiktiver Benchmarkhersteller",
+        "PostalAddress": {
+          "Street": "Fiktiver Messweg 1",
+          "PostalCode": "12345",
+          "City": "Synthetische Messstadt",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "benchmark@example.invalid"
+      },
+      "Variants": [
+        {
+          "SKU": "BENCH-03-A",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "a"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-03-B",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "b"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-03-C",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "c"
+              ]
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Darstellung eines synthetischen Messartikels"
+          }
+        }
+      ],
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "ApplicableRules": [
+          {
+            "Code": "SyntheticBenchmark-NotARealOffer",
+            "Market": "DE"
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "RuleReference"
+        ],
+        "Notices": [
+          {
+            "Code": "SyntheticBenchmark",
+            "Text": {
+              "de-DE": "Ausschließlich synthetische Messdaten. Keine reale Ware, keine Hersteller- oder Rechtskonformitätsbehauptung. Checkout und Zahlung sind Simulation."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "ID": "bench-product-04",
+      "FamilyID": "bench-family",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Synthetischer Messartikel 04"
+      },
+      "Description": {
+        "de-DE": "Reiner technischer Benchmarkdatensatz. Fiktiver neutraler Messartikel ohne behauptete reale elektrische, chemische, medizinische oder sonstige regulierte Produkteigenschaft. Kein reales Kaufangebot; alle Kennungen, Kontakte, Preise und Bestände sind synthetisch."
+      },
+      "Brand": "Synthetisch A",
+      "PrimaryCategoryID": "smartphones",
+      "Slug": "synthetischer-messartikel-04",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "Fiktiver Benchmarkhersteller",
+        "PostalAddress": {
+          "Street": "Fiktiver Messweg 1",
+          "PostalCode": "12345",
+          "City": "Synthetische Messstadt",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "benchmark@example.invalid"
+      },
+      "Variants": [
+        {
+          "SKU": "BENCH-04-A",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "a"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-04-B",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "b"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-04-C",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "c"
+              ]
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Darstellung eines synthetischen Messartikels"
+          }
+        }
+      ],
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "ApplicableRules": [
+          {
+            "Code": "SyntheticBenchmark-NotARealOffer",
+            "Market": "DE"
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "RuleReference"
+        ],
+        "Notices": [
+          {
+            "Code": "SyntheticBenchmark",
+            "Text": {
+              "de-DE": "Ausschließlich synthetische Messdaten. Keine reale Ware, keine Hersteller- oder Rechtskonformitätsbehauptung. Checkout und Zahlung sind Simulation."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ]
+      },
+      "AdditionalCategoryIDs": [
+        "mobile"
+      ]
+    },
+    {
+      "ID": "bench-product-05",
+      "FamilyID": "bench-family",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Synthetischer Messartikel 05"
+      },
+      "Description": {
+        "de-DE": "Reiner technischer Benchmarkdatensatz. Fiktiver neutraler Messartikel ohne behauptete reale elektrische, chemische, medizinische oder sonstige regulierte Produkteigenschaft. Kein reales Kaufangebot; alle Kennungen, Kontakte, Preise und Bestände sind synthetisch."
+      },
+      "Brand": "Synthetisch B",
+      "PrimaryCategoryID": "accessories",
+      "Slug": "synthetischer-messartikel-05",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "Fiktiver Benchmarkhersteller",
+        "PostalAddress": {
+          "Street": "Fiktiver Messweg 1",
+          "PostalCode": "12345",
+          "City": "Synthetische Messstadt",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "benchmark@example.invalid"
+      },
+      "Variants": [
+        {
+          "SKU": "BENCH-05-A",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "a"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-05-B",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "b"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-05-C",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "c"
+              ]
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Darstellung eines synthetischen Messartikels"
+          }
+        }
+      ],
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "ApplicableRules": [
+          {
+            "Code": "SyntheticBenchmark-NotARealOffer",
+            "Market": "DE"
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "RuleReference"
+        ],
+        "Notices": [
+          {
+            "Code": "SyntheticBenchmark",
+            "Text": {
+              "de-DE": "Ausschließlich synthetische Messdaten. Keine reale Ware, keine Hersteller- oder Rechtskonformitätsbehauptung. Checkout und Zahlung sind Simulation."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ]
+      },
+      "AdditionalCategoryIDs": [
+        "mobile"
+      ]
+    },
+    {
+      "ID": "bench-product-06",
+      "FamilyID": "bench-family",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Synthetischer Messartikel 06"
+      },
+      "Description": {
+        "de-DE": "Reiner technischer Benchmarkdatensatz. Fiktiver neutraler Messartikel ohne behauptete reale elektrische, chemische, medizinische oder sonstige regulierte Produkteigenschaft. Kein reales Kaufangebot; alle Kennungen, Kontakte, Preise und Bestände sind synthetisch."
+      },
+      "Brand": "Synthetisch C",
+      "PrimaryCategoryID": "mobile",
+      "Slug": "synthetischer-messartikel-06",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "Fiktiver Benchmarkhersteller",
+        "PostalAddress": {
+          "Street": "Fiktiver Messweg 1",
+          "PostalCode": "12345",
+          "City": "Synthetische Messstadt",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "benchmark@example.invalid"
+      },
+      "Variants": [
+        {
+          "SKU": "BENCH-06-A",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "a"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-06-B",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "b"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-06-C",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "c"
+              ]
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Darstellung eines synthetischen Messartikels"
+          }
+        }
+      ],
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "ApplicableRules": [
+          {
+            "Code": "SyntheticBenchmark-NotARealOffer",
+            "Market": "DE"
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "RuleReference"
+        ],
+        "Notices": [
+          {
+            "Code": "SyntheticBenchmark",
+            "Text": {
+              "de-DE": "Ausschließlich synthetische Messdaten. Keine reale Ware, keine Hersteller- oder Rechtskonformitätsbehauptung. Checkout und Zahlung sind Simulation."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "ID": "bench-product-07",
+      "FamilyID": "bench-family",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Synthetischer Messartikel 07"
+      },
+      "Description": {
+        "de-DE": "Reiner technischer Benchmarkdatensatz. Fiktiver neutraler Messartikel ohne behauptete reale elektrische, chemische, medizinische oder sonstige regulierte Produkteigenschaft. Kein reales Kaufangebot; alle Kennungen, Kontakte, Preise und Bestände sind synthetisch."
+      },
+      "Brand": "Synthetisch A",
+      "PrimaryCategoryID": "home",
+      "Slug": "synthetischer-messartikel-07",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "Fiktiver Benchmarkhersteller",
+        "PostalAddress": {
+          "Street": "Fiktiver Messweg 1",
+          "PostalCode": "12345",
+          "City": "Synthetische Messstadt",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "benchmark@example.invalid"
+      },
+      "Variants": [
+        {
+          "SKU": "BENCH-07-A",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "a"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-07-B",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "b"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-07-C",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "c"
+              ]
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Darstellung eines synthetischen Messartikels"
+          }
+        }
+      ],
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "ApplicableRules": [
+          {
+            "Code": "SyntheticBenchmark-NotARealOffer",
+            "Market": "DE"
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "RuleReference"
+        ],
+        "Notices": [
+          {
+            "Code": "SyntheticBenchmark",
+            "Text": {
+              "de-DE": "Ausschließlich synthetische Messdaten. Keine reale Ware, keine Hersteller- oder Rechtskonformitätsbehauptung. Checkout und Zahlung sind Simulation."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "ID": "bench-product-08",
+      "FamilyID": "bench-family",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Synthetischer Messartikel 08"
+      },
+      "Description": {
+        "de-DE": "Reiner technischer Benchmarkdatensatz. Fiktiver neutraler Messartikel ohne behauptete reale elektrische, chemische, medizinische oder sonstige regulierte Produkteigenschaft. Kein reales Kaufangebot; alle Kennungen, Kontakte, Preise und Bestände sind synthetisch."
+      },
+      "Brand": "Synthetisch B",
+      "PrimaryCategoryID": "coffee",
+      "Slug": "synthetischer-messartikel-08",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "Fiktiver Benchmarkhersteller",
+        "PostalAddress": {
+          "Street": "Fiktiver Messweg 1",
+          "PostalCode": "12345",
+          "City": "Synthetische Messstadt",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "benchmark@example.invalid"
+      },
+      "Variants": [
+        {
+          "SKU": "BENCH-08-A",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "a"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-08-B",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "b"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-08-C",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "c"
+              ]
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Darstellung eines synthetischen Messartikels"
+          }
+        }
+      ],
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "ApplicableRules": [
+          {
+            "Code": "SyntheticBenchmark-NotARealOffer",
+            "Market": "DE"
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "RuleReference"
+        ],
+        "Notices": [
+          {
+            "Code": "SyntheticBenchmark",
+            "Text": {
+              "de-DE": "Ausschließlich synthetische Messdaten. Keine reale Ware, keine Hersteller- oder Rechtskonformitätsbehauptung. Checkout und Zahlung sind Simulation."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "ID": "bench-product-09",
+      "FamilyID": "bench-family",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Synthetischer Messartikel 09"
+      },
+      "Description": {
+        "de-DE": "Reiner technischer Benchmarkdatensatz. Fiktiver neutraler Messartikel ohne behauptete reale elektrische, chemische, medizinische oder sonstige regulierte Produkteigenschaft. Kein reales Kaufangebot; alle Kennungen, Kontakte, Preise und Bestände sind synthetisch."
+      },
+      "Brand": "Synthetisch C",
+      "PrimaryCategoryID": "smartphones",
+      "Slug": "synthetischer-messartikel-09",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "Fiktiver Benchmarkhersteller",
+        "PostalAddress": {
+          "Street": "Fiktiver Messweg 1",
+          "PostalCode": "12345",
+          "City": "Synthetische Messstadt",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "benchmark@example.invalid"
+      },
+      "Variants": [
+        {
+          "SKU": "BENCH-09-A",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "a"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-09-B",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "b"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-09-C",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "c"
+              ]
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Darstellung eines synthetischen Messartikels"
+          }
+        }
+      ],
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "ApplicableRules": [
+          {
+            "Code": "SyntheticBenchmark-NotARealOffer",
+            "Market": "DE"
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "RuleReference"
+        ],
+        "Notices": [
+          {
+            "Code": "SyntheticBenchmark",
+            "Text": {
+              "de-DE": "Ausschließlich synthetische Messdaten. Keine reale Ware, keine Hersteller- oder Rechtskonformitätsbehauptung. Checkout und Zahlung sind Simulation."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ]
+      },
+      "AdditionalCategoryIDs": [
+        "mobile"
+      ]
+    },
+    {
+      "ID": "bench-product-10",
+      "FamilyID": "bench-family",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Synthetischer Messartikel 10"
+      },
+      "Description": {
+        "de-DE": "Reiner technischer Benchmarkdatensatz. Fiktiver neutraler Messartikel ohne behauptete reale elektrische, chemische, medizinische oder sonstige regulierte Produkteigenschaft. Kein reales Kaufangebot; alle Kennungen, Kontakte, Preise und Bestände sind synthetisch."
+      },
+      "Brand": "Synthetisch A",
+      "PrimaryCategoryID": "accessories",
+      "Slug": "synthetischer-messartikel-10",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "Fiktiver Benchmarkhersteller",
+        "PostalAddress": {
+          "Street": "Fiktiver Messweg 1",
+          "PostalCode": "12345",
+          "City": "Synthetische Messstadt",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "benchmark@example.invalid"
+      },
+      "Variants": [
+        {
+          "SKU": "BENCH-10-A",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "a"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-10-B",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "b"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-10-C",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "c"
+              ]
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Darstellung eines synthetischen Messartikels"
+          }
+        }
+      ],
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "ApplicableRules": [
+          {
+            "Code": "SyntheticBenchmark-NotARealOffer",
+            "Market": "DE"
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "RuleReference"
+        ],
+        "Notices": [
+          {
+            "Code": "SyntheticBenchmark",
+            "Text": {
+              "de-DE": "Ausschließlich synthetische Messdaten. Keine reale Ware, keine Hersteller- oder Rechtskonformitätsbehauptung. Checkout und Zahlung sind Simulation."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ]
+      },
+      "AdditionalCategoryIDs": [
+        "mobile"
+      ]
+    },
+    {
+      "ID": "bench-product-11",
+      "FamilyID": "bench-family",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Synthetischer Messartikel 11"
+      },
+      "Description": {
+        "de-DE": "Reiner technischer Benchmarkdatensatz. Fiktiver neutraler Messartikel ohne behauptete reale elektrische, chemische, medizinische oder sonstige regulierte Produkteigenschaft. Kein reales Kaufangebot; alle Kennungen, Kontakte, Preise und Bestände sind synthetisch."
+      },
+      "Brand": "Synthetisch B",
+      "PrimaryCategoryID": "mobile",
+      "Slug": "synthetischer-messartikel-11",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "Fiktiver Benchmarkhersteller",
+        "PostalAddress": {
+          "Street": "Fiktiver Messweg 1",
+          "PostalCode": "12345",
+          "City": "Synthetische Messstadt",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "benchmark@example.invalid"
+      },
+      "Variants": [
+        {
+          "SKU": "BENCH-11-A",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "a"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-11-B",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "b"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-11-C",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "c"
+              ]
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Darstellung eines synthetischen Messartikels"
+          }
+        }
+      ],
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "ApplicableRules": [
+          {
+            "Code": "SyntheticBenchmark-NotARealOffer",
+            "Market": "DE"
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "RuleReference"
+        ],
+        "Notices": [
+          {
+            "Code": "SyntheticBenchmark",
+            "Text": {
+              "de-DE": "Ausschließlich synthetische Messdaten. Keine reale Ware, keine Hersteller- oder Rechtskonformitätsbehauptung. Checkout und Zahlung sind Simulation."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "ID": "bench-product-12",
+      "FamilyID": "bench-family",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Synthetischer Messartikel 12"
+      },
+      "Description": {
+        "de-DE": "Reiner technischer Benchmarkdatensatz. Fiktiver neutraler Messartikel ohne behauptete reale elektrische, chemische, medizinische oder sonstige regulierte Produkteigenschaft. Kein reales Kaufangebot; alle Kennungen, Kontakte, Preise und Bestände sind synthetisch."
+      },
+      "Brand": "Synthetisch C",
+      "PrimaryCategoryID": "home",
+      "Slug": "synthetischer-messartikel-12",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "Fiktiver Benchmarkhersteller",
+        "PostalAddress": {
+          "Street": "Fiktiver Messweg 1",
+          "PostalCode": "12345",
+          "City": "Synthetische Messstadt",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "benchmark@example.invalid"
+      },
+      "Variants": [
+        {
+          "SKU": "BENCH-12-A",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "a"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-12-B",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "b"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-12-C",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "c"
+              ]
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Darstellung eines synthetischen Messartikels"
+          }
+        }
+      ],
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "ApplicableRules": [
+          {
+            "Code": "SyntheticBenchmark-NotARealOffer",
+            "Market": "DE"
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "RuleReference"
+        ],
+        "Notices": [
+          {
+            "Code": "SyntheticBenchmark",
+            "Text": {
+              "de-DE": "Ausschließlich synthetische Messdaten. Keine reale Ware, keine Hersteller- oder Rechtskonformitätsbehauptung. Checkout und Zahlung sind Simulation."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "ID": "bench-product-13",
+      "FamilyID": "bench-family",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Synthetischer Messartikel 13"
+      },
+      "Description": {
+        "de-DE": "Reiner technischer Benchmarkdatensatz. Fiktiver neutraler Messartikel ohne behauptete reale elektrische, chemische, medizinische oder sonstige regulierte Produkteigenschaft. Kein reales Kaufangebot; alle Kennungen, Kontakte, Preise und Bestände sind synthetisch."
+      },
+      "Brand": "Synthetisch A",
+      "PrimaryCategoryID": "coffee",
+      "Slug": "synthetischer-messartikel-13",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "Fiktiver Benchmarkhersteller",
+        "PostalAddress": {
+          "Street": "Fiktiver Messweg 1",
+          "PostalCode": "12345",
+          "City": "Synthetische Messstadt",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "benchmark@example.invalid"
+      },
+      "Variants": [
+        {
+          "SKU": "BENCH-13-A",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "a"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-13-B",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "b"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-13-C",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "c"
+              ]
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Darstellung eines synthetischen Messartikels"
+          }
+        }
+      ],
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "ApplicableRules": [
+          {
+            "Code": "SyntheticBenchmark-NotARealOffer",
+            "Market": "DE"
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "RuleReference"
+        ],
+        "Notices": [
+          {
+            "Code": "SyntheticBenchmark",
+            "Text": {
+              "de-DE": "Ausschließlich synthetische Messdaten. Keine reale Ware, keine Hersteller- oder Rechtskonformitätsbehauptung. Checkout und Zahlung sind Simulation."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "ID": "bench-product-14",
+      "FamilyID": "bench-family",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Synthetischer Messartikel 14"
+      },
+      "Description": {
+        "de-DE": "Reiner technischer Benchmarkdatensatz. Fiktiver neutraler Messartikel ohne behauptete reale elektrische, chemische, medizinische oder sonstige regulierte Produkteigenschaft. Kein reales Kaufangebot; alle Kennungen, Kontakte, Preise und Bestände sind synthetisch."
+      },
+      "Brand": "Synthetisch B",
+      "PrimaryCategoryID": "smartphones",
+      "Slug": "synthetischer-messartikel-14",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "Fiktiver Benchmarkhersteller",
+        "PostalAddress": {
+          "Street": "Fiktiver Messweg 1",
+          "PostalCode": "12345",
+          "City": "Synthetische Messstadt",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "benchmark@example.invalid"
+      },
+      "Variants": [
+        {
+          "SKU": "BENCH-14-A",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "a"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-14-B",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "b"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-14-C",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "c"
+              ]
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Darstellung eines synthetischen Messartikels"
+          }
+        }
+      ],
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "ApplicableRules": [
+          {
+            "Code": "SyntheticBenchmark-NotARealOffer",
+            "Market": "DE"
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "RuleReference"
+        ],
+        "Notices": [
+          {
+            "Code": "SyntheticBenchmark",
+            "Text": {
+              "de-DE": "Ausschließlich synthetische Messdaten. Keine reale Ware, keine Hersteller- oder Rechtskonformitätsbehauptung. Checkout und Zahlung sind Simulation."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ]
+      },
+      "AdditionalCategoryIDs": [
+        "mobile"
+      ]
+    },
+    {
+      "ID": "bench-product-15",
+      "FamilyID": "bench-family",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Synthetischer Messartikel 15"
+      },
+      "Description": {
+        "de-DE": "Reiner technischer Benchmarkdatensatz. Fiktiver neutraler Messartikel ohne behauptete reale elektrische, chemische, medizinische oder sonstige regulierte Produkteigenschaft. Kein reales Kaufangebot; alle Kennungen, Kontakte, Preise und Bestände sind synthetisch."
+      },
+      "Brand": "Synthetisch C",
+      "PrimaryCategoryID": "accessories",
+      "Slug": "synthetischer-messartikel-15",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "Fiktiver Benchmarkhersteller",
+        "PostalAddress": {
+          "Street": "Fiktiver Messweg 1",
+          "PostalCode": "12345",
+          "City": "Synthetische Messstadt",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "benchmark@example.invalid"
+      },
+      "Variants": [
+        {
+          "SKU": "BENCH-15-A",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "a"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-15-B",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "b"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-15-C",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "c"
+              ]
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Darstellung eines synthetischen Messartikels"
+          }
+        }
+      ],
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "ApplicableRules": [
+          {
+            "Code": "SyntheticBenchmark-NotARealOffer",
+            "Market": "DE"
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "RuleReference"
+        ],
+        "Notices": [
+          {
+            "Code": "SyntheticBenchmark",
+            "Text": {
+              "de-DE": "Ausschließlich synthetische Messdaten. Keine reale Ware, keine Hersteller- oder Rechtskonformitätsbehauptung. Checkout und Zahlung sind Simulation."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ]
+      },
+      "AdditionalCategoryIDs": [
+        "mobile"
+      ]
+    },
+    {
+      "ID": "bench-product-16",
+      "FamilyID": "bench-family",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Synthetischer Messartikel 16"
+      },
+      "Description": {
+        "de-DE": "Reiner technischer Benchmarkdatensatz. Fiktiver neutraler Messartikel ohne behauptete reale elektrische, chemische, medizinische oder sonstige regulierte Produkteigenschaft. Kein reales Kaufangebot; alle Kennungen, Kontakte, Preise und Bestände sind synthetisch."
+      },
+      "Brand": "Synthetisch A",
+      "PrimaryCategoryID": "mobile",
+      "Slug": "synthetischer-messartikel-16",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "Fiktiver Benchmarkhersteller",
+        "PostalAddress": {
+          "Street": "Fiktiver Messweg 1",
+          "PostalCode": "12345",
+          "City": "Synthetische Messstadt",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "benchmark@example.invalid"
+      },
+      "Variants": [
+        {
+          "SKU": "BENCH-16-A",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "a"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-16-B",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "b"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-16-C",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "c"
+              ]
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Darstellung eines synthetischen Messartikels"
+          }
+        }
+      ],
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "ApplicableRules": [
+          {
+            "Code": "SyntheticBenchmark-NotARealOffer",
+            "Market": "DE"
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "RuleReference"
+        ],
+        "Notices": [
+          {
+            "Code": "SyntheticBenchmark",
+            "Text": {
+              "de-DE": "Ausschließlich synthetische Messdaten. Keine reale Ware, keine Hersteller- oder Rechtskonformitätsbehauptung. Checkout und Zahlung sind Simulation."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "ID": "bench-product-17",
+      "FamilyID": "bench-family",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Synthetischer Messartikel 17"
+      },
+      "Description": {
+        "de-DE": "Reiner technischer Benchmarkdatensatz. Fiktiver neutraler Messartikel ohne behauptete reale elektrische, chemische, medizinische oder sonstige regulierte Produkteigenschaft. Kein reales Kaufangebot; alle Kennungen, Kontakte, Preise und Bestände sind synthetisch."
+      },
+      "Brand": "Synthetisch B",
+      "PrimaryCategoryID": "home",
+      "Slug": "synthetischer-messartikel-17",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "Fiktiver Benchmarkhersteller",
+        "PostalAddress": {
+          "Street": "Fiktiver Messweg 1",
+          "PostalCode": "12345",
+          "City": "Synthetische Messstadt",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "benchmark@example.invalid"
+      },
+      "Variants": [
+        {
+          "SKU": "BENCH-17-A",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "a"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-17-B",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "b"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-17-C",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "c"
+              ]
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Darstellung eines synthetischen Messartikels"
+          }
+        }
+      ],
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "ApplicableRules": [
+          {
+            "Code": "SyntheticBenchmark-NotARealOffer",
+            "Market": "DE"
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "RuleReference"
+        ],
+        "Notices": [
+          {
+            "Code": "SyntheticBenchmark",
+            "Text": {
+              "de-DE": "Ausschließlich synthetische Messdaten. Keine reale Ware, keine Hersteller- oder Rechtskonformitätsbehauptung. Checkout und Zahlung sind Simulation."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "ID": "bench-product-18",
+      "FamilyID": "bench-family",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Synthetischer Messartikel 18"
+      },
+      "Description": {
+        "de-DE": "Reiner technischer Benchmarkdatensatz. Fiktiver neutraler Messartikel ohne behauptete reale elektrische, chemische, medizinische oder sonstige regulierte Produkteigenschaft. Kein reales Kaufangebot; alle Kennungen, Kontakte, Preise und Bestände sind synthetisch."
+      },
+      "Brand": "Synthetisch C",
+      "PrimaryCategoryID": "coffee",
+      "Slug": "synthetischer-messartikel-18",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "Fiktiver Benchmarkhersteller",
+        "PostalAddress": {
+          "Street": "Fiktiver Messweg 1",
+          "PostalCode": "12345",
+          "City": "Synthetische Messstadt",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "benchmark@example.invalid"
+      },
+      "Variants": [
+        {
+          "SKU": "BENCH-18-A",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "a"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-18-B",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "b"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-18-C",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "c"
+              ]
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Darstellung eines synthetischen Messartikels"
+          }
+        }
+      ],
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "ApplicableRules": [
+          {
+            "Code": "SyntheticBenchmark-NotARealOffer",
+            "Market": "DE"
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "RuleReference"
+        ],
+        "Notices": [
+          {
+            "Code": "SyntheticBenchmark",
+            "Text": {
+              "de-DE": "Ausschließlich synthetische Messdaten. Keine reale Ware, keine Hersteller- oder Rechtskonformitätsbehauptung. Checkout und Zahlung sind Simulation."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "ID": "bench-product-19",
+      "FamilyID": "bench-family",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Synthetischer Messartikel 19"
+      },
+      "Description": {
+        "de-DE": "Reiner technischer Benchmarkdatensatz. Fiktiver neutraler Messartikel ohne behauptete reale elektrische, chemische, medizinische oder sonstige regulierte Produkteigenschaft. Kein reales Kaufangebot; alle Kennungen, Kontakte, Preise und Bestände sind synthetisch."
+      },
+      "Brand": "Synthetisch A",
+      "PrimaryCategoryID": "smartphones",
+      "Slug": "synthetischer-messartikel-19",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "Fiktiver Benchmarkhersteller",
+        "PostalAddress": {
+          "Street": "Fiktiver Messweg 1",
+          "PostalCode": "12345",
+          "City": "Synthetische Messstadt",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "benchmark@example.invalid"
+      },
+      "Variants": [
+        {
+          "SKU": "BENCH-19-A",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "a"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-19-B",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "b"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-19-C",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "c"
+              ]
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Darstellung eines synthetischen Messartikels"
+          }
+        }
+      ],
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "ApplicableRules": [
+          {
+            "Code": "SyntheticBenchmark-NotARealOffer",
+            "Market": "DE"
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "RuleReference"
+        ],
+        "Notices": [
+          {
+            "Code": "SyntheticBenchmark",
+            "Text": {
+              "de-DE": "Ausschließlich synthetische Messdaten. Keine reale Ware, keine Hersteller- oder Rechtskonformitätsbehauptung. Checkout und Zahlung sind Simulation."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ]
+      },
+      "AdditionalCategoryIDs": [
+        "mobile"
+      ]
+    },
+    {
+      "ID": "bench-product-20",
+      "FamilyID": "bench-family",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Synthetischer Messartikel 20"
+      },
+      "Description": {
+        "de-DE": "Reiner technischer Benchmarkdatensatz. Fiktiver neutraler Messartikel ohne behauptete reale elektrische, chemische, medizinische oder sonstige regulierte Produkteigenschaft. Kein reales Kaufangebot; alle Kennungen, Kontakte, Preise und Bestände sind synthetisch."
+      },
+      "Brand": "Synthetisch B",
+      "PrimaryCategoryID": "accessories",
+      "Slug": "synthetischer-messartikel-20",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "Fiktiver Benchmarkhersteller",
+        "PostalAddress": {
+          "Street": "Fiktiver Messweg 1",
+          "PostalCode": "12345",
+          "City": "Synthetische Messstadt",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "benchmark@example.invalid"
+      },
+      "Variants": [
+        {
+          "SKU": "BENCH-20-A",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "a"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-20-B",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "b"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-20-C",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "c"
+              ]
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Darstellung eines synthetischen Messartikels"
+          }
+        }
+      ],
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "ApplicableRules": [
+          {
+            "Code": "SyntheticBenchmark-NotARealOffer",
+            "Market": "DE"
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "RuleReference"
+        ],
+        "Notices": [
+          {
+            "Code": "SyntheticBenchmark",
+            "Text": {
+              "de-DE": "Ausschließlich synthetische Messdaten. Keine reale Ware, keine Hersteller- oder Rechtskonformitätsbehauptung. Checkout und Zahlung sind Simulation."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ]
+      },
+      "AdditionalCategoryIDs": [
+        "mobile"
+      ]
+    },
+    {
+      "ID": "bench-product-21",
+      "FamilyID": "bench-family",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Synthetischer Messartikel 21"
+      },
+      "Description": {
+        "de-DE": "Reiner technischer Benchmarkdatensatz. Fiktiver neutraler Messartikel ohne behauptete reale elektrische, chemische, medizinische oder sonstige regulierte Produkteigenschaft. Kein reales Kaufangebot; alle Kennungen, Kontakte, Preise und Bestände sind synthetisch."
+      },
+      "Brand": "Synthetisch C",
+      "PrimaryCategoryID": "mobile",
+      "Slug": "synthetischer-messartikel-21",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "Fiktiver Benchmarkhersteller",
+        "PostalAddress": {
+          "Street": "Fiktiver Messweg 1",
+          "PostalCode": "12345",
+          "City": "Synthetische Messstadt",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "benchmark@example.invalid"
+      },
+      "Variants": [
+        {
+          "SKU": "BENCH-21-A",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "a"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-21-B",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "b"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-21-C",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "c"
+              ]
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Darstellung eines synthetischen Messartikels"
+          }
+        }
+      ],
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "ApplicableRules": [
+          {
+            "Code": "SyntheticBenchmark-NotARealOffer",
+            "Market": "DE"
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "RuleReference"
+        ],
+        "Notices": [
+          {
+            "Code": "SyntheticBenchmark",
+            "Text": {
+              "de-DE": "Ausschließlich synthetische Messdaten. Keine reale Ware, keine Hersteller- oder Rechtskonformitätsbehauptung. Checkout und Zahlung sind Simulation."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "ID": "bench-product-22",
+      "FamilyID": "bench-family",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Synthetischer Messartikel 22"
+      },
+      "Description": {
+        "de-DE": "Reiner technischer Benchmarkdatensatz. Fiktiver neutraler Messartikel ohne behauptete reale elektrische, chemische, medizinische oder sonstige regulierte Produkteigenschaft. Kein reales Kaufangebot; alle Kennungen, Kontakte, Preise und Bestände sind synthetisch."
+      },
+      "Brand": "Synthetisch A",
+      "PrimaryCategoryID": "home",
+      "Slug": "synthetischer-messartikel-22",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "Fiktiver Benchmarkhersteller",
+        "PostalAddress": {
+          "Street": "Fiktiver Messweg 1",
+          "PostalCode": "12345",
+          "City": "Synthetische Messstadt",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "benchmark@example.invalid"
+      },
+      "Variants": [
+        {
+          "SKU": "BENCH-22-A",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "a"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-22-B",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "b"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-22-C",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "c"
+              ]
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Darstellung eines synthetischen Messartikels"
+          }
+        }
+      ],
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "ApplicableRules": [
+          {
+            "Code": "SyntheticBenchmark-NotARealOffer",
+            "Market": "DE"
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "RuleReference"
+        ],
+        "Notices": [
+          {
+            "Code": "SyntheticBenchmark",
+            "Text": {
+              "de-DE": "Ausschließlich synthetische Messdaten. Keine reale Ware, keine Hersteller- oder Rechtskonformitätsbehauptung. Checkout und Zahlung sind Simulation."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "ID": "bench-product-23",
+      "FamilyID": "bench-family",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Synthetischer Messartikel 23"
+      },
+      "Description": {
+        "de-DE": "Reiner technischer Benchmarkdatensatz. Fiktiver neutraler Messartikel ohne behauptete reale elektrische, chemische, medizinische oder sonstige regulierte Produkteigenschaft. Kein reales Kaufangebot; alle Kennungen, Kontakte, Preise und Bestände sind synthetisch."
+      },
+      "Brand": "Synthetisch B",
+      "PrimaryCategoryID": "coffee",
+      "Slug": "synthetischer-messartikel-23",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "Fiktiver Benchmarkhersteller",
+        "PostalAddress": {
+          "Street": "Fiktiver Messweg 1",
+          "PostalCode": "12345",
+          "City": "Synthetische Messstadt",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "benchmark@example.invalid"
+      },
+      "Variants": [
+        {
+          "SKU": "BENCH-23-A",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "a"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-23-B",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "b"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-23-C",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "c"
+              ]
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Darstellung eines synthetischen Messartikels"
+          }
+        }
+      ],
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "ApplicableRules": [
+          {
+            "Code": "SyntheticBenchmark-NotARealOffer",
+            "Market": "DE"
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "RuleReference"
+        ],
+        "Notices": [
+          {
+            "Code": "SyntheticBenchmark",
+            "Text": {
+              "de-DE": "Ausschließlich synthetische Messdaten. Keine reale Ware, keine Hersteller- oder Rechtskonformitätsbehauptung. Checkout und Zahlung sind Simulation."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "ID": "bench-product-24",
+      "FamilyID": "bench-family",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Synthetischer Messartikel 24"
+      },
+      "Description": {
+        "de-DE": "Reiner technischer Benchmarkdatensatz. Fiktiver neutraler Messartikel ohne behauptete reale elektrische, chemische, medizinische oder sonstige regulierte Produkteigenschaft. Kein reales Kaufangebot; alle Kennungen, Kontakte, Preise und Bestände sind synthetisch."
+      },
+      "Brand": "Synthetisch C",
+      "PrimaryCategoryID": "smartphones",
+      "Slug": "synthetischer-messartikel-24",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "Fiktiver Benchmarkhersteller",
+        "PostalAddress": {
+          "Street": "Fiktiver Messweg 1",
+          "PostalCode": "12345",
+          "City": "Synthetische Messstadt",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "benchmark@example.invalid"
+      },
+      "Variants": [
+        {
+          "SKU": "BENCH-24-A",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "a"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-24-B",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "b"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-24-C",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "c"
+              ]
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Darstellung eines synthetischen Messartikels"
+          }
+        }
+      ],
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "ApplicableRules": [
+          {
+            "Code": "SyntheticBenchmark-NotARealOffer",
+            "Market": "DE"
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "RuleReference"
+        ],
+        "Notices": [
+          {
+            "Code": "SyntheticBenchmark",
+            "Text": {
+              "de-DE": "Ausschließlich synthetische Messdaten. Keine reale Ware, keine Hersteller- oder Rechtskonformitätsbehauptung. Checkout und Zahlung sind Simulation."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ]
+      },
+      "AdditionalCategoryIDs": [
+        "mobile"
+      ]
+    },
+    {
+      "ID": "bench-product-25",
+      "FamilyID": "bench-family",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Synthetischer Messartikel 25"
+      },
+      "Description": {
+        "de-DE": "Reiner technischer Benchmarkdatensatz. Fiktiver neutraler Messartikel ohne behauptete reale elektrische, chemische, medizinische oder sonstige regulierte Produkteigenschaft. Kein reales Kaufangebot; alle Kennungen, Kontakte, Preise und Bestände sind synthetisch."
+      },
+      "Brand": "Synthetisch A",
+      "PrimaryCategoryID": "accessories",
+      "Slug": "synthetischer-messartikel-25",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "Fiktiver Benchmarkhersteller",
+        "PostalAddress": {
+          "Street": "Fiktiver Messweg 1",
+          "PostalCode": "12345",
+          "City": "Synthetische Messstadt",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "benchmark@example.invalid"
+      },
+      "Variants": [
+        {
+          "SKU": "BENCH-25-A",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "a"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-25-B",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "b"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-25-C",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "c"
+              ]
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Darstellung eines synthetischen Messartikels"
+          }
+        }
+      ],
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "ApplicableRules": [
+          {
+            "Code": "SyntheticBenchmark-NotARealOffer",
+            "Market": "DE"
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "RuleReference"
+        ],
+        "Notices": [
+          {
+            "Code": "SyntheticBenchmark",
+            "Text": {
+              "de-DE": "Ausschließlich synthetische Messdaten. Keine reale Ware, keine Hersteller- oder Rechtskonformitätsbehauptung. Checkout und Zahlung sind Simulation."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ]
+      },
+      "AdditionalCategoryIDs": [
+        "mobile"
+      ]
+    },
+    {
+      "ID": "bench-product-26",
+      "FamilyID": "bench-family",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Synthetischer Messartikel 26"
+      },
+      "Description": {
+        "de-DE": "Reiner technischer Benchmarkdatensatz. Fiktiver neutraler Messartikel ohne behauptete reale elektrische, chemische, medizinische oder sonstige regulierte Produkteigenschaft. Kein reales Kaufangebot; alle Kennungen, Kontakte, Preise und Bestände sind synthetisch."
+      },
+      "Brand": "Synthetisch B",
+      "PrimaryCategoryID": "mobile",
+      "Slug": "synthetischer-messartikel-26",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "Fiktiver Benchmarkhersteller",
+        "PostalAddress": {
+          "Street": "Fiktiver Messweg 1",
+          "PostalCode": "12345",
+          "City": "Synthetische Messstadt",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "benchmark@example.invalid"
+      },
+      "Variants": [
+        {
+          "SKU": "BENCH-26-A",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "a"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-26-B",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "b"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-26-C",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "c"
+              ]
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Darstellung eines synthetischen Messartikels"
+          }
+        }
+      ],
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "ApplicableRules": [
+          {
+            "Code": "SyntheticBenchmark-NotARealOffer",
+            "Market": "DE"
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "RuleReference"
+        ],
+        "Notices": [
+          {
+            "Code": "SyntheticBenchmark",
+            "Text": {
+              "de-DE": "Ausschließlich synthetische Messdaten. Keine reale Ware, keine Hersteller- oder Rechtskonformitätsbehauptung. Checkout und Zahlung sind Simulation."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "ID": "bench-product-27",
+      "FamilyID": "bench-family",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Synthetischer Messartikel 27"
+      },
+      "Description": {
+        "de-DE": "Reiner technischer Benchmarkdatensatz. Fiktiver neutraler Messartikel ohne behauptete reale elektrische, chemische, medizinische oder sonstige regulierte Produkteigenschaft. Kein reales Kaufangebot; alle Kennungen, Kontakte, Preise und Bestände sind synthetisch."
+      },
+      "Brand": "Synthetisch C",
+      "PrimaryCategoryID": "home",
+      "Slug": "synthetischer-messartikel-27",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "Fiktiver Benchmarkhersteller",
+        "PostalAddress": {
+          "Street": "Fiktiver Messweg 1",
+          "PostalCode": "12345",
+          "City": "Synthetische Messstadt",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "benchmark@example.invalid"
+      },
+      "Variants": [
+        {
+          "SKU": "BENCH-27-A",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "a"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-27-B",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "b"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-27-C",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "c"
+              ]
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Darstellung eines synthetischen Messartikels"
+          }
+        }
+      ],
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "ApplicableRules": [
+          {
+            "Code": "SyntheticBenchmark-NotARealOffer",
+            "Market": "DE"
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "RuleReference"
+        ],
+        "Notices": [
+          {
+            "Code": "SyntheticBenchmark",
+            "Text": {
+              "de-DE": "Ausschließlich synthetische Messdaten. Keine reale Ware, keine Hersteller- oder Rechtskonformitätsbehauptung. Checkout und Zahlung sind Simulation."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "ID": "bench-product-28",
+      "FamilyID": "bench-family",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Synthetischer Messartikel 28"
+      },
+      "Description": {
+        "de-DE": "Reiner technischer Benchmarkdatensatz. Fiktiver neutraler Messartikel ohne behauptete reale elektrische, chemische, medizinische oder sonstige regulierte Produkteigenschaft. Kein reales Kaufangebot; alle Kennungen, Kontakte, Preise und Bestände sind synthetisch."
+      },
+      "Brand": "Synthetisch A",
+      "PrimaryCategoryID": "coffee",
+      "Slug": "synthetischer-messartikel-28",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "Fiktiver Benchmarkhersteller",
+        "PostalAddress": {
+          "Street": "Fiktiver Messweg 1",
+          "PostalCode": "12345",
+          "City": "Synthetische Messstadt",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "benchmark@example.invalid"
+      },
+      "Variants": [
+        {
+          "SKU": "BENCH-28-A",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "a"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-28-B",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "b"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-28-C",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "c"
+              ]
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Darstellung eines synthetischen Messartikels"
+          }
+        }
+      ],
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "ApplicableRules": [
+          {
+            "Code": "SyntheticBenchmark-NotARealOffer",
+            "Market": "DE"
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "RuleReference"
+        ],
+        "Notices": [
+          {
+            "Code": "SyntheticBenchmark",
+            "Text": {
+              "de-DE": "Ausschließlich synthetische Messdaten. Keine reale Ware, keine Hersteller- oder Rechtskonformitätsbehauptung. Checkout und Zahlung sind Simulation."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "ID": "bench-product-29",
+      "FamilyID": "bench-family",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Synthetischer Messartikel 29"
+      },
+      "Description": {
+        "de-DE": "Reiner technischer Benchmarkdatensatz. Fiktiver neutraler Messartikel ohne behauptete reale elektrische, chemische, medizinische oder sonstige regulierte Produkteigenschaft. Kein reales Kaufangebot; alle Kennungen, Kontakte, Preise und Bestände sind synthetisch."
+      },
+      "Brand": "Synthetisch B",
+      "PrimaryCategoryID": "smartphones",
+      "Slug": "synthetischer-messartikel-29",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "Fiktiver Benchmarkhersteller",
+        "PostalAddress": {
+          "Street": "Fiktiver Messweg 1",
+          "PostalCode": "12345",
+          "City": "Synthetische Messstadt",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "benchmark@example.invalid"
+      },
+      "Variants": [
+        {
+          "SKU": "BENCH-29-A",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "a"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-29-B",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "b"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-29-C",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "c"
+              ]
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Darstellung eines synthetischen Messartikels"
+          }
+        }
+      ],
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "ApplicableRules": [
+          {
+            "Code": "SyntheticBenchmark-NotARealOffer",
+            "Market": "DE"
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "RuleReference"
+        ],
+        "Notices": [
+          {
+            "Code": "SyntheticBenchmark",
+            "Text": {
+              "de-DE": "Ausschließlich synthetische Messdaten. Keine reale Ware, keine Hersteller- oder Rechtskonformitätsbehauptung. Checkout und Zahlung sind Simulation."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ]
+      },
+      "AdditionalCategoryIDs": [
+        "mobile"
+      ]
+    },
+    {
+      "ID": "bench-product-30",
+      "FamilyID": "bench-family",
+      "FamilyVersion": 1,
+      "Name": {
+        "de-DE": "Synthetischer Messartikel 30"
+      },
+      "Description": {
+        "de-DE": "Reiner technischer Benchmarkdatensatz. Fiktiver neutraler Messartikel ohne behauptete reale elektrische, chemische, medizinische oder sonstige regulierte Produkteigenschaft. Kein reales Kaufangebot; alle Kennungen, Kontakte, Preise und Bestände sind synthetisch."
+      },
+      "Brand": "Synthetisch C",
+      "PrimaryCategoryID": "accessories",
+      "Slug": "synthetischer-messartikel-30",
+      "Revision": 1,
+      "Published": true,
+      "Manufacturer": {
+        "Name": "Fiktiver Benchmarkhersteller",
+        "PostalAddress": {
+          "Street": "Fiktiver Messweg 1",
+          "PostalCode": "12345",
+          "City": "Synthetische Messstadt",
+          "Country": "DE"
+        },
+        "ElectronicAddress": "benchmark@example.invalid"
+      },
+      "Variants": [
+        {
+          "SKU": "BENCH-30-A",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "a"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-30-B",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "b"
+              ]
+            }
+          }
+        },
+        {
+          "SKU": "BENCH-30-C",
+          "Attributes": {
+            "sample": {
+              "Type": "select",
+              "Options": [
+                "c"
+              ]
+            }
+          }
+        }
+      ],
+      "Images": [
+        {
+          "URL": "/assets/product.dad5b938174f.svg",
+          "AltText": {
+            "de-DE": "Eigene neutrale Darstellung eines synthetischen Messartikels"
+          }
+        }
+      ],
+      "Compliance": {
+        "Context": {
+          "Market": "DE",
+          "Locale": "de-DE",
+          "VerificationStatus": "verified"
+        },
+        "ApplicableRules": [
+          {
+            "Code": "SyntheticBenchmark-NotARealOffer",
+            "Market": "DE"
+          }
+        ],
+        "RequiredFields": [
+          "Manufacturer",
+          "RuleReference"
+        ],
+        "Notices": [
+          {
+            "Code": "SyntheticBenchmark",
+            "Text": {
+              "de-DE": "Ausschließlich synthetische Messdaten. Keine reale Ware, keine Hersteller- oder Rechtskonformitätsbehauptung. Checkout und Zahlung sind Simulation."
+            },
+            "Placement": [
+              "listing",
+              "detail",
+              "cart",
+              "checkout"
+            ]
+          }
+        ]
+      },
+      "AdditionalCategoryIDs": [
+        "mobile"
+      ]
+    }
+  ],
+  "Families": [
+    {
+      "ID": "bench-family",
+      "Version": 1,
+      "Name": {
+        "de-DE": "Synthetische Messartikel"
+      },
+      "Attributes": [
+        {
+          "Code": "sample",
+          "Name": {
+            "de-DE": "Synthetische Ausführung"
+          },
+          "Type": "select",
+          "Level": "variant",
+          "Required": true,
+          "Options": [
+            {
+              "Code": "a",
+              "Label": {
+                "de-DE": "Messausführung A"
+              }
+            },
+            {
+              "Code": "b",
+              "Label": {
+                "de-DE": "Messausführung B"
+              }
+            },
+            {
+              "Code": "c",
+              "Label": {
+                "de-DE": "Messausführung C"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "Categories": [
+    {
+      "ID": "mobile",
+      "Version": 1,
+      "Name": {
+        "de-DE": "Synthetische Mobilkategorie"
+      },
+      "Description": {
+        "de-DE": "Ausschließlich synthetische Messdaten, kein reales Produktangebot."
+      },
+      "Slug": "benchmark-mobile",
+      "FilterAttributes": [
+        "sample"
+      ],
+      "TopAttributes": [
+        "sample"
+      ]
+    },
+    {
+      "ID": "home",
+      "Version": 1,
+      "Name": {
+        "de-DE": "Synthetische Haushaltskategorie"
+      },
+      "Description": {
+        "de-DE": "Ausschließlich synthetische Messdaten, kein reales Produktangebot."
+      },
+      "Slug": "benchmark-home",
+      "FilterAttributes": [
+        "sample"
+      ],
+      "TopAttributes": [
+        "sample"
+      ]
+    },
+    {
+      "ID": "coffee",
+      "Version": 1,
+      "Name": {
+        "de-DE": "Synthetische Pflegekategorie"
+      },
+      "Description": {
+        "de-DE": "Ausschließlich synthetische Messdaten, kein reales Produktangebot."
+      },
+      "Slug": "benchmark-coffee",
+      "FilterAttributes": [
+        "sample"
+      ],
+      "TopAttributes": [
+        "sample"
+      ]
+    },
+    {
+      "ID": "smartphones",
+      "Version": 1,
+      "Name": {
+        "de-DE": "Synthetische Unterkategorie A"
+      },
+      "Description": {
+        "de-DE": "Ausschließlich synthetische Messdaten, kein reales Produktangebot."
+      },
+      "Slug": "benchmark-smartphones",
+      "FilterAttributes": [
+        "sample"
+      ],
+      "TopAttributes": [
+        "sample"
+      ],
+      "ParentID": {
+        "Present": true,
+        "Value": "mobile"
+      }
+    },
+    {
+      "ID": "accessories",
+      "Version": 1,
+      "Name": {
+        "de-DE": "Synthetische Unterkategorie B"
+      },
+      "Description": {
+        "de-DE": "Ausschließlich synthetische Messdaten, kein reales Produktangebot."
+      },
+      "Slug": "benchmark-accessories",
+      "FilterAttributes": [
+        "sample"
+      ],
+      "TopAttributes": [
+        "sample"
+      ],
+      "ParentID": {
+        "Present": true,
+        "Value": "mobile"
+      }
+    }
+  ],
+  "Inventories": [
+    {
+      "SKU": "BENCH-01-A",
+      "Price": {
+        "MinorUnits": 1100,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-01-B",
+      "Price": {
+        "MinorUnits": 1110,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-01-C",
+      "Price": {
+        "MinorUnits": 1120,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-02-A",
+      "Price": {
+        "MinorUnits": 1200,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-02-B",
+      "Price": {
+        "MinorUnits": 1210,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-02-C",
+      "Price": {
+        "MinorUnits": 1220,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-03-A",
+      "Price": {
+        "MinorUnits": 1300,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-03-B",
+      "Price": {
+        "MinorUnits": 1310,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-03-C",
+      "Price": {
+        "MinorUnits": 1320,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-04-A",
+      "Price": {
+        "MinorUnits": 1400,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-04-B",
+      "Price": {
+        "MinorUnits": 1410,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-04-C",
+      "Price": {
+        "MinorUnits": 1420,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-05-A",
+      "Price": {
+        "MinorUnits": 1500,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-05-B",
+      "Price": {
+        "MinorUnits": 1510,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-05-C",
+      "Price": {
+        "MinorUnits": 1520,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-06-A",
+      "Price": {
+        "MinorUnits": 1600,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-06-B",
+      "Price": {
+        "MinorUnits": 1610,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-06-C",
+      "Price": {
+        "MinorUnits": 1620,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-07-A",
+      "Price": {
+        "MinorUnits": 1700,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-07-B",
+      "Price": {
+        "MinorUnits": 1710,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-07-C",
+      "Price": {
+        "MinorUnits": 1720,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-08-A",
+      "Price": {
+        "MinorUnits": 1800,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-08-B",
+      "Price": {
+        "MinorUnits": 1810,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-08-C",
+      "Price": {
+        "MinorUnits": 1820,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-09-A",
+      "Price": {
+        "MinorUnits": 1900,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-09-B",
+      "Price": {
+        "MinorUnits": 1910,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-09-C",
+      "Price": {
+        "MinorUnits": 1920,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-10-A",
+      "Price": {
+        "MinorUnits": 2000,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-10-B",
+      "Price": {
+        "MinorUnits": 2010,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-10-C",
+      "Price": {
+        "MinorUnits": 2020,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-11-A",
+      "Price": {
+        "MinorUnits": 2100,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-11-B",
+      "Price": {
+        "MinorUnits": 2110,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-11-C",
+      "Price": {
+        "MinorUnits": 2120,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-12-A",
+      "Price": {
+        "MinorUnits": 2200,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-12-B",
+      "Price": {
+        "MinorUnits": 2210,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-12-C",
+      "Price": {
+        "MinorUnits": 2220,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-13-A",
+      "Price": {
+        "MinorUnits": 2300,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-13-B",
+      "Price": {
+        "MinorUnits": 2310,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-13-C",
+      "Price": {
+        "MinorUnits": 2320,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-14-A",
+      "Price": {
+        "MinorUnits": 2400,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-14-B",
+      "Price": {
+        "MinorUnits": 2410,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-14-C",
+      "Price": {
+        "MinorUnits": 2420,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-15-A",
+      "Price": {
+        "MinorUnits": 2500,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-15-B",
+      "Price": {
+        "MinorUnits": 2510,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-15-C",
+      "Price": {
+        "MinorUnits": 2520,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-16-A",
+      "Price": {
+        "MinorUnits": 2600,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-16-B",
+      "Price": {
+        "MinorUnits": 2610,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-16-C",
+      "Price": {
+        "MinorUnits": 2620,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-17-A",
+      "Price": {
+        "MinorUnits": 2700,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-17-B",
+      "Price": {
+        "MinorUnits": 2710,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-17-C",
+      "Price": {
+        "MinorUnits": 2720,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-18-A",
+      "Price": {
+        "MinorUnits": 2800,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-18-B",
+      "Price": {
+        "MinorUnits": 2810,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-18-C",
+      "Price": {
+        "MinorUnits": 2820,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-19-A",
+      "Price": {
+        "MinorUnits": 2900,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-19-B",
+      "Price": {
+        "MinorUnits": 2910,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-19-C",
+      "Price": {
+        "MinorUnits": 2920,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-20-A",
+      "Price": {
+        "MinorUnits": 3000,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-20-B",
+      "Price": {
+        "MinorUnits": 3010,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-20-C",
+      "Price": {
+        "MinorUnits": 3020,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-21-A",
+      "Price": {
+        "MinorUnits": 3100,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-21-B",
+      "Price": {
+        "MinorUnits": 3110,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-21-C",
+      "Price": {
+        "MinorUnits": 3120,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-22-A",
+      "Price": {
+        "MinorUnits": 3200,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-22-B",
+      "Price": {
+        "MinorUnits": 3210,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-22-C",
+      "Price": {
+        "MinorUnits": 3220,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-23-A",
+      "Price": {
+        "MinorUnits": 3300,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-23-B",
+      "Price": {
+        "MinorUnits": 3310,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-23-C",
+      "Price": {
+        "MinorUnits": 3320,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-24-A",
+      "Price": {
+        "MinorUnits": 3400,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-24-B",
+      "Price": {
+        "MinorUnits": 3410,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-24-C",
+      "Price": {
+        "MinorUnits": 3420,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-25-A",
+      "Price": {
+        "MinorUnits": 3500,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-25-B",
+      "Price": {
+        "MinorUnits": 3510,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-25-C",
+      "Price": {
+        "MinorUnits": 3520,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-26-A",
+      "Price": {
+        "MinorUnits": 3600,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-26-B",
+      "Price": {
+        "MinorUnits": 3610,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-26-C",
+      "Price": {
+        "MinorUnits": 3620,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-27-A",
+      "Price": {
+        "MinorUnits": 3700,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-27-B",
+      "Price": {
+        "MinorUnits": 3710,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-27-C",
+      "Price": {
+        "MinorUnits": 3720,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-28-A",
+      "Price": {
+        "MinorUnits": 3800,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-28-B",
+      "Price": {
+        "MinorUnits": 3810,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-28-C",
+      "Price": {
+        "MinorUnits": 3820,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-29-A",
+      "Price": {
+        "MinorUnits": 3900,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-29-B",
+      "Price": {
+        "MinorUnits": 3910,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-29-C",
+      "Price": {
+        "MinorUnits": 3920,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-30-A",
+      "Price": {
+        "MinorUnits": 4000,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-30-B",
+      "Price": {
+        "MinorUnits": 4010,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    },
+    {
+      "SKU": "BENCH-30-C",
+      "Price": {
+        "MinorUnits": 4020,
+        "Currency": "EUR"
+      },
+      "StockQuantity": 2000,
+      "Revision": 1
+    }
+  ],
+  "PurchaseCosts": {
+    "BENCH-01-A": {
+      "MinorUnits": 825,
+      "Currency": "EUR"
+    },
+    "BENCH-01-B": {
+      "MinorUnits": 832,
+      "Currency": "EUR"
+    },
+    "BENCH-01-C": {
+      "MinorUnits": 840,
+      "Currency": "EUR"
+    },
+    "BENCH-02-A": {
+      "MinorUnits": 900,
+      "Currency": "EUR"
+    },
+    "BENCH-02-B": {
+      "MinorUnits": 907,
+      "Currency": "EUR"
+    },
+    "BENCH-02-C": {
+      "MinorUnits": 915,
+      "Currency": "EUR"
+    },
+    "BENCH-03-A": {
+      "MinorUnits": 975,
+      "Currency": "EUR"
+    },
+    "BENCH-03-B": {
+      "MinorUnits": 982,
+      "Currency": "EUR"
+    },
+    "BENCH-03-C": {
+      "MinorUnits": 990,
+      "Currency": "EUR"
+    },
+    "BENCH-04-A": {
+      "MinorUnits": 1050,
+      "Currency": "EUR"
+    },
+    "BENCH-04-B": {
+      "MinorUnits": 1057,
+      "Currency": "EUR"
+    },
+    "BENCH-04-C": {
+      "MinorUnits": 1065,
+      "Currency": "EUR"
+    },
+    "BENCH-05-A": {
+      "MinorUnits": 1125,
+      "Currency": "EUR"
+    },
+    "BENCH-05-B": {
+      "MinorUnits": 1132,
+      "Currency": "EUR"
+    },
+    "BENCH-05-C": {
+      "MinorUnits": 1140,
+      "Currency": "EUR"
+    },
+    "BENCH-06-A": {
+      "MinorUnits": 1200,
+      "Currency": "EUR"
+    },
+    "BENCH-06-B": {
+      "MinorUnits": 1207,
+      "Currency": "EUR"
+    },
+    "BENCH-06-C": {
+      "MinorUnits": 1215,
+      "Currency": "EUR"
+    },
+    "BENCH-07-A": {
+      "MinorUnits": 1275,
+      "Currency": "EUR"
+    },
+    "BENCH-07-B": {
+      "MinorUnits": 1282,
+      "Currency": "EUR"
+    },
+    "BENCH-07-C": {
+      "MinorUnits": 1290,
+      "Currency": "EUR"
+    },
+    "BENCH-08-A": {
+      "MinorUnits": 1350,
+      "Currency": "EUR"
+    },
+    "BENCH-08-B": {
+      "MinorUnits": 1357,
+      "Currency": "EUR"
+    },
+    "BENCH-08-C": {
+      "MinorUnits": 1365,
+      "Currency": "EUR"
+    },
+    "BENCH-09-A": {
+      "MinorUnits": 1425,
+      "Currency": "EUR"
+    },
+    "BENCH-09-B": {
+      "MinorUnits": 1432,
+      "Currency": "EUR"
+    },
+    "BENCH-09-C": {
+      "MinorUnits": 1440,
+      "Currency": "EUR"
+    },
+    "BENCH-10-A": {
+      "MinorUnits": 1500,
+      "Currency": "EUR"
+    },
+    "BENCH-10-B": {
+      "MinorUnits": 1507,
+      "Currency": "EUR"
+    },
+    "BENCH-10-C": {
+      "MinorUnits": 1515,
+      "Currency": "EUR"
+    },
+    "BENCH-11-A": {
+      "MinorUnits": 1575,
+      "Currency": "EUR"
+    },
+    "BENCH-11-B": {
+      "MinorUnits": 1582,
+      "Currency": "EUR"
+    },
+    "BENCH-11-C": {
+      "MinorUnits": 1590,
+      "Currency": "EUR"
+    },
+    "BENCH-12-A": {
+      "MinorUnits": 1650,
+      "Currency": "EUR"
+    },
+    "BENCH-12-B": {
+      "MinorUnits": 1657,
+      "Currency": "EUR"
+    },
+    "BENCH-12-C": {
+      "MinorUnits": 1665,
+      "Currency": "EUR"
+    },
+    "BENCH-13-A": {
+      "MinorUnits": 1725,
+      "Currency": "EUR"
+    },
+    "BENCH-13-B": {
+      "MinorUnits": 1732,
+      "Currency": "EUR"
+    },
+    "BENCH-13-C": {
+      "MinorUnits": 1740,
+      "Currency": "EUR"
+    },
+    "BENCH-14-A": {
+      "MinorUnits": 1800,
+      "Currency": "EUR"
+    },
+    "BENCH-14-B": {
+      "MinorUnits": 1807,
+      "Currency": "EUR"
+    },
+    "BENCH-14-C": {
+      "MinorUnits": 1815,
+      "Currency": "EUR"
+    },
+    "BENCH-15-A": {
+      "MinorUnits": 1875,
+      "Currency": "EUR"
+    },
+    "BENCH-15-B": {
+      "MinorUnits": 1882,
+      "Currency": "EUR"
+    },
+    "BENCH-15-C": {
+      "MinorUnits": 1890,
+      "Currency": "EUR"
+    },
+    "BENCH-16-A": {
+      "MinorUnits": 1950,
+      "Currency": "EUR"
+    },
+    "BENCH-16-B": {
+      "MinorUnits": 1957,
+      "Currency": "EUR"
+    },
+    "BENCH-16-C": {
+      "MinorUnits": 1965,
+      "Currency": "EUR"
+    },
+    "BENCH-17-A": {
+      "MinorUnits": 2025,
+      "Currency": "EUR"
+    },
+    "BENCH-17-B": {
+      "MinorUnits": 2032,
+      "Currency": "EUR"
+    },
+    "BENCH-17-C": {
+      "MinorUnits": 2040,
+      "Currency": "EUR"
+    },
+    "BENCH-18-A": {
+      "MinorUnits": 2100,
+      "Currency": "EUR"
+    },
+    "BENCH-18-B": {
+      "MinorUnits": 2107,
+      "Currency": "EUR"
+    },
+    "BENCH-18-C": {
+      "MinorUnits": 2115,
+      "Currency": "EUR"
+    },
+    "BENCH-19-A": {
+      "MinorUnits": 2175,
+      "Currency": "EUR"
+    },
+    "BENCH-19-B": {
+      "MinorUnits": 2182,
+      "Currency": "EUR"
+    },
+    "BENCH-19-C": {
+      "MinorUnits": 2190,
+      "Currency": "EUR"
+    },
+    "BENCH-20-A": {
+      "MinorUnits": 2250,
+      "Currency": "EUR"
+    },
+    "BENCH-20-B": {
+      "MinorUnits": 2257,
+      "Currency": "EUR"
+    },
+    "BENCH-20-C": {
+      "MinorUnits": 2265,
+      "Currency": "EUR"
+    },
+    "BENCH-21-A": {
+      "MinorUnits": 2325,
+      "Currency": "EUR"
+    },
+    "BENCH-21-B": {
+      "MinorUnits": 2332,
+      "Currency": "EUR"
+    },
+    "BENCH-21-C": {
+      "MinorUnits": 2340,
+      "Currency": "EUR"
+    },
+    "BENCH-22-A": {
+      "MinorUnits": 2400,
+      "Currency": "EUR"
+    },
+    "BENCH-22-B": {
+      "MinorUnits": 2407,
+      "Currency": "EUR"
+    },
+    "BENCH-22-C": {
+      "MinorUnits": 2415,
+      "Currency": "EUR"
+    },
+    "BENCH-23-A": {
+      "MinorUnits": 2475,
+      "Currency": "EUR"
+    },
+    "BENCH-23-B": {
+      "MinorUnits": 2482,
+      "Currency": "EUR"
+    },
+    "BENCH-23-C": {
+      "MinorUnits": 2490,
+      "Currency": "EUR"
+    },
+    "BENCH-24-A": {
+      "MinorUnits": 2550,
+      "Currency": "EUR"
+    },
+    "BENCH-24-B": {
+      "MinorUnits": 2557,
+      "Currency": "EUR"
+    },
+    "BENCH-24-C": {
+      "MinorUnits": 2565,
+      "Currency": "EUR"
+    },
+    "BENCH-25-A": {
+      "MinorUnits": 2625,
+      "Currency": "EUR"
+    },
+    "BENCH-25-B": {
+      "MinorUnits": 2632,
+      "Currency": "EUR"
+    },
+    "BENCH-25-C": {
+      "MinorUnits": 2640,
+      "Currency": "EUR"
+    },
+    "BENCH-26-A": {
+      "MinorUnits": 2700,
+      "Currency": "EUR"
+    },
+    "BENCH-26-B": {
+      "MinorUnits": 2707,
+      "Currency": "EUR"
+    },
+    "BENCH-26-C": {
+      "MinorUnits": 2715,
+      "Currency": "EUR"
+    },
+    "BENCH-27-A": {
+      "MinorUnits": 2775,
+      "Currency": "EUR"
+    },
+    "BENCH-27-B": {
+      "MinorUnits": 2782,
+      "Currency": "EUR"
+    },
+    "BENCH-27-C": {
+      "MinorUnits": 2790,
+      "Currency": "EUR"
+    },
+    "BENCH-28-A": {
+      "MinorUnits": 2850,
+      "Currency": "EUR"
+    },
+    "BENCH-28-B": {
+      "MinorUnits": 2857,
+      "Currency": "EUR"
+    },
+    "BENCH-28-C": {
+      "MinorUnits": 2865,
+      "Currency": "EUR"
+    },
+    "BENCH-29-A": {
+      "MinorUnits": 2925,
+      "Currency": "EUR"
+    },
+    "BENCH-29-B": {
+      "MinorUnits": 2932,
+      "Currency": "EUR"
+    },
+    "BENCH-29-C": {
+      "MinorUnits": 2940,
+      "Currency": "EUR"
+    },
+    "BENCH-30-A": {
+      "MinorUnits": 3000,
+      "Currency": "EUR"
+    },
+    "BENCH-30-B": {
+      "MinorUnits": 3007,
+      "Currency": "EUR"
+    },
+    "BENCH-30-C": {
+      "MinorUnits": 3015,
+      "Currency": "EUR"
+    }
+  },
+  "DiscountRules": [],
+  "CoPurchaseStatistics": []
+}

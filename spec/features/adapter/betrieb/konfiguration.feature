@@ -27,6 +27,7 @@ Funktionalität: Fehlergrenzen der Laufzeitkonfiguration
       | open | TemporalAddress | 127.0.0.1:1 | InternalError |
       | run | Schema | invalid! | InvalidInput |
       | run | Listen | diagnostic-listener | InternalError |
+      | run | BackendListen | diagnostic-listener | InternalError |
       | run | TemporalNamespace | missing-runtime-namespace | InternalError |
       | healthcheck | Listen | invalid | InternalError |
       | healthcheck | Listen | 127.0.0.1:% | InternalError |

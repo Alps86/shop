@@ -9,16 +9,21 @@ import (
 	"github.com/Alps86/shop/internal/domain/value"
 )
 
-func (app *App) bind(snapshot application.AdminCatalogSnapshot) {
+func (app *App) bind(snapshot application.AdminCatalogSnapshot) error {
 	app.Service = app.applicationService()
 	app.Processes = shoptemporal.New(app.Client, app.Service, app.Store.Carts())
 	app.Processes.Queue = app.Config.TaskQueue
 	app.Service.Processes = app.Processes
 	config := app.projectionConfig()
 	app.Search = opensearch.New(app.searchConfig(snapshot, config))
-	config.Target = app.Search
+	if err := app.bindFrontend(snapshot); err != nil {
+		return err
+	}
+
+	config.Target = cacheProjection{Adapter: app.Search, cache: app.cache, skus: catalogSKUs(snapshot)}
 	app.Consumer = cdc.New(config)
-	app.Handler = app.healthHandler()
+
+	return nil
 }
 
 func (app *App) applicationService() application.Service {

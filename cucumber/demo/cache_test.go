@@ -1,0 +1,87 @@
+package demo_test
+
+import (
+	"errors"
+	"fmt"
+	"github.com/cucumber/godog"
+	"os/exec"
+	"path/filepath"
+	"strconv"
+	"strings"
+	"time"
+)
+
+func (current *world) cacheHit(table *godog.Table) error {
+	data := read(table)[0]
+	before, err := current.deployment.cacheHits()
+	if err != nil {
+		return err
+	}
+
+	if err := current.get(data["Path"], ""); err != nil {
+		return err
+	}
+
+	return current.awaitHits(before, data)
+}
+
+func (current *world) awaitHits(before int64, data map[string]string) error {
+	minimum, err := strconv.ParseInt(data["MinimumHits"], 10, 64)
+	seconds, parseError := strconv.Atoi(data["TimeoutSeconds"])
+	if err := errors.Join(err, parseError); err != nil {
+		return err
+	}
+
+	deadline := time.Now().Add(time.Duration(seconds) * time.Second)
+
+	return current.pollHits(before, minimum, deadline)
+}
+
+func (current *world) pollHits(before, minimum int64, deadline time.Time) error {
+	for time.Now().Before(deadline) {
+		after, err := current.deployment.cacheHits()
+		if err != nil {
+			return err
+		}
+
+		if after-before >= minimum {
+			return nil
+		}
+
+		time.Sleep(20 * time.Millisecond)
+	}
+
+	return fmt.Errorf("Produkt-ESIcache: weniger als %d Hits", minimum)
+}
+
+func (deployment *deployment) cacheHits() (int64, error) {
+	varnishstat := filepath.Join(filepath.Dir(binary("SHOP_VARNISH", "/usr/sbin/varnishd")), "../bin/varnishstat")
+	// #nosec G204 -- Eigenes Standardwerkzeug, selbst erzeugte Instanz ohne Shell.
+	command := exec.Command(varnishstat, "-n", deployment.directory+"/varnish", "-1", "-f", "MAIN.cache_hit")
+	if deployment.external {
+		command = exec.Command("docker", "compose", "exec", "-T", "varnish", "varnishstat", "-1", "-f", "MAIN.cache_hit")
+		command.Dir = "../.."
+	}
+
+	output, err := command.CombinedOutput()
+	if err != nil {
+		return 0, fmt.Errorf("Varnishcachezähler: %w: %s", err, output)
+	}
+
+	return parseHits(string(output))
+}
+
+func parseHits(output string) (int64, error) {
+	for _, line := range strings.Split(output, "\n") {
+		fields := strings.Fields(line)
+		if len(fields) < 2 {
+			continue
+		}
+
+		if fields[0] == "MAIN.cache_hit" {
+			return strconv.ParseInt(fields[1], 10, 64)
+		}
+	}
+
+	return 0, fmt.Errorf("Varnishcachezähler fehlt: %s", output)
+}

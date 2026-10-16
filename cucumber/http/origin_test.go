@@ -15,7 +15,7 @@ func (origin compositionOrigin) ServeHTTP(writer http.ResponseWriter, request *h
 }
 
 func (origin compositionOrigin) dropFragment(request *http.Request) bool {
-	if origin.current.options["FragmentFault"] != "connectionClose" {
+	if !origin.current.fragmentFault.Load() {
 		return false
 	}
 

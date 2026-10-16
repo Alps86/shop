@@ -7,5 +7,5 @@ RUN CGO_ENABLED=0 go build -trimpath -o /shop ./cmd/shop
 
 FROM gcr.io/distroless/static-debian12:nonroot
 COPY --from=build /shop /shop
-COPY --from=build /src/spec/fixtures/runtime/startkatalog.json /demo/synthetic-start.json
+COPY --from=build /src/spec/fixtures/demo/katalog.json /demo/katalog.json
 ENTRYPOINT ["/shop"]

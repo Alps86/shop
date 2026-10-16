@@ -86,7 +86,7 @@ func (current *world) launchCommand() error {
 
 func (current *world) environment() []string {
 	config := current.config
-	environment := append(os.Environ(), "SHOP_POSTGRES_DSN="+config.DSN, "SHOP_SCHEMA="+config.Schema, "SHOP_TEMPORAL_ADDRESS="+config.TemporalAddress, "SHOP_TEMPORAL_NAMESPACE="+config.TemporalNamespace, "SHOP_TASK_QUEUE="+config.TaskQueue, "SHOP_OPENSEARCH_URL="+config.SearchEndpoint, "SHOP_SEARCH_INDEX="+config.SearchIndex, "SHOP_CDC_PUBLICATION="+config.Publication, "SHOP_CDC_SLOT="+config.Slot, "SHOP_LISTEN="+config.Listen, "SHOP_SEED_FILE="+config.SeedFile)
+	environment := append(current.frontendEnvironment(), "SHOP_POSTGRES_DSN="+config.DSN, "SHOP_SCHEMA="+config.Schema, "SHOP_TEMPORAL_ADDRESS="+config.TemporalAddress, "SHOP_TEMPORAL_NAMESPACE="+config.TemporalNamespace, "SHOP_TASK_QUEUE="+config.TaskQueue, "SHOP_OPENSEARCH_URL="+config.SearchEndpoint, "SHOP_SEARCH_INDEX="+config.SearchIndex, "SHOP_CDC_PUBLICATION="+config.Publication, "SHOP_CDC_SLOT="+config.Slot, "SHOP_LISTEN="+config.Listen, "SHOP_SEED_FILE="+config.SeedFile)
 	if directory := os.Getenv("SHOP_PROCESS_COVERDIR"); directory != "" {
 		environment = append(environment, "GOCOVERDIR="+directory)
 	}
@@ -115,6 +115,7 @@ func (current *world) execute(table *godog.Table) error {
 
 func (current *world) requestedCommand(arguments string) (*exec.Cmd, error) {
 	commands := map[string]*exec.Cmd{
+		"content":           exec.Command("./shop", "content"),
 		"healthcheck":       exec.Command("./shop", "healthcheck"),
 		"unknown":           exec.Command("./shop", "unknown"),
 		"healthcheck,extra": exec.Command("./shop", "healthcheck", "extra"),

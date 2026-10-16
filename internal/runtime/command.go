@@ -19,6 +19,10 @@ func (config Config) Execute(ctx context.Context, arguments []string) error {
 		return value.NewError("InvalidInput", "Arguments")
 	}
 
+	if arguments[0] == "content" {
+		return config.exportContent(ctx)
+	}
+
 	if arguments[0] != "healthcheck" {
 		return value.NewError("InvalidInput", "Command")
 	}

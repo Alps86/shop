@@ -10,10 +10,12 @@ import (
 	"net/http/httptest"
 	"os/exec"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
 type world struct {
+	fragmentFault      atomic.Bool
 	engineClients      map[string]*http.Client
 	sharedFrame        string
 	lastCSRF           string

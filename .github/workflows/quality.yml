@@ -8,6 +8,19 @@ permissions:
 env:
   QLTY_VERSION: '0.651.0'
   SHOP_BASE_SHA: ${{ github.event.pull_request.base.sha || 'origin/main' }}
+  SHOP_PERFORMANCE_PUBLIC_URL: http://127.0.0.1:28080
+  SHOP_PERFORMANCE_BACKEND_URL: http://127.0.0.1:28081
+  SHOP_PERFORMANCE_POSTGRES_DSN: postgres://shop:local-demo-only@127.0.0.1:25432/shop?sslmode=disable
+  SHOP_PERFORMANCE_SCHEMA: demo_benchmark
+  SHOP_PERFORMANCE_TEMPORAL_ADDRESS: 127.0.0.1:27233
+  SHOP_PERFORMANCE_OPENSEARCH_URL: http://127.0.0.1:29200
+  SHOP_PERFORMANCE_SEARCH_INDEX: shop-benchmark
+  SHOP_PERFORMANCE_TASK_QUEUE: demo_benchmark
+  SHOP_PERFORMANCE_COMPOSE_PROJECT: shop-benchmark
+  SHOP_PERFORMANCE_REPORT_DIRECTORY: /tmp/shop-benchmark-results
+  SHOP_PERFORMANCE_STATE_FILE: /tmp/shop-benchmark-private-state.json
+  SHOP_PERFORMANCE_IMAGES: postgres16.15,temporal1.9.1,opensearch3.9.0,go1.26.9,hugo0.168.0,nginx1.30.6,varnish9.1.0; digests in compose.yml
+  SHOP_HEY: /tmp/shop-standard-tools/hey
 jobs:
   static:
     name: static
@@ -84,13 +97,23 @@ jobs:
           hugo version
           nginx -v
           varnishd -V
+      - name: Standardlastwerkzeug installieren
+        run: GOBIN=/tmp/shop-standard-tools go install github.com/rakyll/hey@v0.1.5
       - name: Tatsächliche Compose-Laufzeit starten
         run: docker compose up --detach --build --wait --wait-timeout 180
+      - name: Isoliertes synthetisches Referenzprofil mit gleichem Build starten
+        run: docker compose -p shop-benchmark -f compose.yml -f compose.benchmark.yml up --detach --build --wait --wait-timeout 180
       - name: Tatsächlichen Dienstrestart prüfen
         run: |
           docker compose restart shop
           docker compose up --detach --wait --wait-timeout 120
           docker compose exec shop /shop healthcheck
+      - name: Vollständigen Compose-Gastkauf und persistenten Dienstrestart über HTTP prüfen
+        env:
+          SHOP_DEMO_PUBLIC_URL: http://127.0.0.1:8080
+          SHOP_DEMO_BACKEND_URL: http://127.0.0.1:8081
+          SHOP_DEMO_DEPLOYMENT: compose
+        run: go test ./cucumber/demo -count=1
       - name: Sämtliches Gherkin ohne Verhaltensbehauptung parsen
         run: go test ./... -run '^TestFeatureSyntax$' -count=1
       - name: Native Packageermittlung, fachliches Verhalten und vollständige Coveragequote
@@ -107,9 +130,23 @@ jobs:
           go tool covdata merge -i="$SHOP_PROCESS_COVERDIR" -o=/tmp/shop-merged-coverage -pcombine
           go tool covdata textfmt -i=/tmp/shop-merged-coverage -o=cover.out
           go run github.com/vladopajic/go-test-coverage/v2@v2.19.0 --config=.testcoverage.yml
+      - name: Tatsächliche vollständige Lastwerte und Aussagegrenzen ausgeben
+        if: always()
+        run: cat /tmp/shop-benchmark-results/measurement.json
       - name: Compose-Ausgabe sichern
         if: always()
         run: docker compose logs --no-color
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: performance-${{ github.job }}
+          path: /tmp/shop-benchmark-results
+      - name: Isolierte Benchmarkausgabe sichern
+        if: always()
+        run: docker compose -p shop-benchmark -f compose.yml -f compose.benchmark.yml logs --no-color
+      - name: Eigene Benchmarkdienste entfernen
+        if: always()
+        run: docker compose -p shop-benchmark -f compose.yml -f compose.benchmark.yml down --volumes
       - name: Eigene Testdienste entfernen
         if: always()
         run: docker compose down --volumes
@@ -135,8 +172,12 @@ jobs:
           hugo version
           nginx -v
           varnishd -V
+      - name: Standardlastwerkzeug installieren
+        run: GOBIN=/tmp/shop-standard-tools go install github.com/rakyll/hey@v0.1.5
       - name: Tatsächliche Compose-Laufzeit starten
         run: docker compose up --detach --build --wait --wait-timeout 180
+      - name: Isoliertes synthetisches Referenzprofil mit gleichem Build starten
+        run: docker compose -p shop-benchmark -f compose.yml -f compose.benchmark.yml up --detach --build --wait --wait-timeout 180
       - name: Echte Standardtestanbindung mit Race-Erkennung
         run: |
           packages="$(go list -f '{{if or .GoFiles .CgoFiles}}{{.ImportPath}}{{end}}' ./... | sed '/^$/d')"
@@ -146,9 +187,23 @@ jobs:
             exit 0
           fi
           go test -p 1 -race ./... -count=1
+      - name: Tatsächliche vollständige Lastwerte und Aussagegrenzen ausgeben
+        if: always()
+        run: cat /tmp/shop-benchmark-results/measurement.json
       - name: Compose-Ausgabe sichern
         if: always()
         run: docker compose logs --no-color
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: performance-${{ github.job }}
+          path: /tmp/shop-benchmark-results
+      - name: Isolierte Benchmarkausgabe sichern
+        if: always()
+        run: docker compose -p shop-benchmark -f compose.yml -f compose.benchmark.yml logs --no-color
+      - name: Eigene Benchmarkdienste entfernen
+        if: always()
+        run: docker compose -p shop-benchmark -f compose.yml -f compose.benchmark.yml down --volumes
       - name: Eigene Testdienste entfernen
         if: always()
         run: docker compose down --volumes

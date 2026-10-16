@@ -36,13 +36,14 @@ Funktionalität: Geschützte normale Formulare und HTMX
       | Field | Value |
       | Status | <status> |
       | Header:Location | <ziel> |
+      | Header:HX-Redirect | <hxziel> |
     Beispiele:
-      | aktion | htmx | status | ziel |
-      | evaluate | false | 303 | /de-DE/kasse |
-      | confirm | true | 200 | |
-      | place | false | 303 | /de-DE/bestellung/order-a |
-      | place | true | 303 | /de-DE/bestellung/order-a |
-      | start | false | 303 | /de-DE/kasse |
+      | aktion | htmx | status | ziel | hxziel |
+      | evaluate | false | 303 | /de-DE/kasse | |
+      | confirm | true | 200 | | |
+      | place | false | 303 | /de-DE/bestellung/order-a | |
+      | place | true | 200 | | /de-DE/bestellung/order-a |
+      | start | false | 303 | /de-DE/kasse | |
 
   Szenario: Anonymer Gast beginnt ausdrücklich einen eigenen Einkauf
     Wenn der Shop liefert eine HTTPansicht
@@ -105,5 +106,5 @@ Funktionalität: Geschützte normale Formulare und HTMX
       | /de-DE/warenkorb/aktion | public | test-session-a | /de-DE/warenkorb | cartID=cart-a&commandID=redirect-cart&revision=2&sku=RED-256&quantity=1&action=add | false | 303 |
       | /de-DE/profil | public | test-session-a | /de-DE/profil | profile=coffee | false | 303 |
       | /de-DE/warenkorb/aktion | public | test-session-a | /de-DE/kasse | cartID=cart-a&commandID=redirect-order&revision=2&evaluationID=evaluation-a&action=place&return=checkout | false | 303 |
-      | /de-DE/warenkorb/aktion | public | test-session-a | /de-DE/kasse | cartID=cart-a&commandID=redirect-order&revision=2&evaluationID=evaluation-a&action=place&return=checkout | true | 303 |
+      | /de-DE/warenkorb/aktion | public | test-session-a | /de-DE/kasse | cartID=cart-a&commandID=redirect-order&revision=2&evaluationID=evaluation-a&action=place&return=checkout | true | 200 |
       | /de-DE/warenkorb/aktion | public | test-session-a | /de-DE/warenkorb | cartID=cart-a&commandID=fragment-cart&revision=2&sku=RED-256&quantity=1&action=add | true | 200 |

@@ -30,6 +30,7 @@ func (current *world) register(ctx *godog.ScenarioContext) {
 	ctx.Step(`^liefert die Laufzeitdiagnose$`, current.observed)
 	ctx.Step(`^Worker Projektor und HTTP-Dienst gestartet werden$`, current.start)
 	ctx.Step(`^die vollständige Bereitschaft begrenzt abgewartet wird$`, current.awaitReady)
+	current.contentSteps(ctx)
 	current.commandSteps(ctx)
 	current.configurationSteps(ctx)
 	current.failureSteps(ctx)
@@ -37,24 +38,26 @@ func (current *world) register(ctx *godog.ScenarioContext) {
 	ctx.Step(`^die veröffentlichte Laufzeitquelle enthält$`, current.catalogObserved)
 }
 
-func (current *world) open(table *godog.Table) {
+func (current *world) open(table *godog.Table) error {
 	*current = world{}
 	data := read(table)[0]
 	suffix := strings.ToLower(rand.Text()[:10])
 	current.config = runtime.Config{DSN: os.Getenv(data["PostgresEnv"]), Schema: "runtime_" + suffix, TemporalAddress: os.Getenv(data["TemporalEnv"]), TemporalNamespace: data["Namespace"], TaskQueue: "runtime_" + suffix, SearchEndpoint: os.Getenv(data["SearchEnv"]), SearchIndex: "shop-runtime-" + suffix, Publication: "runtime_pub_" + suffix, Slot: "runtime_slot_" + suffix, Listen: data["Listen"], Context: value.RequestContext{Locale: value.Locale(data["Locale"]), Currency: value.Currency(data["Currency"]), Market: value.CountryCode(data["Market"])}}
+	current.configureFrontend()
 	current.config.SeedFile = data["SeedFile"]
+	current.configureSearchEndpoint(data)
 	current.openApplication()
+
+	return current.err
 }
 
 func (current *world) openApplication() {
-	if current.config.SeedFile != "" {
-		absolute, err := filepath.Abs(current.config.SeedFile)
-		if err != nil {
-			current.err = err
-			return
-		}
+	if current.err != nil {
+		return
+	}
 
-		current.config.SeedFile = absolute
+	if current.err = current.resolveSeedFile(); current.err != nil {
+		return
 	}
 
 	current.app, current.err = runtime.Open(context.Background(), current.config)
@@ -62,6 +65,17 @@ func (current *world) openApplication() {
 		current.server = httptest.NewServer(current.app.Handler)
 		current.baseURL = current.server.URL
 	}
+}
+
+func (current *world) resolveSeedFile() error {
+	if current.config.SeedFile == "" {
+		return nil
+	}
+
+	absolute, err := filepath.Abs(current.config.SeedFile)
+	current.config.SeedFile = absolute
+
+	return err
 }
 
 func (current *world) observed(table *godog.Table) error {
@@ -76,4 +90,11 @@ func (current *world) observed(table *godog.Table) error {
 	}
 
 	return nil
+}
+
+func (current *world) configureSearchEndpoint(data map[string]string) {
+	current.resourceSearchEndpoint = current.config.SearchEndpoint
+	if endpoint := data["SearchEndpoint"]; endpoint != "" {
+		current.config.SearchEndpoint = endpoint
+	}
 }

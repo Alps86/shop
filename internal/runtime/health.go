@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func (app *App) healthHandler() http.Handler {
+func (app *App) healthHandler() *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /health", app.health)
 	mux.HandleFunc("GET /ready", app.ready)
