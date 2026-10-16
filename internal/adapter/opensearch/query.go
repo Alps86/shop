@@ -17,7 +17,7 @@ func (adapter Adapter) searchBody(query application.SearchQuery) (JSON, error) {
 	base := adapter.baseQuery(query)
 	base["should"] = []JSON{inner}
 	base["minimum_should_match"] = 0
-	body := JSON{"_source": []string{"product_id"}, "from": (query.Page - 1) * 12, "size": 12, "track_total_hits": true, "query": (Ranking{Interests: query.Interests}).query(JSON{"bool": base}), "post_filter": selection, "sort": plan.productSort(variant), "aggs": adapter.facets(plan)}
+	body := JSON{"_source": false, "stored_fields": []string{"product_id"}, "from": (query.Page - 1) * 12, "size": 12, "track_total_hits": true, "query": (Ranking{Interests: query.Interests}).query(JSON{"bool": base}), "post_filter": selection, "sort": plan.productSort(variant), "aggs": adapter.facets(plan)}
 	adapter.suggestBody(body, query)
 
 	return body, nil

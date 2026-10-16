@@ -10,6 +10,7 @@ import (
 	"github.com/Alps86/shop/internal/domain/sale"
 	"github.com/Alps86/shop/internal/domain/value"
 	"github.com/cucumber/godog"
+	"go.temporal.io/api/serviceerror"
 	"go.temporal.io/sdk/worker"
 	"google.golang.org/grpc/status"
 	"time"
@@ -114,19 +115,102 @@ func (current *world) awaitCartWorker(table *godog.Table) error {
 		return err
 	}
 
+	interval, err := time.ParseDuration(current.rows(table)[0]["ReadinessPollInterval"])
+	if err != nil {
+		return err
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
-	// Start spawns pollers; only a successful query proves cold history replay.
-	encoded, err := current.connection.QueryWorkflow(ctx, "cart/"+current.id, current.runID, "ProcessStatus")
+	readiness := restartReadiness{ctx: ctx, interval: interval}
+
+	return readiness.await(current)
+}
+
+func (readiness *restartReadiness) await(current *world) error {
+	for {
+		if err := readiness.ctx.Err(); err != nil {
+			return readiness.failure("Caller", err)
+		}
+
+		ready, err := readiness.observe(current)
+		if err != nil {
+			return err
+		}
+
+		if ready {
+			readiness.report()
+			return nil
+		}
+
+		if err := readiness.wait(); err != nil {
+			return readiness.failure("Caller", err)
+		}
+	}
+}
+
+func (readiness *restartReadiness) observe(current *world) (bool, error) {
+	readiness.probes++
+	encoded, err := current.connection.QueryWorkflow(readiness.ctx, "cart/"+current.id, current.runID, "ProcessStatus")
 	if err != nil {
-		return fmt.Errorf("Restart.Readiness QueryWorkflow: type=%T grpc=%s canceled=%t caller=%s: %w", err, status.Code(err), errors.Is(err, context.Canceled), fmt.Sprint(ctx.Err()), err)
+		return false, readiness.queryError(err)
+	}
+
+	if err := readiness.ctx.Err(); err != nil {
+		return false, readiness.failure("Caller", err)
 	}
 
 	if err := encoded.Get(&current.processStatus); err != nil {
-		return fmt.Errorf("Restart.Readiness Decode: %w", err)
+		return false, readiness.failure("Decode", err)
+	}
+
+	if err := readiness.ctx.Err(); err != nil {
+		return false, readiness.failure("Caller", err)
+	}
+
+	return true, nil
+}
+
+func (readiness *restartReadiness) queryError(err error) error {
+	if caller := readiness.ctx.Err(); caller != nil {
+		return readiness.failure("Caller", caller)
+	}
+
+	var canceled *serviceerror.Canceled
+	if !errors.As(err, &canceled) {
+		return readiness.failure("QueryWorkflow", err)
+	}
+
+	readiness.canceled++
+	if readiness.first == "" {
+		readiness.first = readiness.classify(err)
+		fmt.Printf("Restart.Readiness QueryWorkflow noch nicht bereit: probes=%d firstCanceled=%s\n", readiness.probes, readiness.first)
 	}
 
 	return nil
+}
+
+func (readiness *restartReadiness) wait() error {
+	timer := time.NewTimer(readiness.interval)
+	defer timer.Stop()
+	select {
+	case <-readiness.ctx.Done():
+		return readiness.ctx.Err()
+	case <-timer.C:
+		return nil
+	}
+}
+
+func (readiness *restartReadiness) classify(err error) string {
+	return fmt.Sprintf("type=%T grpc=%s canceled=%t caller=%s: %v", err, status.Code(err), errors.Is(err, context.Canceled), fmt.Sprint(readiness.ctx.Err()), err)
+}
+
+func (readiness *restartReadiness) failure(phase string, err error) error {
+	return fmt.Errorf("Restart.Readiness %s probes=%d canceledProbes=%d firstCanceled=%s last=%s: %w", phase, readiness.probes, readiness.canceled, readiness.first, readiness.classify(err), err)
+}
+
+func (readiness *restartReadiness) report() {
+	fmt.Printf("Restart.Readiness bereit: probes=%d canceledProbes=%d firstCanceled=%s\n", readiness.probes, readiness.canceled, readiness.first)
 }
 
 func (current *world) resumeCart() error {

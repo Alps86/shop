@@ -110,3 +110,4 @@ Alle hier konkretisierten Fach-/Seitenverträge sind Demo-Kern. Produktionsbacku
 - [Verbindungspool](adapter/suche/verbindungspool.feature): Zwei parallele Suchbatches vergleichen vollständige Antworten und echte Verbindungswiederverwendung unter Standard-, explizitem und fremdem Clienttransport.
 
 - [Multisuche](adapter/suche/multisuche.feature) hält Hauptkarten und Facetten zusammen, trennt cachefähige Completion und verwirft fehlerhafte Teilantworten vollständig.
+- [Gespeicherte Karten](adapter/suche/gespeicherte-karte.feature): Sourcefreier Storedfields-Transport erhält vollständige öffentliche Karten und verwirft fehlende, defekte oder inkonsistente Identitäten und Payloads.

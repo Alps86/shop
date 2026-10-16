@@ -5,67 +5,28 @@
     },
     "hits": [
       {
-        "_source": {
-          "product_id": "p-pool"
-        },
         "inner_hits": {
           "chosen": {
             "hits": {
               "hits": [
                 {
-                  "_source": {
-                    "sku": "POOL",
-                    "card": {
-                      "ProductID": "p-pool",
-                      "URL": "/de-DE/produkt/testmodell--p-phone?sku=RED-256",
-                      "Name": "Testmodell <b>",
-                      "SKU": "POOL",
-                      "Image": {
-                        "URL": "/assets/product.svg",
-                        "AltText": {
-                          "de-DE": "Galerie RED-256"
-                        }
-                      },
-                      "UnitPrice": {
-                        "MinorUnits": 12000,
-                        "Currency": "EUR"
-                      },
-                      "AvailableQuantity": 7,
-                      "VariantCount": 3,
-                      "TopAttributes": {
-                        "storageCapacity": {
-                          "Type": "number",
-                          "Number": {
-                            "Present": true,
-                            "Value": "256"
-                          }
-                        }
-                      },
-                      "Compliance": {
-                        "Context": {
-                          "Market": "DE",
-                          "Locale": "de-DE",
-                          "VerificationStatus": "verified"
-                        },
-                        "Notices": [
-                          {
-                            "Code": "notice",
-                            "Text": {
-                              "de-DE": "verified-blue"
-                            },
-                            "Placement": [
-                              "detail",
-                              "listing"
-                            ]
-                          }
-                        ]
-                      }
-                    }
+                  "fields": {
+                    "variants.sku": [
+                      "POOL"
+                    ],
+                    "variants.card_payload": [
+                      "eyJQcm9kdWN0SUQiOiJwLXBvb2wiLCJVUkwiOiIvZGUtREUvcHJvZHVrdC90ZXN0bW9kZWxsLS1wLXBob25lP3NrdT1SRUQtMjU2IiwiTmFtZSI6IlRlc3Rtb2RlbGwgPGI+IiwiU0tVIjoiUE9PTCIsIkltYWdlIjp7IlVSTCI6Ii9hc3NldHMvcHJvZHVjdC5zdmciLCJBbHRUZXh0Ijp7ImRlLURFIjoiR2FsZXJpZSBSRUQtMjU2In19LCJVbml0UHJpY2UiOnsiTWlub3JVbml0cyI6MTIwMDAsIkN1cnJlbmN5IjoiRVVSIn0sIkF2YWlsYWJsZVF1YW50aXR5Ijo3LCJWYXJpYW50Q291bnQiOjMsIlRvcEF0dHJpYnV0ZXMiOnsic3RvcmFnZUNhcGFjaXR5Ijp7IlR5cGUiOiJudW1iZXIiLCJOdW1iZXIiOnsiUHJlc2VudCI6dHJ1ZSwiVmFsdWUiOiIyNTYifX19LCJDb21wbGlhbmNlIjp7IkNvbnRleHQiOnsiTWFya2V0IjoiREUiLCJMb2NhbGUiOiJkZS1ERSIsIlZlcmlmaWNhdGlvblN0YXR1cyI6InZlcmlmaWVkIn0sIk5vdGljZXMiOlt7IkNvZGUiOiJub3RpY2UiLCJUZXh0Ijp7ImRlLURFIjoidmVyaWZpZWQtYmx1ZSJ9LCJQbGFjZW1lbnQiOlsiZGV0YWlsIiwibGlzdGluZyJdfV19fQ=="
+                    ]
                   }
                 }
               ]
             }
           }
+        },
+        "fields": {
+          "product_id": [
+            "p-pool"
+          ]
         }
       }
     ]

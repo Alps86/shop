@@ -148,3 +148,9 @@ Funktionalität: Laufzeitkomposition der echten Adapter
     Dann liefert die Laufzeitdiagnose
       | Status | Contains |
       | 200 | CDC:SearchUnavailable |
+    Wenn die Bereitschaft nach dem technischen Retryintervall erneut abgefragt wird
+      | Path | Milliseconds |
+      | /ready | 1100 |
+    Dann liefert die Laufzeitdiagnose
+      | Status | Contains |
+      | 200 | CDC:SearchUnavailable |

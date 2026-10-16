@@ -219,43 +219,6 @@ jobs:
             curl --fail --silent --show-error --max-time 5 "http://127.0.0.1:$port/_nodes/stats/indices,jvm,process,os,thread_pool" > "$directory/opensearch-$port-nodes.json" 2> "$directory/opensearch-$port-nodes.stderr" || printf 'OSnodes %s nicht verfügbar\n' "$port" >> "$directory/unavailable.txt"
             curl --fail --silent --show-error --max-time 5 "http://127.0.0.1:$port/_stats/request_cache,search" > "$directory/opensearch-$port-search.json" 2> "$directory/opensearch-$port-search.stderr" || printf 'OSindexstats %s nicht verfügbar\n' "$port" >> "$directory/unavailable.txt"
           done
-      - name: Einmaliger separater Performancevergleich nach vollständiger Suite
-        if: always()
-        run: |
-          directory=/tmp/shop-benchmark-results/separate-performance
-          mkdir -p "$directory"
-          printf '1\n' > "$directory/exit-status.txt"
-          printf 'Genau ein nachgelagerter Vergleich, kein Ersatz der Originalsuite. Gleicher Produktionsstack, Ressourcen, Routen, Last und persistierter Messzustand. Plain-Testclient und spätere wärmere Laufzeit unterscheiden sich gemeinsam; bessere Werte allein beweisen keine Ursache. Originalfehler bleiben erhalten.\n' > "$directory/measurement-boundary.txt"
-          if [ ! -s "$SHOP_PERFORMANCE_STATE_FILE" ]; then
-            printf 'Nicht ausführbar: bestehender privater Messzustand fehlt; keine Gäste oder Orders neu erzeugen.\n' > "$directory/unavailable.txt"
-            exit 1
-          fi
-          result=1
-          for phase in before after; do
-            snapshot="$directory/resources/$phase"
-            mkdir -p "$snapshot"
-            date --utc --iso-8601=ns > "$snapshot/utc.txt"
-            docker info --format '{"cpu":{{.NCPU}},"memoryBytes":{{.MemTotal}}}' > "$snapshot/docker-host.json"
-            free --bytes > "$snapshot/host-memory.txt"
-            ps -eo pid,ppid,comm > "$snapshot/process-tree.txt"
-            for pressure in cpu memory io; do
-              cat "/proc/pressure/$pressure" > "$snapshot/host-$pressure-pressure.txt"
-            done
-            for port in 19200 29200; do
-              curl --fail --silent --show-error --max-time 5 "http://127.0.0.1:$port/_nodes/stats/indices,jvm,process,os,thread_pool" > "$snapshot/opensearch-$port-nodes.json" 2> "$snapshot/opensearch-$port-nodes.stderr" || printf 'OSnodes %s nicht verfügbar\n' "$port" >> "$snapshot/unavailable.txt"
-              curl --fail --silent --show-error --max-time 5 "http://127.0.0.1:$port/_stats/request_cache,search" > "$snapshot/opensearch-$port-search.json" 2> "$snapshot/opensearch-$port-search.stderr" || printf 'OSindexstats %s nicht verfügbar\n' "$port" >> "$snapshot/unavailable.txt"
-            done
-            if [ "$phase" = before ]; then
-              date --utc --iso-8601=ns > "$directory/test-start-utc.txt"
-              set +e
-              SHOP_PERFORMANCE_REPORT_DIRECTORY="$directory" go test -p 1 ./cucumber/performance -count=1 > "$directory/go-test.log" 2>&1
-              result=$?
-              set -e
-              date --utc --iso-8601=ns > "$directory/test-finish-utc.txt"
-              printf '%s\n' "$result" > "$directory/exit-status.txt"
-            fi
-          done
-          exit "$result"
       - name: Eigene beobachtende Collectorprozesse auch nach Testfehlern beenden
         if: always()
         run: |
@@ -415,43 +378,6 @@ jobs:
             curl --fail --silent --show-error --max-time 5 "http://127.0.0.1:$port/_nodes/stats/indices,jvm,process,os,thread_pool" > "$directory/opensearch-$port-nodes.json" 2> "$directory/opensearch-$port-nodes.stderr" || printf 'OSnodes %s nicht verfügbar\n' "$port" >> "$directory/unavailable.txt"
             curl --fail --silent --show-error --max-time 5 "http://127.0.0.1:$port/_stats/request_cache,search" > "$directory/opensearch-$port-search.json" 2> "$directory/opensearch-$port-search.stderr" || printf 'OSindexstats %s nicht verfügbar\n' "$port" >> "$directory/unavailable.txt"
           done
-      - name: Einmaliger separater Performancevergleich nach vollständiger Suite
-        if: always()
-        run: |
-          directory=/tmp/shop-benchmark-results/separate-performance
-          mkdir -p "$directory"
-          printf '1\n' > "$directory/exit-status.txt"
-          printf 'Genau ein nachgelagerter Vergleich, kein Ersatz der Originalsuite. Gleicher Produktionsstack, Ressourcen, Routen, Last und persistierter Messzustand. Plain-Testclient und spätere wärmere Laufzeit unterscheiden sich gemeinsam; bessere Werte allein beweisen keine Ursache. Originalfehler bleiben erhalten.\n' > "$directory/measurement-boundary.txt"
-          if [ ! -s "$SHOP_PERFORMANCE_STATE_FILE" ]; then
-            printf 'Nicht ausführbar: bestehender privater Messzustand fehlt; keine Gäste oder Orders neu erzeugen.\n' > "$directory/unavailable.txt"
-            exit 1
-          fi
-          result=1
-          for phase in before after; do
-            snapshot="$directory/resources/$phase"
-            mkdir -p "$snapshot"
-            date --utc --iso-8601=ns > "$snapshot/utc.txt"
-            docker info --format '{"cpu":{{.NCPU}},"memoryBytes":{{.MemTotal}}}' > "$snapshot/docker-host.json"
-            free --bytes > "$snapshot/host-memory.txt"
-            ps -eo pid,ppid,comm > "$snapshot/process-tree.txt"
-            for pressure in cpu memory io; do
-              cat "/proc/pressure/$pressure" > "$snapshot/host-$pressure-pressure.txt"
-            done
-            for port in 19200 29200; do
-              curl --fail --silent --show-error --max-time 5 "http://127.0.0.1:$port/_nodes/stats/indices,jvm,process,os,thread_pool" > "$snapshot/opensearch-$port-nodes.json" 2> "$snapshot/opensearch-$port-nodes.stderr" || printf 'OSnodes %s nicht verfügbar\n' "$port" >> "$snapshot/unavailable.txt"
-              curl --fail --silent --show-error --max-time 5 "http://127.0.0.1:$port/_stats/request_cache,search" > "$snapshot/opensearch-$port-search.json" 2> "$snapshot/opensearch-$port-search.stderr" || printf 'OSindexstats %s nicht verfügbar\n' "$port" >> "$snapshot/unavailable.txt"
-            done
-            if [ "$phase" = before ]; then
-              date --utc --iso-8601=ns > "$directory/test-start-utc.txt"
-              set +e
-              SHOP_PERFORMANCE_REPORT_DIRECTORY="$directory" go test -p 1 ./cucumber/performance -count=1 > "$directory/go-test.log" 2>&1
-              result=$?
-              set -e
-              date --utc --iso-8601=ns > "$directory/test-finish-utc.txt"
-              printf '%s\n' "$result" > "$directory/exit-status.txt"
-            fi
-          done
-          exit "$result"
       - name: Eigene beobachtende Collectorprozesse auch nach Testfehlern beenden
         if: always()
         run: |

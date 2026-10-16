@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"reflect"
 	"strconv"
-	"strings"
 )
 
 func (current *world) cacheSteps(ctx *godog.ScenarioContext) {
@@ -102,17 +101,64 @@ func (current *world) sourceObserved(table *godog.Table) error {
 
 func (current *world) sourceHits(hits []map[string]json.RawMessage, expected row) error {
 	for _, hit := range hits {
-		root := map[string]json.RawMessage{}
-		if err := json.Unmarshal(hit["_source"], &root); err != nil {
-			return err
+		if _, exists := hit["_source"]; exists {
+			return fmt.Errorf("Suchtreffer darf keinen Root-Source enthalten")
 		}
 
-		if err := expected.matches(row{"RootFields": fmt.Sprint(len(root)), "ProductID": strings.Trim(string(root["product_id"]), "\"")}); err != nil {
+		if err := expected.storedHit(hit); err != nil {
 			return err
 		}
 	}
 
 	return current.sameCard()
+}
+
+func (expected row) storedHit(hit map[string]json.RawMessage) error {
+	if err := expected.storedRoot(hit["fields"]); err != nil {
+		return err
+	}
+
+	inner := map[string]sourceResponse{}
+	if err := json.Unmarshal(hit["inner_hits"], &inner); err != nil {
+		return err
+	}
+
+	return storedChosen(inner["chosen"].Hits.Hits)
+}
+
+func storedChosen(hits []map[string]json.RawMessage) error {
+	if len(hits) != 1 {
+		return fmt.Errorf("genau ein gespeicherter Varianttreffer benötigt")
+	}
+
+	if _, exists := hits[0]["_source"]; exists {
+		return fmt.Errorf("Varianttreffer darf keinen Source enthalten")
+	}
+
+	fields := map[string]json.RawMessage{}
+	if err := json.Unmarshal(hits[0]["fields"], &fields); err != nil {
+		return err
+	}
+
+	if len(fields) != 2 {
+		return fmt.Errorf("genau SKU und vollständige Payload als gespeicherte Variantfelder benötigt")
+	}
+
+	return nil
+}
+
+func (expected row) storedRoot(payload []byte) error {
+	root := map[string][]string{}
+	if err := json.Unmarshal(payload, &root); err != nil {
+		return err
+	}
+
+	ids := root["product_id"]
+	if len(ids) != 1 {
+		return fmt.Errorf("genau eine gespeicherte ProductID benötigt")
+	}
+
+	return expected.matches(row{"RootFields": fmt.Sprint(len(root)), "ProductID": ids[0]})
 }
 
 func (current *world) sameCard() error {

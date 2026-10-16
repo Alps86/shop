@@ -17,8 +17,8 @@ Funktionalität: Echter Gastkauf mit PostgreSQL und Temporal
       | address-a | address | | 0 | Demo Gast | Testweg 1 | 12345 | Teststadt | DE | | |
       | payment-a | payment | | 0 | | | | | | | <Payment> |
     Und der Worker mit geleertem lokalen SDK-Cache neu startet und seine History wieder bereitsteht
-      | ReadinessTimeout |
-      | 10s |
+      | ReadinessTimeout | ReadinessPollInterval |
+      | 10s | 20ms |
     Und der Kauf über den Workflow verbindlich abgeschlossen wird
       | ConfirmCommandID | PlaceCommandID |
       | confirm-a | place-a |
@@ -138,8 +138,8 @@ Funktionalität: Echter Gastkauf mit PostgreSQL und Temporal
       | Fixture | PublishedRules | CommandID |
       | spec/fixtures/runtime/katalog.json | demo-v2 | start-new |
     Und der Worker mit geleertem lokalen SDK-Cache neu startet und seine History wieder bereitsteht
-      | ReadinessTimeout |
-      | 10s |
+      | ReadinessTimeout | ReadinessPollInterval |
+      | 10s | 20ms |
     Dann bestehende und neue Prozesse ihre jeweiligen Versionen behalten
       | ExistingRules | NewRules |
       | demo-v1 | demo-v2 |

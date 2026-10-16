@@ -20,7 +20,8 @@ Funktionalität: Cachefähige Completion neben unverändertem Hauptsuchkontext
       | Line | Path | JSON |
       | 0 | request_cache | true |
       | 2 | request_cache | true |
-      | 1 | _source | ["product_id"] |
+      | 1 | _source | false |
+      | 1 | stored_fields | ["product_id"] |
       | 1 | size | 12 |
       | 1 | suggest | null |
       | 3 | _source | false |

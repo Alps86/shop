@@ -28,9 +28,9 @@ Funktionalität: Ehrliche Suchdienstfehler
       | invalid | 503 | {} | DependencyUnavailable |
       | open | 503 | {} | SearchUnavailable |
       | open | 200 | invalid-json | SearchUnavailable |
-      | open | 200 | {"hits":{"hits":[{"_source":{"product_id":"p-a"}}]}} | SearchUnavailable |
-      | open | 200 | {"hits":{"hits":[{"_source":{"product_id":"p-a"},"inner_hits":{"chosen":{"hits":{"hits":[{"_source":{"sku":"a-red","card":{"ProductID":"p-b","SKU":"a-red"}}}]}}}}]}} | SearchUnavailable |
-      | open | 200 | {"hits":{"hits":[{"_source":{"product_id":"p-a"},"inner_hits":{"chosen":{"hits":{"hits":[{"_source":{"sku":"a-red","card":{"ProductID":"p-a","SKU":"a-blue"}}}]}}}}]}} | SearchUnavailable |
+      | open | 200 | {"hits":{"hits":[{"fields":{"product_id":["p-a"]}}]}} | SearchUnavailable |
+      | open | 200 | {"hits":{"hits":[{"inner_hits":{"chosen":{"hits":{"hits":[{"fields":{"variants.sku":["a-red"],"variants.card_payload":["eyJQcm9kdWN0SUQiOiJwLWIiLCJTS1UiOiJhLXJlZCJ9"]}}]}}},"fields":{"product_id":["p-a"]}}]}} | SearchUnavailable |
+      | open | 200 | {"hits":{"hits":[{"inner_hits":{"chosen":{"hits":{"hits":[{"fields":{"variants.sku":["a-red"],"variants.card_payload":["eyJQcm9kdWN0SUQiOiJwLWEiLCJTS1UiOiJhLWJsdWUifQ=="]}}]}}},"fields":{"product_id":["p-a"]}}]}} | SearchUnavailable |
       | open | 200 | {"aggregations":{"facet_brand":false}} | SearchUnavailable |
       | open | 200 | {"aggregations":{"facet_price":{"variants":{"matching":{"values":{"buckets":[{"key":{}}]}}}}}} | SearchUnavailable |
 
