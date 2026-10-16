@@ -378,47 +378,6 @@ jobs:
             curl --fail --silent --show-error --max-time 5 "http://127.0.0.1:$port/_nodes/stats/indices,jvm,process,os,thread_pool" > "$directory/opensearch-$port-nodes.json" 2> "$directory/opensearch-$port-nodes.stderr" || printf 'OSnodes %s nicht verfügbar\n' "$port" >> "$directory/unavailable.txt"
             curl --fail --silent --show-error --max-time 5 "http://127.0.0.1:$port/_stats/request_cache,search" > "$directory/opensearch-$port-search.json" 2> "$directory/opensearch-$port-search.stderr" || printf 'OSindexstats %s nicht verfügbar\n' "$port" >> "$directory/unavailable.txt"
           done
-      - name: Einmalige private E2E-Diagnose nach der unveränderten Originalsuite
-        if: success() && github.run_number == 48 && github.run_attempt == 1 && github.event_name == 'pull_request' && github.event.action == 'synchronize' && github.event.pull_request.head.ref == 'codex/shop-performance'
-        timeout-minutes: 5
-        run: |
-          for file in /tmp/shop-demo-events.pid /tmp/shop-benchmark-events.pid; do
-            test -s "$file"
-            process=$(cat "$file")
-            [[ "$process" =~ ^[0-9]+$ ]]
-            if kill -0 -- "-$process" 2>/dev/null; then
-              kill -- "-$process"
-            fi
-          done
-          sleep 1
-          for file in /tmp/shop-demo-events.pid /tmp/shop-benchmark-events.pid; do
-            process=$(cat "$file")
-            if kill -0 -- "-$process" 2>/dev/null; then
-              echo 'Ursprünglicher Docker-Eventcollector ist noch aktiv; Diagnose abgebrochen.'
-              exit 1
-            fi
-          done
-          date --utc --iso-8601=ns > /tmp/shop-benchmark-results/resources/events-ended-before-e2e.utc
-          bash .github/diagnostics/e2e/run.sh
-      - name: Geprüfte Diagnoseallowlist einmalig verschlüsseln
-        if: always() && github.run_number == 48 && github.run_attempt == 1 && github.event_name == 'pull_request' && github.event.action == 'synchronize' && github.event.pull_request.head.ref == 'codex/shop-performance'
-        run: |
-          umask 077
-          test -d /tmp/shop-e2e-approved
-          mkdir -p /tmp/shop-e2e-sealed
-          tar -C /tmp/shop-e2e-approved -czf /tmp/shop-e2e-private/approved.tar.gz .
-          openssl cms -encrypt -binary -aes-256-gcm -in /tmp/shop-e2e-private/approved.tar.gz -outform DER -out /tmp/shop-e2e-sealed/profiles.cms .github/diagnostics/e2e/recipient.pem
-          ciphertext=$(sha256sum /tmp/shop-e2e-sealed/profiles.cms | cut -d ' ' -f 1)
-          size=$(stat -c '%s' /tmp/shop-e2e-sealed/profiles.cms)
-          recipient=$(openssl x509 -in .github/diagnostics/e2e/recipient.pem -noout -fingerprint -sha256 | cut -d '=' -f 2 | tr -d ':')
-          printf '{"file":"profiles.cms","algorithm":"CMS-AES-256-GCM","ciphertextSHA256":"%s","bytes":%s,"recipientSHA256":"%s"}\n' "$ciphertext" "$size" "$recipient" > /tmp/shop-e2e-sealed/manifest.json
-      - uses: actions/upload-artifact@v4
-        if: always() && github.run_number == 48 && github.run_attempt == 1 && github.event_name == 'pull_request' && github.event.action == 'synchronize' && github.event.pull_request.head.ref == 'codex/shop-performance'
-        with:
-          name: e2e-diagnostic-sealed
-          path: /tmp/shop-e2e-sealed
-          if-no-files-found: warn
-          retention-days: 7
       - name: Eigene beobachtende Collectorprozesse auch nach Testfehlern beenden
         if: always()
         run: |
