@@ -1,0 +1,44 @@
+package e2ediag
+
+import (
+	"net/http"
+	"os"
+	"sync"
+	"sync/atomic"
+	"time"
+)
+
+type contextKey int
+
+const (
+	requestKey contextKey = iota
+	phaseKey
+	finishKey
+)
+
+type Profiler struct {
+	mutex        sync.Mutex
+	state        string
+	directory    string
+	cpu          *os.File
+	execution    *os.File
+	cpuStarted   bool
+	traceStarted bool
+	timer        *time.Timer
+	listener     *http.Server
+}
+
+var requests atomic.Uint64
+
+type sqlFinish struct {
+	end   func()
+	phase string
+}
+
+type SQLTracer struct{}
+
+type ProfileState struct {
+	State string
+	UTC   time.Time
+	PID   int
+}

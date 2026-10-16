@@ -1,0 +1,60 @@
+package e2ediag
+
+import (
+	"context"
+	"errors"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"slices"
+)
+
+func OpenPool(ctx context.Context, config *pgxpool.Config) (*pgxpool.Pool, error) {
+	if config.ConnConfig.Tracer != nil {
+		return nil, errors.New("diagnostic existing tracer")
+	}
+
+	config.ConnConfig.Tracer = SQLTracer{}
+
+	return pgxpool.NewWithConfig(ctx, config)
+}
+
+func SQL(ctx context.Context, phase string, operation func(context.Context) error) error {
+	ctx, finish := Begin(ctx, phase)
+	defer finish()
+
+	return operation(ctx)
+}
+
+func (SQLTracer) TraceQueryStart(ctx context.Context, conn *pgx.Conn, _ pgx.TraceQueryStartData) context.Context {
+	phase, ok := ctx.Value(phaseKey).(string)
+	if !ok {
+		return ctx
+	}
+
+	if !slices.Contains([]string{"sql.resolve-session", "sql.active-cart", "sql.user-payload"}, phase) {
+		return ctx
+	}
+
+	Number(ctx, phase+".pid", int64(conn.PgConn().PID()))
+	ctx, finish := Begin(ctx, phase+".query")
+
+	return context.WithValue(ctx, finishKey, sqlFinish{end: finish, phase: phase})
+}
+
+func (SQLTracer) TraceQueryEnd(ctx context.Context, _ *pgx.Conn, data pgx.TraceQueryEndData) {
+	finish, ok := ctx.Value(finishKey).(sqlFinish)
+	if !ok {
+		return
+	}
+
+	Number(ctx, finish.phase+".failed", failureNumber(data.Err))
+	finish.end()
+}
+
+func failureNumber(err error) int64 {
+	if err != nil {
+		return 1
+	}
+
+	return 0
+}
