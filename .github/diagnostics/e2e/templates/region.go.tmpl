@@ -1,0 +1,91 @@
+package e2ediag
+
+import (
+	"context"
+	"net/http"
+	"runtime/pprof"
+	"runtime/trace"
+	"strconv"
+	"sync"
+)
+
+func Request(request *http.Request, writer http.ResponseWriter) (*http.Request, func()) {
+	if !trace.IsEnabled() {
+		return request, func() {
+		}
+	}
+
+	if !personalSearch(request) {
+		return request, func() {
+		}
+	}
+
+	return profiledRequest(request, writer)
+}
+
+func profiledRequest(request *http.Request, writer http.ResponseWriter) (*http.Request, func()) {
+	id := requests.Add(1)
+	ctx, task := trace.NewTask(request.Context(), "personal-search")
+	ctx = context.WithValue(ctx, requestKey, id)
+	ctx = pprof.WithLabels(ctx, pprof.Labels("route", "personal-search"))
+	pprof.SetGoroutineLabels(ctx)
+	writer.Header().Set("X-Shop-Diagnostic-Id", strconv.FormatUint(id, 10))
+	Number(ctx, "request-id", int64(id))
+
+	return request.WithContext(ctx), func() {
+		task.End()
+		pprof.SetGoroutineLabels(request.Context())
+	}
+}
+
+func personalSearch(request *http.Request) bool {
+	return request.URL.Path == "/de-DE/suche" && request.Header.Get("Cookie") != ""
+}
+
+func marked(ctx context.Context) bool {
+	_, ok := ctx.Value(requestKey).(uint64)
+
+	return ok
+}
+
+func Begin(ctx context.Context, phase string) (context.Context, func()) {
+	if !marked(ctx) {
+		return ctx, func() {
+		}
+	}
+
+	parent := ctx
+	ctx = context.WithValue(ctx, phaseKey, phase)
+	ctx = pprof.WithLabels(ctx, pprof.Labels("phase", phase))
+	pprof.SetGoroutineLabels(ctx)
+	region := trace.StartRegion(ctx, phase)
+	var once sync.Once
+
+	return ctx, func() {
+		once.Do(func() {
+			region.End()
+			pprof.SetGoroutineLabels(parent)
+		})
+	}
+}
+
+func Number(ctx context.Context, name string, number int64) {
+	if !marked(ctx) {
+		return
+	}
+
+	trace.Log(ctx, name, strconv.FormatInt(number, 10))
+}
+
+func Took(ctx context.Context, name string, number *int64) {
+	if number != nil {
+		Number(ctx, name, *number)
+	}
+}
+
+func HTTP(ctx context.Context, client *http.Client, request *http.Request) (*http.Response, error) {
+	_, finish := Begin(ctx, "os.http-headers")
+	defer finish()
+
+	return client.Do(request)
+}
