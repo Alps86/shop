@@ -3,6 +3,7 @@ package http_test
 import (
 	"fmt"
 	shophttp "github.com/Alps86/shop/internal/adapter/http"
+	"github.com/Alps86/shop/internal/application"
 	"github.com/cucumber/godog"
 	"net/http"
 	"net/http/httptest"
@@ -100,8 +101,9 @@ func (current *world) expectField(fields map[string]string) error {
 }
 
 func (current *world) expectPort(table *godog.Table) error {
-	actual := map[string]string{"Calls": strings.Join(current.calls, ","), "Brands": strings.Join(current.lastQuery.Filters.Brands, ","), "Page": fmt.Sprint(current.lastQuery.Page), "SKU": string(current.lastChange.SKU), "Operation": current.lastChange.Operation, "Revision": fmt.Sprint(current.lastChange.ExpectedRevision), "CommandID": string(current.lastChange.CommandID), "CartID": string(current.lastChange.CartID)}
-	current.commandValues(actual)
+	observed := current.snapshotSearch()
+	actual := map[string]string{"Calls": strings.Join(observed.calls, ","), "Brands": strings.Join(observed.query.Filters.Brands, ","), "Page": fmt.Sprint(observed.query.Page), "SKU": string(current.lastChange.SKU), "Operation": current.lastChange.Operation, "Revision": fmt.Sprint(current.lastChange.ExpectedRevision), "CommandID": string(current.lastChange.CommandID), "CartID": string(current.lastChange.CartID)}
+	current.commandValues(actual, observed.query)
 
 	return read(table).matches(actual)
 }
@@ -208,7 +210,7 @@ func (current *world) requestBody(input map[string]string, form url.Values) stri
 	return form.Encode()
 }
 
-func (current *world) commandValues(actual map[string]string) {
+func (current *world) commandValues(actual map[string]string, query application.SearchQuery) {
 	actual["InventorySKU"] = string(current.lastInventory.SKU)
 	actual["InventoryRevision"] = fmt.Sprint(current.lastInventory.ExpectedRevision)
 	actual["InventoryCommandID"] = string(current.lastInventory.CommandID)
@@ -216,6 +218,6 @@ func (current *world) commandValues(actual map[string]string) {
 	actual["InventoryStock"] = fmt.Sprint(current.lastInventory.Stock.Value)
 	actual["DeliveryOrder"] = string(current.lastDelivery.OrderID)
 	actual["DeliveryCommandID"] = string(current.lastDelivery.CommandID)
-	actual["SearchInterests"] = fmt.Sprint(current.lastQuery.Interests)
+	actual["SearchInterests"] = fmt.Sprint(query.Interests)
 	actual["RecommendationInterests"] = fmt.Sprint(current.lastRecommendation.Interests)
 }

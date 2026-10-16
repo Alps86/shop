@@ -15,7 +15,7 @@ func (current *world) registerBudget(ctx *godog.ScenarioContext) {
 }
 
 func (current *world) waitSearch(ctx context.Context) error {
-	raw := current.options["SearchDelayMilliseconds"]
+	raw := current.searchDelayString()
 	if raw == "" {
 		return nil
 	}
@@ -62,4 +62,13 @@ func (current *world) fragmentBudget(table *godog.Table) error {
 	}
 
 	return nil
+}
+
+func (current *world) searchDelayString() string {
+	raw, ok := current.searchDelay.Load().(string)
+	if !ok {
+		return ""
+	}
+
+	return raw
 }

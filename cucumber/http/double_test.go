@@ -84,7 +84,7 @@ func (double searchDouble) Search(ctx context.Context, query application.SearchQ
 		return application.SearchResult{}, err
 	}
 
-	double.current.lastQuery = query
+	double.current.recordSearchQuery(query)
 
 	return double.current.fixture.Search, double.current.portError("Search")
 }
