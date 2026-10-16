@@ -17,5 +17,6 @@
 | ID im lesbaren Slugpfad | Umbenennungen ohne Identitätsverlust; ein kanonisches Modell mit adressierbaren Varianten |
 | Sessionfähigkeit getrennt von Profil | Öffentlicher Profilumschalter darf keine fremden Carts/Orders öffnen |
 | Schlichtes eigenständiges Design | EP als Strukturreferenz, Performance/Demo vor Pixelkopie; keine Browsermatrix |
+| Vorab festgelegte lokale Vier-CPU-Vollstackreferenz | Kontrollierbare Hardware und nachgewiesene gemeinsame Ressourcenhülle erlauben eine ausdrücklich begrenzte lokale Leistungsabnahme. Derselbe vollständige fachliche Stack und unveränderte Last gelten; die technische Ausführung über unprivilegierte OCI-Binärdateien ist gesondert auf Lifecycle- und Versionsäquivalenz zu prüfen. Cloudgates und sämtliche Cloudlatenzberichte bleiben erhalten. Daraus folgen weder eine bewiesene externe CPUursache noch Cloud- oder Hardwareunabhängigkeitsgarantien. |
 
 Dies sind bewusst jetzt getroffene Konkretisierungen früherer Vorschläge, keine Behauptung historischer Einzelabstimmung. Implementierung darf technische Details verfeinern, muss verhaltensrelevante Vertragsänderungen vorher synchronisieren.

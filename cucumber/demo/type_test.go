@@ -52,6 +52,7 @@ type deployment struct {
 	public      string
 	backend     string
 	reserved    map[string]net.Listener
+	systemd     bool
 	external    bool
 	cancel      context.CancelFunc
 	finished    chan error
@@ -100,4 +101,9 @@ type searchCacheEntry struct {
 
 type searchProjectionReply struct {
 	Source opensearch.Document `json:"_source"`
+}
+
+type systemdSearchHealth struct {
+	Status   string `json:"status"`
+	TimedOut bool   `json:"timed_out"`
 }

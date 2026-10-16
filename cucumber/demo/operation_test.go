@@ -83,6 +83,10 @@ func (current *world) restart() error {
 }
 
 func (deployment *deployment) restartCompose() error {
+	if deployment.systemd {
+		return deployment.restartSystemd()
+	}
+
 	commands := []*exec.Cmd{exec.Command("docker", "compose", "stop", "shop"), exec.Command("docker", "compose", "restart", "postgres", "temporal", "opensearch"), exec.Command("docker", "compose", "up", "--detach", "--wait", "--wait-timeout", "180")}
 	for _, command := range commands {
 		command.Dir = "../.."

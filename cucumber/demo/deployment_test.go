@@ -18,6 +18,11 @@ import (
 func (current *world) open(table *godog.Table) error {
 	data := read(table)[0]
 	current.deployment = &deployment{}
+	if os.Getenv("SHOP_DEMO_DEPLOYMENT") == "systemd" {
+		current.deployment.systemd = true
+		return current.deployment.connectCompose(data)
+	}
+
 	if os.Getenv("SHOP_DEMO_DEPLOYMENT") == "compose" {
 		return current.deployment.connectCompose(data)
 	}

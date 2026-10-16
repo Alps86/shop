@@ -44,6 +44,10 @@ func validSearchState(state string) bool {
 }
 
 func (deployment *deployment) composeSearch(state string) error {
+	if deployment.systemd {
+		return deployment.systemdSearch(state)
+	}
+
 	command := exec.Command("docker", "compose", "stop", "opensearch")
 	if state == "available" {
 		command = exec.Command("docker", "compose", "up", "--detach", "--wait", "--wait-timeout", "180", "opensearch")
