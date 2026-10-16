@@ -117,7 +117,7 @@ func (plan FilterPlan) variantSort() []JSON {
 func (plan FilterPlan) rankedInner(variant JSON) JSON {
 	functions := []JSON{{"field_value_factor": JSON{"field": "variants.margin", "factor": 0.00000005, "missing": 0}}}
 	ranking := JSON{"function_score": JSON{"query": variant, "functions": functions, "boost_mode": "replace", "score_mode": "sum"}}
-	nested := JSON{"path": "variants", "query": ranking, "score_mode": "max", "inner_hits": JSON{"name": "chosen", "size": 1, "_source": false, "stored_fields": []string{"variants.sku", "variants.card_payload"}, "sort": plan.variantSort()}}
+	nested := JSON{"path": "variants", "query": ranking, "score_mode": "max", "inner_hits": JSON{"name": "chosen", "size": 1, "_source": false, "stored_fields": []string{"_none_"}, "docvalue_fields": []string{"variants.sku", "variants.card_payload"}, "sort": plan.variantSort()}}
 
 	return JSON{"nested": nested}
 }

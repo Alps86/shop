@@ -67,7 +67,7 @@ type HitTotal struct {
 }
 
 type Hit struct {
-	Fields StoredProductFields  `json:"fields"`
+	Fields ProductFields        `json:"fields"`
 	Inner  map[string]InnerPage `json:"inner_hits"`
 }
 
@@ -80,7 +80,7 @@ type VariantPage struct {
 }
 
 type VariantHit struct {
-	Fields StoredVariantFields `json:"fields"`
+	Fields VariantFields `json:"fields"`
 }
 
 type SuggestionGroup struct {
@@ -113,13 +113,13 @@ type Document struct {
 
 type documentJSON Document
 
-type StoredProductFields struct {
+type ProductFields struct {
 	ProductID []value.ProductID `json:"product_id"`
 }
 
-type StoredVariantFields struct {
-	SKU         []value.SKU `json:"variants.sku"`
-	CardPayload [][]byte    `json:"variants.card_payload"`
+type VariantFields struct {
+	SKU         []value.SKU   `json:"variants.sku"`
+	CardPayload []cardPayload `json:"variants.card_payload"`
 }
 
 type Variant struct {
@@ -219,3 +219,5 @@ type storedCardCompliance struct {
 	RequiredFields      []string                              `json:",omitzero"`
 	NonApplicableReason string                                `json:",omitzero"`
 }
+
+type cardPayload []byte

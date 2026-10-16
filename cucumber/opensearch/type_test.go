@@ -132,8 +132,9 @@ type protocolEnvelope struct {
 }
 
 type cardCodecProbe struct {
-	original application.ProductCard
-	document cardCodecDocument
+	wirePayload value.Optional[string]
+	original    application.ProductCard
+	document    cardCodecDocument
 }
 
 type cardCodecDocument struct {
@@ -148,4 +149,18 @@ type cardCodecVariant struct {
 type transportLog struct {
 	mutex  sync.Mutex
 	buffer bytes.Buffer
+}
+
+type docValuesQuery struct {
+	Query struct {
+		Bool struct {
+			Should []docValuesClause
+		}
+	}
+}
+
+type docValuesClause struct {
+	Nested struct {
+		InnerHits map[string]any `json:"inner_hits"`
+	}
 }

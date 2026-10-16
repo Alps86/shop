@@ -16,12 +16,16 @@ Funktionalität: Cachefähige Completion neben unverändertem Hauptsuchkontext
     Und das vollständige Protokollsuchergebnis entspricht
       | Code | ExpectedFixture |
       | OK | spec/fixtures/opensearch/pool-expected.json |
+    Und der gewählte Varianttreffer ausschließlich native DocValues anfordert
+      | Source | StoredFields | DocValueFields |
+      | false | ["_none_"] | ["variants.sku","variants.card_payload"] |
     Und die NDJSON-Teilabfragen entsprechen
       | Line | Path | JSON |
       | 0 | request_cache | true |
       | 2 | request_cache | true |
       | 1 | _source | false |
-      | 1 | stored_fields | ["product_id"] |
+      | 1 | stored_fields | ["_none_"] |
+      | 1 | docvalue_fields | ["product_id"] |
       | 1 | size | 12 |
       | 1 | suggest | null |
       | 3 | _source | false |

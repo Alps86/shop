@@ -101,11 +101,11 @@ func (current *world) sourceObserved(table *godog.Table) error {
 
 func (current *world) sourceHits(hits []map[string]json.RawMessage, expected row) error {
 	for _, hit := range hits {
-		if _, exists := hit["_source"]; exists {
-			return fmt.Errorf("Suchtreffer darf keinen Root-Source enthalten")
+		if err := fetchMetadataAbsent(hit); err != nil {
+			return err
 		}
 
-		if err := expected.storedHit(hit); err != nil {
+		if err := expected.docValueHit(hit); err != nil {
 			return err
 		}
 	}
@@ -113,8 +113,8 @@ func (current *world) sourceHits(hits []map[string]json.RawMessage, expected row
 	return current.sameCard()
 }
 
-func (expected row) storedHit(hit map[string]json.RawMessage) error {
-	if err := expected.storedRoot(hit["fields"]); err != nil {
+func (expected row) docValueHit(hit map[string]json.RawMessage) error {
+	if err := expected.docValueRoot(hit["fields"]); err != nil {
 		return err
 	}
 
@@ -123,16 +123,16 @@ func (expected row) storedHit(hit map[string]json.RawMessage) error {
 		return err
 	}
 
-	return storedChosen(inner["chosen"].Hits.Hits)
+	return docValueChosen(inner["chosen"].Hits.Hits)
 }
 
-func storedChosen(hits []map[string]json.RawMessage) error {
+func docValueChosen(hits []map[string]json.RawMessage) error {
 	if len(hits) != 1 {
-		return fmt.Errorf("genau ein gespeicherter Varianttreffer benötigt")
+		return fmt.Errorf("genau ein DocValues-Varianttreffer benötigt")
 	}
 
-	if _, exists := hits[0]["_source"]; exists {
-		return fmt.Errorf("Varianttreffer darf keinen Source enthalten")
+	if err := fetchMetadataAbsent(hits[0]); err != nil {
+		return err
 	}
 
 	fields := map[string]json.RawMessage{}
@@ -141,13 +141,13 @@ func storedChosen(hits []map[string]json.RawMessage) error {
 	}
 
 	if len(fields) != 2 {
-		return fmt.Errorf("genau SKU und vollständige Payload als gespeicherte Variantfelder benötigt")
+		return fmt.Errorf("genau SKU und vollständige Payload als DocValues-Variantfelder benötigt")
 	}
 
 	return nil
 }
 
-func (expected row) storedRoot(payload []byte) error {
+func (expected row) docValueRoot(payload []byte) error {
 	root := map[string][]string{}
 	if err := json.Unmarshal(payload, &root); err != nil {
 		return err
@@ -155,7 +155,7 @@ func (expected row) storedRoot(payload []byte) error {
 
 	ids := root["product_id"]
 	if len(ids) != 1 {
-		return fmt.Errorf("genau eine gespeicherte ProductID benötigt")
+		return fmt.Errorf("genau eine ProductID aus DocValues benötigt")
 	}
 
 	return expected.matches(row{"RootFields": fmt.Sprint(len(root)), "ProductID": ids[0]})
@@ -181,4 +181,14 @@ func (current *world) captureResponse(table *godog.Table) error {
 	current.capture.observeResponse = capture
 
 	return err
+}
+
+func fetchMetadataAbsent(hit map[string]json.RawMessage) error {
+	for _, key := range []string{"_source", "_id"} {
+		if _, exists := hit[key]; exists {
+			return fmt.Errorf("DocValues-Treffer darf %s nicht laden", key)
+		}
+	}
+
+	return nil
 }
