@@ -467,6 +467,9 @@ Funktionalität: Reale Demo und ehrliche Performanceabnahme
 
   @demo-performance
   Szenario: Tatsächliche HTTPlast hält Messumfang und Browsergrenze getrennt
+    Die neutrale Suche bleibt vollständig gerendert im Proxy-PASS; ihr gemeinsamer Proxycache ist nicht anwendbar.
+    Die privaten Routen umgehen ebenfalls den gemeinsamen Cache, während die übrigen öffentlichen Fragmente echte Cachewerte belegen.
+
     Angenommen der dokumentierte Messdatensatz ist geladen
       | Dataset | Products | Variants | Categories | Profiles | ProfileCodes | Orders | Concurrency | CounterFlushMilliseconds | Network | MinimumCPU | MinimumRAMGiB | Namespace | SKU | Recipient | Street | PostalCode | City | Country | Shipping | Payment | CategoryPath | ListingContains | SearchPath | ProductPath | CategoryDelegation | ProductDelegation |
       | benchmark-synthetic-v1 | 30 | 90 | 5 | 4 | neutral,mobile,home,coffee | 100 | 10 | 1500 | loopback | 4 | 8 | default | BENCH-01-A | Synthetischer Messgast | Messweg 1 | 10115 | Berlin | DE | standard | invoice | /de-DE/kategorie/benchmark-mobile--mobile | bench-product-01 | /de-DE/suche?q=Synthetischer | /de-DE/produkt/synthetischer-messartikel-01--bench-product-01?sku=BENCH-01-A | /_frame/category/mobile/1/index.html? | /_frame/product/bench-product-01/1/index.html?sku=BENCH-01-A |

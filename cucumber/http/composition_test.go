@@ -104,6 +104,7 @@ func (current *world) composedRequest(table *godog.Table) error {
 	}
 
 	request.Header.Set("Cookie", fields["Cookie"])
+	request.Header.Set("HX-Request", fields["HTMX"])
 	response, err := current.engineClient(fields["Jar"]).Do(request)
 	if err != nil {
 		return err

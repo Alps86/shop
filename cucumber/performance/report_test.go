@@ -79,8 +79,8 @@ func (current *world) verifyCache(report measurement) error {
 }
 
 func (current *world) verifyMisses(report measurement) error {
-	if current.privateRoute(report.Route) {
-		return nil
+	if current.proxyPassRoute(report.Route) {
+		return current.verifyPass(report)
 	}
 
 	if float64(report.CacheMisses) < float64(report.Requests) {
@@ -92,6 +92,26 @@ func (current *world) verifyMisses(report measurement) error {
 
 func (current *world) privateRoute(route string) bool {
 	return map[string]bool{"cart": true, "checkout": true, "order": true, "personalized-search": true}[route]
+}
+
+func (current *world) proxyPassRoute(route string) bool {
+	if route == "search" {
+		return true
+	}
+
+	return current.privateRoute(route)
+}
+
+func (current *world) verifyPass(report measurement) error {
+	if report.hasProxyActivity() {
+		return fmt.Errorf("Proxy-PASS %s mit unerwarteten Cachewerten: Hits %d, Misses %d, Coalescing %d", report.Route, report.CacheHits, report.CacheMisses, report.Coalesced)
+	}
+
+	return nil
+}
+
+func (report measurement) hasProxyActivity() bool {
+	return report.CacheHits != 0 || report.CacheMisses != 0 || report.Coalesced != 0
 }
 
 func (current *world) writeReport() error {
@@ -111,7 +131,7 @@ func (current *world) writeReport() error {
 }
 
 func (current *world) environmentReport() (map[string]any, error) {
-	environment := map[string]any{"CPU": runtime.NumCPU(), "OS": runtime.GOOS, "images": os.Getenv("SHOP_PERFORMANCE_IMAGES"), "dataset": current.datasetFacts(), "TCP": "hey keepalive enabled; NewConnections=-1 is unmeasured; actual curl cold num_connects per route", "compression": "disabled explicitly for hey; curl sends no Accept-Encoding", "ColdBoundary": "Only Varnish frame/fragment objects are cold; PostgreSQL/OpenSearch/Temporal services stay ready; OpenSearch request cache is not reset", "BrowserLCPMeasured": false, "CompletePageSLAAchieved": false, "measurements": current.reports, "BackendMeasurements": current.backendReports, "FragmentMeasurements": current.fragmentReports, "Failure": current.failure, "PostFailureProbes": current.diagnostics}
+	environment := map[string]any{"CPU": runtime.NumCPU(), "OS": runtime.GOOS, "images": os.Getenv("SHOP_PERFORMANCE_IMAGES"), "dataset": current.datasetFacts(), "TCP": "hey keepalive enabled; NewConnections=-1 is unmeasured; actual curl cold num_connects per route", "compression": "disabled explicitly for public hey; public curl sends no Accept-Encoding; internal Go-to-OpenSearch transport is measured separately", "ColdBoundary": "Only applicable Varnish frame/fragment objects are cold; search SSR uses Varnish pass with shared cache N/A; PostgreSQL/OpenSearch/Temporal services stay ready; OpenSearch request cache is not reset", "BrowserLCPMeasured": false, "CompletePageSLAAchieved": false, "measurements": current.reports, "BackendMeasurements": current.backendReports, "FragmentMeasurements": current.fragmentReports, "Failure": current.failure, "PostFailureProbes": current.diagnostics}
 	memory, err := memoryKiB()
 	if err != nil {
 		return nil, err
@@ -177,16 +197,14 @@ func (current *world) decorate(report measurement, route, cache string, delta co
 		report.NewConnections = -1
 	}
 
-	if current.privateRoute(route) {
-		report.CacheApplicability = "private,no-store; cache N/A"
-	}
+	report.CacheApplicability = current.cacheApplicability(route)
 
 	return report
 }
 
 func (current *world) verifyWarm(report measurement) error {
-	if current.privateRoute(report.Route) {
-		return nil
+	if current.proxyPassRoute(report.Route) {
+		return current.verifyPass(report)
 	}
 
 	if report.CacheHits == 0 {
@@ -194,6 +212,18 @@ func (current *world) verifyWarm(report measurement) error {
 	}
 
 	return nil
+}
+
+func (current *world) cacheApplicability(route string) string {
+	if route == "search" {
+		return "public SSR; Varnish pass; shared cache N/A"
+	}
+
+	if current.privateRoute(route) {
+		return "private,no-store; cache N/A"
+	}
+
+	return "public-fragments"
 }
 
 func (report *measurement) observeSample(sample sample) {

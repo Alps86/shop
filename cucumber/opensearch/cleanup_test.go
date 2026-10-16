@@ -8,7 +8,16 @@ import (
 	"net/http"
 )
 
-func (current *world) cleanup(ctx context.Context, _ *godog.Scenario, _ error) (context.Context, error) {
+func (current *world) cleanup(ctx context.Context, scenario *godog.Scenario, err error) (context.Context, error) {
+	if current.pool != nil {
+		current.pool.close()
+		return ctx, nil
+	}
+
+	return current.cleanupIndex(ctx, scenario, err)
+}
+
+func (current *world) cleanupIndex(ctx context.Context, _ *godog.Scenario, _ error) (context.Context, error) {
 	if current.faultServer != nil {
 		defer current.faultServer.Close()
 		current.config = current.cleanupConfig

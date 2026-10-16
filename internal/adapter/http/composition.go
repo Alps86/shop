@@ -48,24 +48,36 @@ func (path routePath) fragmentAllowed() bool {
 }
 
 func (page *Page) composition(request *http.Request) {
-	if request.Header.Get("X-Shop-Composition") != "1" {
-		return
-	}
-
-	if (requestView{request}).session() != "" {
-		return
-	}
-
-	if !routePath(request.URL.Path).fragmentAllowed() {
+	if !page.canCompose(request) {
 		return
 	}
 
 	page.SSIHeader = template.HTML(`<!--# include virtual="/_static/header.html" -->`)
 	page.SSIFooter = template.HTML(`<!--# include virtual="/_static/footer.html" -->`)
+	if request.URL.Path == "/de-DE/suche" {
+		return
+	}
+
 	page.Fragment.URL = "/fragments" + request.URL.RequestURI()
 	if page.Detail.Product.ID != "" {
 		page.rootVersion()
 	}
+}
+
+func (page Page) canCompose(request *http.Request) bool {
+	if page.Status != http.StatusOK {
+		return false
+	}
+
+	if request.Header.Get("X-Shop-Composition") != "1" {
+		return false
+	}
+
+	if (requestView{request}).session() != "" {
+		return false
+	}
+
+	return routePath(request.URL.Path).fragmentAllowed()
 }
 
 func (handler *Handler) fragmentFailure(writer http.ResponseWriter) {

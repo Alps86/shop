@@ -11,7 +11,7 @@ import (
 
 func New(config Config) Adapter {
 	if config.HTTP == nil {
-		config.HTTP = &http.Client{Timeout: 5 * time.Second}
+		config.HTTP = newHTTPClient()
 	}
 
 	if config.Clock == nil {

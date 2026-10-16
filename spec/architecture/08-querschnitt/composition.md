@@ -23,3 +23,9 @@ HTMX verbessert gewöhnliche Formulare/Links: alle zentralen Aktionen funktionie
 Server setzt escaped HTML, Formular-CSRF-Token und SameSite-Cookie. CSP/weitere produktive Browserhärtung kann später vertieft werden; sichere Gasttrennung und kein gemeinsames Cachen persönlicher Daten bleiben Demobaseline. [Qualität](../10-qualitaet.md) misst das vollständige zusammengesetzte HTML separat von Browseranzeige.
 
 Standardenginegrenze: [Varnish ESI-Teilmenge](https://varnish-cache.org/docs/7.4/users-guide/esi.html). Originfallback und Parentstatusentscheidung werden über HTTP-/Rendererverträge geprüft.
+
+## Einmaliger SSR-Vertrag der Suchseite
+
+Die erfolgreiche öffentliche Route `/de-DE/suche` rendert ihr bereits ermitteltes SearchResult unmittelbar als vollständiges Go-HTML. Header und Footer bleiben unabhängig vom ESI-Marker über Nginx-SSI eingebunden. Für diese Seite entsteht kein zweiter Suchaufruf durch ein ESI-Fragment: kalt zwei → ein Suchaufruf, bei zuvor warmem Fragment weiterhin ein → ein Aufruf. Varnish-PASS bleibt unverändert; kein Ganzseiten- oder neuer Applicationcache wird eingeführt. Auch direkt aufeinanderfolgende gleiche Suchaufrufe prüfen den Suchport neu und können sofort HTTP503 liefern.
+
+Suchmetadaten, Canonical, Pagination, Status422/503, HTMX-Teilantwort, persönliche no-store-Antworten und zeitabhängige Pflichtdaten-TTL bleiben am selben validierten SearchResult gebunden. Nicht erfolgreiche Seiten (`Status != 200`) bekommen weder SSI- noch ESI-Komposition; ihre sichere Fehleransicht behält den echten HTTPstatus. Home-, Kategorie-, Produkt-/Hugo- und direkte Fragmentpfade einschließlich150ms-Fragmentbudget bleiben unverändert. Der gesonderte Suchfragmentendpunkt bleibt bestehen, wird von der gewöhnlichen Suchseite aber nicht mehr angefordert. Gemessene Verbesserung und weiterhin offene Performanceabweichungen werden separat berichtet.

@@ -93,4 +93,6 @@ func (current *world) registerComposition(ctx *godog.ScenarioContext) {
 	ctx.Step(`^die Fragmentcachefrist verstreicht$`, current.awaitFragmentExpiry)
 	ctx.Step(`^getrennte Gastcookiejars werden eingerichtet$`, current.prepareClients)
 	ctx.Step(`^die öffentliche Rahmenantwort wird verglichen$`, current.compareFrame)
+	ctx.Step(`^die Suchaufrufe ab jetzt gezählt werden$`, current.resetSearchCalls)
+	ctx.Step(`^die Suchportaufrufe der Komposition entsprechen$`, current.searchCalls)
 }

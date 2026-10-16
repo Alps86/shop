@@ -10,6 +10,8 @@ import (
 	"github.com/Alps86/shop/internal/domain/value"
 	"net/http"
 	"net/http/httptest"
+	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -37,6 +39,7 @@ type cacheStatistics struct {
 }
 
 type world struct {
+	pool          *poolProbe
 	cacheBefore   int64
 	capture       *captureTransport
 	requestedText string
@@ -65,4 +68,36 @@ type sourceResponse struct {
 	Hits struct {
 		Hits []map[string]json.RawMessage `json:"hits"`
 	} `json:"hits"`
+}
+
+type poolProbe struct {
+	original  http.RoundTripper
+	transport *http.Transport
+	server    *httptest.Server
+	sentinel  *poolSentinel
+	barrier   *poolBarrier
+	payload   []byte
+	expected  application.SearchResult
+	results   []application.SearchResult
+	failures  []error
+	reused    atomic.Int64
+	parallel  int
+}
+
+type poolBarrier struct {
+	arrived  atomic.Int64
+	release  chan struct{}
+	parallel int
+}
+
+type poolSentinel struct {
+	next  http.RoundTripper
+	calls atomic.Int64
+}
+
+type poolBatch struct {
+	probe   *poolProbe
+	adapter opensearch.Adapter
+	query   application.SearchQuery
+	wait    sync.WaitGroup
 }
