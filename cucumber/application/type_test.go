@@ -9,6 +9,8 @@ import (
 )
 
 type world struct {
+	interestResolves      int
+	interestReads         int
 	preview               sale.CartEvaluation
 	previewRules          sale.DiscountRules
 	interestData          map[value.UserID][]sale.CategoryInterest

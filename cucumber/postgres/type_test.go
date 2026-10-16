@@ -9,6 +9,7 @@ import (
 )
 
 type world struct {
+	previousGuest      application.GuestView
 	permissionDatabase string
 	permissionRole     string
 	originalOrder      sale.Order

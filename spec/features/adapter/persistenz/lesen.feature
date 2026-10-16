@@ -178,3 +178,80 @@ Funktionalität: SQL-Lesesichten und Gastidentität
     Dann lautet das öffentliche SQL-Leseergebnis
       | Code |
       | InvalidInput |
+
+  Szenariogrundriss: Der Session-Interessenread prüft echte Fähigkeiten und Payloadfehler
+    Wenn eine neue echte Gastfähigkeit geöffnet wird
+    Und das persistierte Gastprofil gewählt wird
+      | Profile | User |
+      | mobile | own |
+    Und die Gastfähigkeit um Tage gealtert wird
+      | AgeDays |
+      | <alter> |
+    Und folgende SQL-Fixtureänderung nur im eigenen Schema erfolgt
+      | SQL |
+      | <sql> |
+    Und ein persistenter Lesevertrag aufgerufen wird
+      | Operation | Session |
+      | sessionInterests | <session> |
+    Dann lautet das öffentliche SQL-Leseergebnis
+      | Code | PayloadCode | Count | CategoryID | Weight |
+      | <code> | <payload> | <anzahl> | <kategorie> | <gewicht> |
+    Beispiele:
+      | alter | session | sql | code | payload | anzahl | kategorie | gewicht |
+      | 0 | own | SELECT 1 | OK | OK | 1 | mobile | 1 |
+      | 30 | own | SELECT 1 | NotFound | OK | 0 | | |
+      | 0 | unknown | SELECT 1 | NotFound | OK | 0 | | |
+      | 0 | own | UPDATE $schema.users SET payload='"invalid"'::jsonb | OK | DependencyUnavailable | 0 | | |
+      | 0 | own | DROP TABLE $schema.sessions | DependencyUnavailable | OK | 0 | | |
+
+  Szenario: Interessen benötigen kein Leserecht auf Warenkörbe
+    Wenn eine neue echte Gastfähigkeit geöffnet wird
+    Und das persistierte Gastprofil gewählt wird
+      | Profile | User |
+      | mobile | own |
+    Und die Interessenfähigkeit ohne Cartleserecht gelesen wird
+      | Code | PayloadCode | Count | CategoryID | Weight | ResolveCode |
+      | OK | OK | 1 | mobile | 1 | DependencyUnavailable |
+
+  Szenario: Derselbe Gast liest nach einem Profilwechsel frische Interessen
+    Wenn eine neue echte Gastfähigkeit geöffnet wird
+    Und das persistierte Gastprofil gewählt wird
+      | Profile | User |
+      | mobile | own |
+    Und ein persistenter Lesevertrag aufgerufen wird
+      | Operation | Session |
+      | sessionInterests | own |
+    Dann lautet das öffentliche SQL-Leseergebnis
+      | Code | PayloadCode | Count | CategoryID |
+      | OK | OK | 1 | mobile |
+    Wenn das persistierte Gastprofil gewählt wird
+      | Profile | User |
+      | home | own |
+    Und ein persistenter Lesevertrag aufgerufen wird
+      | Operation | Session |
+      | sessionInterests | own |
+    Dann lautet das öffentliche SQL-Leseergebnis
+      | Code | PayloadCode | Count | CategoryID |
+      | OK | OK | 1 | home |
+
+  Szenario: Ein weiterer Gast übernimmt nicht die gespeicherten Interessen
+    Wenn eine neue echte Gastfähigkeit geöffnet wird
+    Und das persistierte Gastprofil gewählt wird
+      | Profile | User |
+      | mobile | own |
+    Und eine zweite getrennte Gastfähigkeit geöffnet wird
+    Und das persistierte Gastprofil gewählt wird
+      | Profile | User |
+      | home | own |
+    Und ein persistenter Lesevertrag aufgerufen wird
+      | Operation | Session |
+      | sessionInterests | previous |
+    Dann lautet das öffentliche SQL-Leseergebnis
+      | Code | PayloadCode | Count | CategoryID |
+      | OK | OK | 1 | mobile |
+    Wenn ein persistenter Lesevertrag aufgerufen wird
+      | Operation | Session |
+      | sessionInterests | own |
+    Dann lautet das öffentliche SQL-Leseergebnis
+      | Code | PayloadCode | Count | CategoryID |
+      | OK | OK | 1 | home |

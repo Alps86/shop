@@ -78,13 +78,20 @@ func (deployment *deployment) startNative(data map[string]string) error {
 	return deployment.prepareNative(data)
 }
 
-func ephemeralAddress() (string, error) {
+func (deployment *deployment) reserveAddress() (string, error) {
 	listener, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		return "", err
 	}
 
-	return listener.Addr().String(), listener.Close()
+	if deployment.reserved == nil {
+		deployment.reserved = make(map[string]net.Listener)
+	}
+
+	address := listener.Addr().String()
+	deployment.reserved[address] = listener
+
+	return address, nil
 }
 
 func binary(variable, name string) string {

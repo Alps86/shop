@@ -28,7 +28,7 @@ func (deployment *deployment) close() error {
 }
 
 func (deployment *deployment) closeNative() error {
-	err := deployment.stopApp()
+	err := errors.Join(deployment.releaseAddresses(), deployment.stopApp())
 	err = errors.Join(err, stopEngine(deployment.varnish), stopEngine(deployment.nginx))
 	if deployment.app != nil {
 		err = errors.Join(err, deployment.app.Close(context.Background()), deployment.removeResources())

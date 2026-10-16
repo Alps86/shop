@@ -2,6 +2,7 @@ package demo_test
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/Alps86/shop/internal/runtime"
 	"net/http"
@@ -14,18 +15,18 @@ import (
 )
 
 func (deployment *deployment) prepareNative(data map[string]string) error {
-	public, err := ephemeralAddress()
+	public, err := deployment.reserveAddress()
 	if err != nil {
 		return err
 	}
 
 	deployment.public = "http://" + public
-	deployment.config.Listen, err = ephemeralAddress()
+	deployment.config.Listen, err = deployment.reserveAddress()
 	if err != nil {
 		return err
 	}
 
-	deployment.config.Frontend.BackendListen, err = ephemeralAddress()
+	deployment.config.Frontend.BackendListen, err = deployment.reserveAddress()
 	if err != nil {
 		return err
 	}
@@ -126,6 +127,10 @@ func (deployment *deployment) buildHugo() error {
 }
 
 func (deployment *deployment) startApp() error {
+	if err := errors.Join(deployment.releaseAddress(deployment.config.Listen), deployment.releaseAddress(deployment.config.Frontend.BackendListen)); err != nil {
+		return err
+	}
+
 	ctx, cancel := context.WithCancel(context.Background())
 	deployment.cancel = cancel
 	deployment.finished = make(chan error, 1)

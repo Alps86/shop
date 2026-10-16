@@ -33,8 +33,15 @@ type GuestStore interface {
 	Profile(context.Context, value.UserID, ProfileCode) (GuestView, error)
 }
 
+// SessionInterests trennt Payloadfehler, damit der Sessionablauf Vorrang behält.
+type SessionInterests struct {
+	IssuedAt     time.Time
+	Interests    []sale.CategoryInterest
+	PayloadError error
+}
+
 type InterestStore interface {
-	ForUser(context.Context, value.UserID) ([]sale.CategoryInterest, error)
+	ForSession(context.Context, Session) (SessionInterests, error)
 }
 
 type CartStore interface {

@@ -9,6 +9,7 @@ import (
 	"github.com/Alps86/shop/internal/domain/value"
 	"github.com/Alps86/shop/internal/runtime"
 	"go.temporal.io/sdk/client"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -50,6 +51,7 @@ type deployment struct {
 	directory   string
 	public      string
 	backend     string
+	reserved    map[string]net.Listener
 	external    bool
 	cancel      context.CancelFunc
 	finished    chan error

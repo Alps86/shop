@@ -16,6 +16,7 @@ Die [konkrete Kern-API](core-api.md) präzisiert die implementierten Signaturen,
 | CartService.Confirm | Session, CartID, EvaluationID, ExpectedRevision → bestätigter Checkoutzustand; exakte aktuelle Bewertung erforderlich |
 | CheckoutService.Place | Session, CartID, CommandID, EvaluationID → Accepted mit Prozessreferenz oder vorhandene OrderID; PriceConfirmationRequired/Unavailable/Expired/Conflict |
 | OrderReader.Get | Session, OrderID → unveränderliche Kaufansicht + getrennte Lieferansicht; fremde Kennung NotFound |
+| InterestStore.ForSession | Sessionfähigkeit → technischer SessionInterests-Snapshot aus IssuedAt, gespeicherten Interessen und getrenntem PayloadError; ein Session/User-Statementsnapshot ohne Cartread, Application-Ablaufprüfung vor Payloadfehler |
 | SearchPort.Search | Text, CategoryID optional, FilterSet, Sort, Page, Context, interne Interests → SearchResult aus ProductCards, Facets, Suggestions; SearchUnavailable |
 | RecommendationPort.Recommend | ProductID, gewählte SKU, Context, interne Interests, Limit → sortierte kompatible verfügbare Angebote; leere Liste + degraded bei technischem Ausfall |
 | InventoryService.Change | SKU, ExpectedRevision, neuer Preis optional/neuer Bestand optional, CommandID → neue Revision und Outbox; InvalidMoney/BelowReserved/Conflict |
