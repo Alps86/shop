@@ -25,9 +25,9 @@ Jede Zeile benennt einen öffentlichen Blackbox-Vertrag, seine maßgebliche Arch
 | [Kontrollierte Workflowzeit und begrenzte Retries](adapter/prozess/temporal.feature) | [06-laufzeit/temporal.md](../architecture/06-laufzeit/temporal.md) | ergänzende SDK-Zeit-/Fehlerprüfung, kein Serverersatz |
 | [Begrenzte Liefer- und Teilliefersimulation](application/lieferung/fortschritt.feature) | [06-laufzeit/temporal.md](../architecture/06-laufzeit/temporal.md) | `application` |
 | [Dauerhafte Cartcommand-Wiederholung](application/gast/idempotenz.feature) | [06-laufzeit/checkout.md](../architecture/06-laufzeit/checkout.md) | `application`, aktiver Retryvertrag |
-| [Abgesicherte interne Interessen](application/gast/interessen.feature) | [08-querschnitt/guest.md](../architecture/08-querschnitt/guest.md) | `application`, kein öffentliches Gewicht-DTO |
+| [Abgesicherte interne Interessen mit Session-Lesesnapshot](application/gast/interessen.feature) | [08-querschnitt/guest.md](../architecture/08-querschnitt/guest.md) | `application`, einmaliger Sessionread, Ablauf vor Payloadfehler; kein öffentliches Gewicht-DTO |
 | [Echte Kaufkonkurrenz und aktuelle Transaktionen](adapter/persistenz/transaktion.feature) | [06-laufzeit/checkout.md](../architecture/06-laufzeit/checkout.md) | `runtime`, echte PG-Transaktionen |
-| [Dauerhafte Gast- und Katalogsichten](adapter/persistenz/lesen.feature) | [05-bausteine/ports.md](../architecture/05-bausteine/ports.md) | `runtime`, echte PG-Leseports |
+| [Dauerhafte Gast- und Katalogsichten](adapter/persistenz/lesen.feature) | [05-bausteine/ports.md](../architecture/05-bausteine/ports.md) | `runtime`, echte PG-Leseports einschließlich Sessioninteressen ohne Cartleserecht und frischem Profilstand |
 | [Reale PostgreSQL-Transaktionen](adapter/persistenz/postgresql.feature) | [06-laufzeit/checkout.md](../architecture/06-laufzeit/checkout.md) | `runtime`, aktiver nativer PG-Pfad |
 | [Echter pgoutput-Snapshot und WAL-Nachlauf](adapter/persistenz/pgoutput.feature) | [06-laufzeit/projection.md](../architecture/06-laufzeit/projection.md) | `runtime`, aktives pgoutput |
 | [Dauerhafte Temporalidentität und Workerrestart](adapter/prozess/identitaet.feature) | [06-laufzeit/temporal.md](../architecture/06-laufzeit/temporal.md) | `runtime`, echter Server |
@@ -111,9 +111,11 @@ Alle hier konkretisierten Fach-/Seitenverträge sind Demo-Kern. Produktionsbacku
 - [Verbindungspool](adapter/suche/verbindungspool.feature): Zwei parallele Suchbatches vergleichen vollständige Antworten und echte Verbindungswiederverwendung unter Standard-, explizitem und fremdem Clienttransport.
 
 - [Multisuche](adapter/suche/multisuche.feature) hält Hauptkarten und Facetten zusammen, trennt cachefähige Completion und verwirft fehlerhafte Teilantworten vollständig.
-- [Gespeicherte Karten](adapter/suche/gespeicherte-karte.feature): Sourcefreier Storedfields-Transport erhält vollständige öffentliche Karten und verwirft fehlende, defekte oder inkonsistente Identitäten und Payloads.
+- [Gespeicherte Karten](adapter/suche/gespeicherte-karte.feature): Source- und Storedfields-freier DocValues-Transport erhält vollständige Karten aller Base64restklassen und verwirft nichtkanonische, defekte oder inkonsistente Identitäten und Payloads.
 - [Explizite Korrektur](adapter/suche/korrektur.feature): Normale Haupttreffer bleiben von öffentlichen, bewusst auszuwählenden vollständigen Wortkorrekturen getrennt.
 
 | [Messdiagnose](adapter/betrieb/messdiagnose.feature) | Technische Zuordnung ursprünglicher Messantworten, öffentliche Header-Allowlist und begrenzte Poolbeobachtung erreichter Lastphasen. |
 
 | [Fragmentbudget](adapter/http/fragmentbudget.feature) | Begrenzte verzögerte Fragmentdaten und echte Varnish-Includes bei unverändertem Leistungsziel. |
+
+- [Vollständige Kartenanzeige](adapter/http/kartendarstellung.feature): Derselbe öffentliche Renderer erhält Karten- und Attributreihenfolge, sichere Formatierung und Grundpreisfehler ohne Teilausgabe für SSR und HX.

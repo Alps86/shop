@@ -17,6 +17,10 @@ import (
 
 func (current *world) cardCodecSteps(ctx *godog.ScenarioContext) {
 	ctx.Step(`^eine vollständige technische Suchkarte vorbereitet ist$`, current.prepareCardCodec)
+	ctx.Step(`^der vollständige Kartenpayload im expliziten Base64format vorliegt$`, current.cardWire)
+	ctx.Step(`^die gespeicherte Karte über den öffentlichen Suchdecoder abgefragt wird$`, current.searchWireCard)
+	ctx.Step(`^die Suchmappingfelder die vereinbarten nativen DocValues bereitstellen$`, current.mappingObserved)
+	ctx.Step(`^der gewählte Varianttreffer ausschließlich native DocValues anfordert$`, current.nestedDocValues)
 	ctx.Step(`^das Projektionsdokument seinen gespeicherten Kartenpayload erzeugt$`, current.encodeCardDocument)
 	ctx.Step(`^der Kartenpayload ausschließlich echte Nullwerte auslässt$`, current.cardFieldsObserved)
 	ctx.Step(`^der bestehende Suchdecoder die vollständige Karte unverändert rekonstruiert$`, current.cardRoundtripObserved)
@@ -91,6 +95,10 @@ func (current *world) cardRoundtripObserved(table *godog.Table) error {
 
 func (probe cardCodecProbe) response() []byte {
 	payload, _ := json.Marshal(probe.document.Variants[0].CardPayload)
+	if probe.wirePayload.Present {
+		payload, _ = json.Marshal(probe.wirePayload.Value)
+	}
+
 	id, _ := json.Marshal(probe.original.ProductID)
 	sku, _ := json.Marshal(probe.original.SKU)
 	response := `{"hits":{"hits":[{"fields":{"product_id":[ID]},"inner_hits":{"chosen":{"hits":{"hits":[{"fields":{"variants.sku":[SKU],"variants.card_payload":[PAYLOAD]}}]}}}}]}}`

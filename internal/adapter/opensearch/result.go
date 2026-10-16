@@ -38,7 +38,7 @@ func (hit Hit) card() (application.ProductCard, error) {
 	return chosen[0].Fields.card(id)
 }
 
-func (fields StoredProductFields) productID() (value.ProductID, error) {
+func (fields ProductFields) productID() (value.ProductID, error) {
 	if len(fields.ProductID) != 1 {
 		return "", value.NewError("SearchUnavailable", "ProductID")
 	}
@@ -51,7 +51,7 @@ func (fields StoredProductFields) productID() (value.ProductID, error) {
 	return id, nil
 }
 
-func (fields StoredVariantFields) validate() error {
+func (fields VariantFields) validate() error {
 	if len(fields.SKU) != 1 {
 		return value.NewError("SearchUnavailable", "SKU")
 	}
@@ -67,7 +67,7 @@ func (fields StoredVariantFields) validate() error {
 	return nil
 }
 
-func (fields StoredVariantFields) card(id value.ProductID) (application.ProductCard, error) {
+func (fields VariantFields) card(id value.ProductID) (application.ProductCard, error) {
 	if err := fields.validate(); err != nil {
 		return application.ProductCard{}, err
 	}

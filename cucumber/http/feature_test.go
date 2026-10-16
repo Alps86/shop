@@ -28,6 +28,8 @@ func (current *world) register(ctx *godog.ScenarioContext) {
 	ctx.Step(`^die HTTPkonfiguration verwendet$`, current.configure)
 	ctx.Step(`^der HTTPadapter wird initialisiert$`, current.construct)
 	ctx.Step(`^die Adapterinitialisierung meldet$`, current.initializationResult)
+	ctx.Step(`^explizite Kartenanzeigedaten ersetzen die Suchkarten$`, current.prepareCards)
+	ctx.Step(`^die Kartenansicht folgt den geordneten HTMLwerten$`, current.expectCardOrder)
 	current.registerComposition(ctx)
 	current.registerBudget(ctx)
 	ctx.Step(`^der Shop liefert eine HTTPansicht$`, current.request)

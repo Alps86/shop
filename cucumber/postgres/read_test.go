@@ -9,6 +9,8 @@ import (
 )
 
 func (current *world) readSteps(ctx *godog.ScenarioContext) {
+	ctx.Step(`^eine zweite getrennte Gastfähigkeit geöffnet wird$`, current.secondGuest)
+	ctx.Step(`^die Interessenfähigkeit ohne Cartleserecht gelesen wird$`, current.interestsWithoutCart)
 	ctx.Step(`^eine neue echte Gastfähigkeit geöffnet wird$`, current.openGuest)
 	ctx.Step(`^kuratierte Produkt- und Variantenattribute vorbereitet werden$`, current.curated)
 	ctx.Step(`^Modellbilder und eine Unterkategorie vorbereitet werden$`, current.productPresentation)
@@ -27,7 +29,7 @@ func (current *world) openGuest() error {
 func (current *world) readContract(input *godog.Table) error {
 	row := table(input)
 	current.observed = map[string]string{}
-	operations := map[string]func(map[string]string) error{"diagnostics": current.readDiagnostics, "resolve": current.resolveGuest, "interests": current.readInterests, "product": current.readProduct, "variant": current.readVariant, "category": current.readCategory, "adminOrders": current.readOrders, "recommendations": current.readRecommendations, "order": current.readOrder, "adminOrder": current.readAdminOrder, "cartOrder": current.readCartOrder}
+	operations := map[string]func(map[string]string) error{"diagnostics": current.readDiagnostics, "resolve": current.resolveGuest, "interests": current.readInterests, "sessionInterests": current.sessionInterests, "product": current.readProduct, "variant": current.readVariant, "category": current.readCategory, "adminOrders": current.readOrders, "recommendations": current.readRecommendations, "order": current.readOrder, "adminOrder": current.readAdminOrder, "cartOrder": current.readCartOrder}
 
 	return operations[row["Operation"]](row)
 }

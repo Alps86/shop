@@ -26,6 +26,8 @@ type world struct {
 	config          cdc.Config
 	events          []application.ProjectionEvent
 	cancel          context.CancelFunc
+	streamRead      bool
+	streamErr       error
 	stopped         chan error
 	done            chan struct{}
 	err             error

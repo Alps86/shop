@@ -63,6 +63,10 @@ func (deployment *deployment) cacheHits() (int64, error) {
 }
 
 func (deployment *deployment) cacheCounter(name string) (int64, error) {
+	if deployment.systemd {
+		return systemdCacheCounter(name)
+	}
+
 	varnishstat := filepath.Join(filepath.Dir(binary("SHOP_VARNISH", "/usr/sbin/varnishd")), "../bin/varnishstat")
 	// #nosec G204 -- Eigenes Standardwerkzeug, selbst erzeugte Instanz ohne Shell.
 	command := exec.Command(varnishstat, "-n", deployment.directory+"/varnish", "-1", "-f", name)

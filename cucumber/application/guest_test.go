@@ -104,6 +104,7 @@ func (current *world) resumed(table *godog.Table) error {
 }
 
 func (current *world) Resolve(_ context.Context, session application.Session) (application.SessionIdentity, error) {
+	current.interestResolves++
 	if current.fault == "guestResolve" {
 		return application.SessionIdentity{}, value.NewError("DependencyUnavailable", "Guest")
 	}

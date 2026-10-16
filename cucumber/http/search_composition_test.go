@@ -15,10 +15,9 @@ func (current *world) resetSearchCalls(table *godog.Table) error {
 }
 
 func (current *world) searchCalls(table *godog.Table) error {
-	current.mutex.Lock()
-	defer current.mutex.Unlock()
+	observed := current.snapshotSearch()
 	count := 0
-	for _, call := range current.calls {
+	for _, call := range observed.calls {
 		if call == "Search" {
 			count++
 		}

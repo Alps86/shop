@@ -124,6 +124,8 @@ Die warme anonyme Suchmessung belegt tatsächliche gemeinsame Hits, Misses und C
 
 HTTPzeiten sind kein Browser-LCP-Beleg. Abweichungen vom p95-Ziel unter100ms und ungemessener Browseraufbau bleiben ausdrücklich sichtbar. Der kurze Browser-Smoke ersetzt keine Lastmessung und keine Browsermatrix. Mutierende Kauf-/Zahlungs-/Liefercommands zählen nicht zur Anzeigelatenz.
 
+Auftrag und Nachweise zum HTTP-p95-Ziel stehen im [Performanceissue #16](https://github.com/Alps86/shop/issues/16).
+
 **Aussagegrenze:** Native Packageermittlung und Standard-Coverageprüfung erfassen den aktuellen buildfähigen Go-Umfang. Sie sind kein unabhängiger AST-Blockvergleich aller Repositoryquellen oder aller Plattform-/Build-Tag-Kombinationen und kein automatischer Beweis vollständiger Slicezuordnung. Solche zusätzliche Härtung ist offen. Review prüft deshalb insbesondere neue Quellen, Build-Tags, zusätzliche Module und unzulässige `spec-only`-Markierungen. Es gibt keine frei konfigurierbare Bootstrap-Abschaltung.
 
 Die acht direkten Go-Antwortzeiten und vier echten Fragmentzeiten werden zusätzlich getrennt erfasst. Neutrale Kategorie- und Produktantworten am Go-Origin delegieren mit leerem Body und `X-Accel-Redirect`; deren Antwortzeit ist keine HTML-Seitenzeit. Diese Diagnosewerte ersetzen keine der 16 vollständigen HTML-Messungen. Die CI protokolliert außerdem den frischen Start beider Compose-Projekte bis zu gesunden Diensten in eigenen JSON-Berichten, einschließlich Imageabruf, Build, Inhaltsgenerierung und Seedimport. Der zweite Stack nutzt dabei den Buildcache des ersten. Bereits laufende native Infrastruktur belegt keinen vollständigen kalten Dienststart. Browser-LCP und eine durchgängig erreichte Vollseitenzeit unter100ms bleiben damit gesondert zu bewerten.

@@ -15,13 +15,17 @@ import (
 )
 
 func (deployment *deployment) launchEngines(data map[string]string) error {
-	nginx, err := ephemeralAddress()
+	nginx, err := deployment.reserveAddress()
 	if err != nil {
 		return err
 	}
 
 	_, port, err := net.SplitHostPort(nginx)
 	if err != nil {
+		return err
+	}
+
+	if err := deployment.releaseAddress(nginx); err != nil {
 		return err
 	}
 
@@ -59,6 +63,10 @@ func (deployment *deployment) launchVarnish(port string, data map[string]string)
 
 	address, err := url.Parse(deployment.public)
 	if err != nil {
+		return err
+	}
+
+	if err := deployment.releaseAddress(address.Host); err != nil {
 		return err
 	}
 

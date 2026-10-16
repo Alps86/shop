@@ -15,6 +15,7 @@ import (
 )
 
 type world struct {
+	searchDelay        atomic.Value
 	responseElapsed    time.Duration
 	fragmentFault      atomic.Bool
 	engineClients      map[string]*http.Client
@@ -138,4 +139,9 @@ type cacheRequest struct {
 	Method       string
 	SKU          string
 	Key          string
+}
+
+type searchObservation struct {
+	query application.SearchQuery
+	calls []string
 }

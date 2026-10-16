@@ -44,6 +44,7 @@ func (current *world) launch(action func(context.Context) error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	stopped, done := make(chan error, 1), make(chan struct{})
 	current.cancel, current.stopped, current.done = cancel, stopped, done
+	current.streamRead, current.streamErr = false, nil
 	go func() {
 		defer close(done)
 		stopped <- action(ctx)
@@ -56,10 +57,10 @@ func (current *world) failTarget() {
 
 func (current *world) failedStream() error {
 	select {
-	case err := <-current.stopped:
-		current.err = err
+	case <-current.done:
+		current.err = current.streamResult()
 	case <-time.After(10 * time.Second):
-		return errors.Join(current.streamDeadline(), current.closeStream())
+		return current.checkpointDeadline()
 	}
 
 	current.cancel()
@@ -86,17 +87,15 @@ func (current *world) stopStream() error {
 	select {
 	case <-current.projected:
 	case <-time.After(10 * time.Second):
-		current.cancel()
-		return context.DeadlineExceeded
+		return current.checkpointDeadline()
 	}
 
 	if err := current.waitAcknowledged(); err != nil {
-		current.cancel()
-		return err
+		return errors.Join(err, current.closeStream(), current.streamFailure())
 	}
 
 	current.cancel()
-	current.err = <-current.stopped
+	current.err = current.streamResult()
 	if errors.Is(current.err, context.Canceled) {
 		current.err = nil
 	}
@@ -112,29 +111,6 @@ func (current *world) setAvailable(available bool) {
 
 func (current *world) waitAcknowledged() error {
 	return current.waitPosition(0)
-}
-
-func (current *world) waitPosition(previous uint64) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	ticker := time.NewTicker(10 * time.Millisecond)
-	defer ticker.Stop()
-	for {
-		lsn, err := current.store.Checkpoint(ctx, current.config.Slot)
-		if err != nil {
-			return err
-		}
-
-		if lsn > previous {
-			return nil
-		}
-
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case <-ticker.C:
-		}
-	}
 }
 
 func (current *world) startRunner() error {
@@ -168,16 +144,17 @@ func (current *world) closeStream() error {
 	if current.done != nil {
 		select {
 		case <-current.done:
+			current.readStreamResult()
 		case <-time.After(10 * time.Second):
 			return context.DeadlineExceeded
 		}
 	}
 
 	if err := current.consumer.Close(context.Background()); err != nil {
-		return err
+		return errors.Join(err, current.unreportedStreamFailure())
 	}
 
-	return current.waitInactive()
+	return errors.Join(current.waitInactive(), current.unreportedStreamFailure())
 }
 
 func (current *world) waitInactive() error {
@@ -216,7 +193,7 @@ func (current *world) cancelBackoff() error {
 
 	time.Sleep(50 * time.Millisecond)
 	current.cancel()
-	current.err = <-current.stopped
+	current.err = current.streamResult()
 	if !errors.Is(current.err, context.Canceled) {
 		return current.err
 	}
